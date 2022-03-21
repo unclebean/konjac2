@@ -1,0 +1,28 @@
+{
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false, 
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintArgs": [],
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "120"
+    ],
+    "python.linting.flake8Args": ["--max-line-length", "120"],
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "*test*.py",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.cwd": "${workspaceFolder}",
+    "python.testing.unittestEnabled": false,
+    "esbonio.sphinx.confDir": "",
+}
