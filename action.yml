@@ -1,2 +1,0 @@
-- name: Python Poetry Action
-  uses: abatilo/actions-poetry@v2.1.3
