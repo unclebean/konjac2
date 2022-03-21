@@ -24,6 +24,6 @@ jobs:
       - name: Install dependency
         run: poetry install
       - name: Running shell 
-        run: petry shell
+        run: poetry shell
       - name: Running test
         run: pytest
