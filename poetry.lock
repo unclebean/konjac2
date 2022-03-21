@@ -1280,17 +1280,6 @@ anyio = ">=3.0.0,<4"
 full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
-name = "ta-lib"
-version = "0.4.24"
-description = "Python wrapper for TA-Lib"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-numpy = "*"
-
-[[package]]
 name = "tenacity"
 version = "8.0.1"
 description = "Retry code until it succeeds"
@@ -1469,7 +1458,7 @@ requests = ">=2.26"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "887f173e879299cc3d8adcf7885574d98310a610a0f3ba91af29c7a6509f48ca"
+content-hash = "de2d5268b1539be303db45fcc7e9844df0e5ca45509494108632b86c79fba2e7"
 
 [metadata.files]
 aiodns = [
@@ -2525,9 +2514,6 @@ stack-data = [
 starlette = [
     {file = "starlette-0.17.1-py3-none-any.whl", hash = "sha256:26a18cbda5e6b651c964c12c88b36d9898481cd428ed6e063f5f29c418f73050"},
     {file = "starlette-0.17.1.tar.gz", hash = "sha256:57eab3cc975a28af62f6faec94d355a410634940f10b30d68d31cb5ec1b44ae8"},
-]
-ta-lib = [
-    {file = "TA-Lib-0.4.24.tar.gz", hash = "sha256:9df262312daa0f1a63f281c6a943fe98c8007a2147776c1b43712e04ccede209"},
 ]
 tenacity = [
     {file = "tenacity-8.0.1-py3-none-any.whl", hash = "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"},
