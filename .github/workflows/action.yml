@@ -21,3 +21,9 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: View poetry --help
         run: poetry --help
+      - name: Install dependency
+        run: poetry install
+      - name: Running shell 
+        run: petry shell
+      - name: Running test
+        run: pytest
