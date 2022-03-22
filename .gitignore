@@ -2,7 +2,7 @@
 .pytest_cache/
 .DS_Store
 .ipynb_checkpoints
-venv/
+dist/
 .idea
 __pycache__
 *.svg
