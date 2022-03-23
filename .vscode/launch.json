@@ -11,9 +11,9 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "python": "${command:python.interpreterPath}",
-            "cwd": "${workspaceFolder}/konjac2",
+            "cwd": "${workspaceFolder}",
             "env": {
-                "PYTHONPATH":"${PYTHONPATH}:${workspaceFolder}/konjac2"
+                "PYTHONPATH":"${PYTHONPATH}:${workspaceFolder}"
             }
         }
     ]

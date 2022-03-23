@@ -3,6 +3,7 @@ import logging
 import uvicorn
 from logging.handlers import RotatingFileHandler
 from fastapi import FastAPI
+from konjac2.bot.telegram_bot import startup_bot
 
 
 app = FastAPI()
@@ -17,6 +18,7 @@ async def startup_event():
     fhandler.setFormatter(formatter)
     logger.addHandler(fhandler)
     logger.setLevel(logging.INFO)
+    startup_bot()
 
 
 @app.get("/")
