@@ -8,7 +8,7 @@ from .crypto.fetcher import crypto_fetcher
 @validate_arguments
 def fetch_data(symbol: str, timeframe: str, complete: bool, **kwargs):
     fetcher = _get_delegator_by_symbol(symbol=symbol)
-    return fetcher(symbol, timeframe, complete, kwargs)
+    return fetcher(symbol, timeframe, complete, **kwargs)
 
 
 @validate_arguments

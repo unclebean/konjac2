@@ -1,4 +1,3 @@
-import requests
 import pandas as pd
 from datetime import datetime
 from .context import get_context, get_binance_context
@@ -18,10 +17,9 @@ TIMEFRAME_CCXT_MAPPER = {
 }
 
 
-def crypto_fetcher(symbol, timeframe, complete=True, *args):
-    more_args = args[0]
-    since = more_args.get('since', None)
-    limit = more_args.get('limit', None)
+def crypto_fetcher(symbol, timeframe, complete=True, **kwargs):
+    since = kwargs.get('since', None)
+    limit = kwargs.get('limit', None)
     exchange = get_binance_context()
     return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
 

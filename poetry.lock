@@ -1635,7 +1635,7 @@ requests = ">=2.26"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "bfd14d5b9dd09a0bf0a43a1a402e109b7e83b48c31e1052f4f65262d6c43b92b"
+content-hash = "c2241c862ef6ed30ecce2006611a559c3de0341afc79010ed365912f4fa44865"
 
 [metadata.files]
 aiodns = [
