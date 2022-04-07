@@ -57,4 +57,3 @@ async def bbcci_scanner():
         strategy.seek_trend(m5_data)
         strategy.entry_signal(m5_data)
         strategy.exit_signal(m5_data)
-        print(strategy.get_trade())
