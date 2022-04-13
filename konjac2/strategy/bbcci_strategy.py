@@ -5,6 +5,7 @@ from ..indicator.bb_cci_momentum import bb_cci_mom
 from ..models import apply_session
 from ..models.trade import Trade, TradeStatus, get_last_time_trade
 from ..models.signal import Signal
+from ..bot.telegram_bot import say_something
 
 
 class BBCCIStrategy:
@@ -57,8 +58,10 @@ class BBCCIStrategy:
         ):
             if last_trade.trend == TradeType.long.name and is_crossing_down(cci34[-1], -240):
                 self._update_open_trade(TradeType.long.name, candles.close[-1], cci34[-1])
+                say_something(f'{self.symbol} open {TradeType.long.name}')
             if last_trade.trend == TradeType.short.name and is_crossing_up(cci34[-1], 240):
                 self._update_open_trade(TradeType.short.name, candles.close[-1], cci34[-1])
+                say_something(f'{self.symbol} open {TradeType.short.name}')
 
     def exit_signal(self, candles):
         last_trade = get_last_time_trade(self.symbol)
@@ -70,6 +73,7 @@ class BBCCIStrategy:
             and cci34[-1] >= 160
         ):
             self._update_close_trade(TradeType.short.name, candles.close[-1], cci34[-1])
+            say_something(f'{self.symbol} close {TradeType.long.name}')
         if (
             last_trade is not None
             and last_trade.status == TradeStatus.opend.name
@@ -77,6 +81,7 @@ class BBCCIStrategy:
             and cci34[-1] <= -160
         ):
             self._update_close_trade(TradeType.long.name, candles.close[-1], cci34[-1])
+            say_something(f'{self.symbol} close {TradeType.short.name}')
 
     def get_trade(self):
         return get_last_time_trade(self.symbol)

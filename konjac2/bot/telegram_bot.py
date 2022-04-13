@@ -1,3 +1,4 @@
+import requests
 from telegram import Update
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
@@ -15,3 +16,14 @@ def startup_bot():
 
 def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+
+
+def say_something(something):
+    requests.get(
+        "https://api.telegram.org/bot1244865740:AAF0Noszz4SefXcZWUU0E-79yC31qkwxIb4/sendMessage",
+        params={
+            "parse_mode": "HTML",
+            "chat_id": "1068224058",
+            "text": something,
+        },
+    )
