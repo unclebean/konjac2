@@ -65,7 +65,7 @@ async def bbcci_scanner():
 
     for symbol in Cryptos:
         strategy = BBCCIStrategy(symbol=symbol)
-        m5_data = fetch_data(symbol, "M5", True)
+        m5_data = fetch_data(symbol, "M5", True, limit=1500)
         strategy.seek_trend(m5_data)
         strategy.entry_signal(m5_data)
         strategy.exit_signal(m5_data)
