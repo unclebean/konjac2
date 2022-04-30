@@ -7,7 +7,7 @@ from konjac2.models import apply_session
 from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
-from . import Instruments
+from . import Cryptos, Instruments
 
 
 def forex_scanner():
@@ -41,7 +41,12 @@ def forex_scanner():
 
         if trend_action is not None:
             trend = TradingTrend(
-                symbol=symbol, trend=trend_action, trend_anme="heikin_ashi", timeframe="D/H6", update_date=now.date(), update_time=now.time()
+                symbol=symbol,
+                trend=trend_action,
+                trend_anme="heikin_ashi",
+                timeframe="D/H6",
+                update_date=now.date(),
+                update_time=now.time(),
             )
             session.add(trend)
 
@@ -52,6 +57,13 @@ def forex_scanner():
 
 async def bbcci_scanner():
     for symbol in Instruments:
+        strategy = BBCCIStrategy(symbol=symbol)
+        m5_data = fetch_data(symbol, "M5", True)
+        strategy.seek_trend(m5_data)
+        strategy.entry_signal(m5_data)
+        strategy.exit_signal(m5_data)
+
+    for symbol in Cryptos:
         strategy = BBCCIStrategy(symbol=symbol)
         m5_data = fetch_data(symbol, "M5", True)
         strategy.seek_trend(m5_data)
