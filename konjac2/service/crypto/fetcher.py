@@ -58,6 +58,7 @@ def _fetcher(exchange, symbol, timerframe, complete=True, since=None, limit=1500
     data = exchange.fetch_ohlcv(symbol=symbol, timeframe=tf, since=since, limit=limit)
     dataframe = pd.DataFrame(data, columns=["datetime", "open", "high", "low", "close", "volume"])
     dataframe.set_index("datetime", inplace=True)
+    dataframe.index.names = ["date"]
     dataframe.volume = dataframe.volume.map(lambda v: round(v, 4))
     dataframe.index = dataframe.index.map(lambda t: datetime.utcfromtimestamp(t / 1000))
     if complete:
