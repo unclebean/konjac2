@@ -36,7 +36,7 @@ class ABCStrategy(ABC):
         ready_to_new_trade = (
             last_trade is not None
             and last_trade.status != TradeStatus.closed.name
-            and last_trade.status != TradeStatus.opend.name
+            and last_trade.status != TradeStatus.opened.name
         )
         is_long = ready_to_new_trade and last_trade.trend == TradeType.long.name
         is_short = ready_to_new_trade and last_trade.trend == TradeType.short.name
@@ -44,7 +44,7 @@ class ABCStrategy(ABC):
 
     def _can_close_trade(self) -> LastTradeStatus:
         last_trade = get_last_time_trade(self.symbol)
-        ready_to_close = last_trade is not None and last_trade.status == TradeStatus.opend.name
+        ready_to_close = last_trade is not None and last_trade.status == TradeStatus.opened.name
         is_long = ready_to_close and last_trade.trend == TradeType.long.name
         is_short = ready_to_close and last_trade.trend == TradeType.short.name
         return LastTradeStatus(ready_to_close, is_long, is_short)
@@ -83,8 +83,8 @@ class ABCStrategy(ABC):
         session.delete(last_trade)
         last_trade.entry_signal = tradeType
         last_trade.entry_date = datetime.now()
-        last_trade.status = TradeStatus.opend.name
-        last_trade.opend_position = position
+        last_trade.status = TradeStatus.opened.name
+        last_trade.opened_position = position
         session.add(last_trade)
         session.add(
             Signal(
@@ -92,7 +92,7 @@ class ABCStrategy(ABC):
                 indicator=indicator,
                 indicator_value=str(indicator_value),
                 trade_signal=tradeType,
-                trade_status=TradeStatus.opend.name,
+                trade_status=TradeStatus.opened.name,
                 trade_id=last_trade.id,
             )
         )
@@ -104,12 +104,12 @@ class ABCStrategy(ABC):
         last_trade = (
             session.query(Trade).filter(Trade.symbol == self.symbol).order_by(Trade.create_date.desc())
         ).first()
-        if last_trade is None or last_trade.opend_position is None:
+        if last_trade is None or last_trade.opened_position is None:
             return
         result = (
-            position - last_trade.opend_position
+            position - last_trade.opened_position
             if tradeType == TradeType.short.name
-            else last_trade.opend_position - position
+            else last_trade.opened_position - position
         )
         session.delete(last_trade)
         last_trade.exit_signal = tradeType

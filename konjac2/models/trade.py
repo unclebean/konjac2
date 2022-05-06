@@ -11,7 +11,7 @@ def generate_uuid():
 
 class TradeStatus(Enum):
     pending_by_signal = 0
-    opend = 1
+    opened = 1
     in_progress = 2
     closed = 3
 
@@ -24,7 +24,7 @@ class Trade(Base):
     trend = Column(String)
     entry_signal = Column(String, nullable=True)
     entry_date = Column(DateTime, nullable=True)
-    opend_position = Column(Float, nullable=True)
+    opened_position = Column(Float, nullable=True)
     exit_signal = Column(String, nullable=True)
     exit_date = Column(DateTime, nullable=True)
     closed_position = Column(Float, nullable=True)

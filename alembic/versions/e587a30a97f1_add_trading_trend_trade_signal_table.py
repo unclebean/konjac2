@@ -1,8 +1,8 @@
 """add trading_trend & trade & signal table
 
-Revision ID: c83f3b281fc8
+Revision ID: e587a30a97f1
 Revises: 
-Create Date: 2022-04-07 09:46:21.868819
+Create Date: 2022-05-06 23:17:35.611330
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c83f3b281fc8'
+revision = 'e587a30a97f1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('trend', sa.String(), nullable=True),
     sa.Column('entry_signal', sa.String(), nullable=True),
     sa.Column('entry_date', sa.DateTime(), nullable=True),
-    sa.Column('opend_position', sa.Float(), nullable=True),
+    sa.Column('opened_position', sa.Float(), nullable=True),
     sa.Column('exit_signal', sa.String(), nullable=True),
     sa.Column('exit_date', sa.DateTime(), nullable=True),
     sa.Column('closed_position', sa.Float(), nullable=True),
