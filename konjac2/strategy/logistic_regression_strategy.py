@@ -30,7 +30,6 @@ class LogisticRegressionStrategy(ABCStrategy):
             position = last_trade.opened_position
             close_price = candles.close[-1]
             change_pctg = (close_price - position) / position
-            print(change_pctg)
 
             trend, _ = LogisticRegressionModel(candles.copy(deep=True))
             trend = TradeType.long.name if trend[0] > 0.5 else TradeType.short.name
