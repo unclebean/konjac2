@@ -24,6 +24,7 @@ python-telegram-bot = "^13.11"
 alembic = "^1.7.7"
 SQLAlchemy = "^1.4.32"
 APScheduler = "^3.6.3"
+scikit-learn = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

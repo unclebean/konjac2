@@ -18,8 +18,8 @@ TIMEFRAME_CCXT_MAPPER = {
 
 
 def crypto_fetcher(symbol, timeframe, complete=True, **kwargs):
-    since = kwargs.get('since', None)
-    limit = kwargs.get('limit', None)
+    since = kwargs.get("since", None)
+    limit = kwargs.get("limit", None)
     exchange = get_binance_context()
     return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
 
@@ -83,3 +83,19 @@ def have_ftx_free_balance(currency_code):
     response = exchange.fetch_balance()
     balance = response.get(currency_code, {"free": 0.0})["free"]
     return balance != 0.0
+
+
+def buy_spot(symbol, account=""):
+    exchange = get_context(account=account)
+    available_balance = get_ftx_balance(account=account)
+
+    price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
+    amount = available_balance / price
+    exchange.create_market_order(symbol, "buy", amount)
+
+
+def sell_spot(symbol, account=""):
+    exchanage = get_context(account=account)
+    currency_code = symbol.replace("/USD", "")
+    amount = get_ftx_balance_bu_currency_code(currency_code, account=account)
+    exchanage.create_market_sell_order(symbol, amount)

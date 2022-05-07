@@ -1,4 +1,6 @@
 from datetime import datetime as dt
+from konjac2.models.trade import TradeStatus, get_last_time_trade
+from konjac2.service.crypto.fetcher import buy_spot, sell_spot
 from konjac2.service.fetcher import fetch_data
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 from konjac2.indicator.squeeze_momentum import squeeze
@@ -7,6 +9,7 @@ from konjac2.models import apply_session
 from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
+from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Cryptos, Instruments
 
 
@@ -69,3 +72,16 @@ async def bbcci_scanner():
         strategy.seek_trend(m5_data)
         strategy.entry_signal(m5_data)
         strategy.exit_signal(m5_data)
+
+
+async def eth_spot_long_bot():
+    strategy = LogisticRegressionStrategy(symbol="ETH/USDT")
+    data = fetch_data("ETH/USDT", "M30", True, limit=1500)
+    strategy.seek_trend(data)
+    strategy.entry_signal(data)
+    strategy.exit_signal(data)
+    trade = get_last_time_trade("ETH/USDT")
+    if trade is not None and trade.status == TradeStatus.opened.name:
+        buy_spot("ETH/USD", account="spot")
+    if trade is not None and trade.status == TradeStatus.closed.name:
+        sell_spot("ETH/USD", account="spot")

@@ -4,6 +4,8 @@ from sqlalchemy.sql import func
 
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
+from konjac2.strategy.vegas_strategy import VegasStrategy
+from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from .prepare_data import prepare_forex_backtest_data
 from ..indicator.heikin_ashi_momentum import heikin_ashi_mom
 from ..models import apply_session
@@ -45,9 +47,9 @@ def short_term_backtest(symbol: str):
     session.commit()
     session.close()
     m5_data = pd.read_csv(f"{symbol}_0_30.csv", index_col="date", parse_dates=True)
-    strategy = BBCCIStrategy(symbol=symbol)
-    for window in m5_data.rolling(window=144 * 5):
-        if len(window.index) < 144 * 5:
+    strategy = LogisticRegressionStrategy(symbol=symbol)
+    for window in m5_data.rolling(window=144 * 6):
+        if len(window.index) < 144 * 6:
             continue
         strategy.seek_trend(window)
         strategy.entry_signal(window)

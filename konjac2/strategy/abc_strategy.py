@@ -57,7 +57,7 @@ class ABCStrategy(ABC):
             session.commit()
             session.close()
 
-    def _start_new_trade(self, trend: str):
+    def _start_new_trade(self, trend: str, create_date=datetime.now()):
         last_trade = get_last_time_trade(self.symbol)
         if last_trade is None or last_trade is not None and last_trade.status == TradeStatus.closed.name:
             session = apply_session()
@@ -67,13 +67,13 @@ class ABCStrategy(ABC):
                     strategy=self.strategy_name,
                     trend=trend,
                     status=TradeStatus.in_progress.name,
-                    create_date=datetime.now(),
+                    create_date=create_date,
                 )
             )
             session.commit()
             session.close()
 
-    def _update_open_trade(self, tradeType, position, indicator, indicator_value=0):
+    def _update_open_trade(self, tradeType, position, indicator, indicator_value=0, entry_date=datetime.now()):
         session = apply_session()
         last_trade = (
             session.query(Trade).filter(Trade.symbol == self.symbol).order_by(Trade.create_date.desc())
@@ -82,7 +82,7 @@ class ABCStrategy(ABC):
             return
         session.delete(last_trade)
         last_trade.entry_signal = tradeType
-        last_trade.entry_date = datetime.now()
+        last_trade.entry_date = entry_date
         last_trade.status = TradeStatus.opened.name
         last_trade.opened_position = position
         session.add(last_trade)
@@ -99,7 +99,7 @@ class ABCStrategy(ABC):
         session.commit()
         session.close()
 
-    def _update_close_trade(self, tradeType, position, indicator, indicator_value=0):
+    def _update_close_trade(self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now()):
         session = apply_session()
         last_trade = (
             session.query(Trade).filter(Trade.symbol == self.symbol).order_by(Trade.create_date.desc())
@@ -113,7 +113,7 @@ class ABCStrategy(ABC):
         )
         session.delete(last_trade)
         last_trade.exit_signal = tradeType
-        last_trade.exit_date = datetime.now()
+        last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
         last_trade.result = result
