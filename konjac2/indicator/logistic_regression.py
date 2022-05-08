@@ -24,11 +24,11 @@ def LogisticRegressionModel(candles):
     candles["t-k"] = ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"]
     candles["s-s"] = ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"]
     candles["macd"] = macd_to_series(candles.close)
-    candles["bbands"] = bbands_to_series(candles.close, 55)
-    candles["cci"] = cci_to_series(candles.high, candles.low, candles.close, 55)
-    candles["rsi"] = rsi_to_series(candles.close, 55)
+    candles["bbands"] = bbands_to_series(candles.close, 21)
+    candles["cci"] = cci_to_series(candles.high, candles.low, candles.close, 21)
+    candles["rsi"] = rsi_to_series(candles.close, 21)
     candles["vwap"] = vwap_to_series(candles, 0)
-    candles["efi"] = efi_to_series(candles.close, candles.volume, 21)
+    candles["efi"] = efi_to_series(candles.close, candles.volume, 13)
     candles["ema"] = ema_to_serires(candles.close)
 
     candles = candles.dropna()
@@ -249,6 +249,6 @@ def efi_to_series(close, volume, period):
 
 
 def ema_to_serires(close):
-    fast = ema(close, 144).values
-    slow = ema(close, 169).values
+    fast = ema(close, 20).values
+    slow = ema(close, 50).values
     return fast - slow

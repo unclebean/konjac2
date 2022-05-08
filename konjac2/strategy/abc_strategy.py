@@ -74,10 +74,8 @@ class ABCStrategy(ABC):
             session.close()
 
     def _update_open_trade(self, tradeType, position, indicator, indicator_value=0, entry_date=datetime.now()):
+        last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
-        last_trade = (
-            session.query(Trade).filter(Trade.symbol == self.symbol).order_by(Trade.create_date.desc())
-        ).first()
         if last_trade is None:
             return
         session.delete(last_trade)
@@ -100,15 +98,13 @@ class ABCStrategy(ABC):
         session.close()
 
     def _update_close_trade(self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now()):
+        last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
-        last_trade = (
-            session.query(Trade).filter(Trade.symbol == self.symbol).order_by(Trade.create_date.desc())
-        ).first()
         if last_trade is None or last_trade.opened_position is None:
             return
         result = (
             last_trade.opened_position - position
-            if tradeType == TradeType.short.name
+            if last_trade.trend == TradeType.short.name
             else position - last_trade.opened_position
         )
         session.delete(last_trade)

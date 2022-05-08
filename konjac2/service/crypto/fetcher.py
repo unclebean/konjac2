@@ -99,3 +99,46 @@ def sell_spot(symbol, account=""):
     currency_code = symbol.replace("/USD", "")
     amount = get_ftx_balance_bu_currency_code(currency_code, account=account)
     exchanage.create_market_sell_order(symbol, amount)
+
+
+def place_trade(symbol, side, tradeType="", tp=0, sl=0):
+    if side == "buy":
+        open_position(symbol, tradeType, tp, sl)
+    else:
+        close_position(symbol)
+
+
+def open_position(symbol, tradeType, tp, sl):
+    exchange = get_context()
+    balance = get_ftx_balance()
+    price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
+    amount = balance / price * 1
+    side = "buy" if tradeType == "long" else "sell"
+    exchange.cancel_all_orders(symbol)
+    exchange.create_market_order(symbol, side, amount)
+    '''
+    gain_rate = price * 0.013 if tp == 0 else tp
+    loss_rate = price * 0.012 if sl == 0 else sl
+    if side == "buy":
+        gain = price + gain_rate
+        loss = price - loss_rate
+        exchange.create_order(symbol, "takeProfit", "sell", amount, None, params={"triggerPrice": gain})
+        exchange.create_order(symbol, "stop", "sell", amount, None, params={"triggerPrice": loss})
+    else:
+        gain = price - gain_rate
+        loss = price + loss_rate
+        exchange.create_order(symbol, "takeProfit", "buy", amount, None, params={"triggerPrice": gain})
+        exchange.create_order(symbol, "stop", "buy", amount, None, params={"triggerPrice": loss})
+    '''
+
+
+def close_position(symbol):
+    exchange = get_context()
+    positions = exchange.fetch_positions()
+    symbol_position = next(p for p in positions if p["future"] == symbol)
+    side = symbol_position["side"]
+    if side == "buy":
+        exchange.create_market_sell_order(symbol, float(symbol_position["openSize"]))
+    else:
+        exchange.create_market_buy_order(symbol, float(symbol_position["openSize"]))
+    exchange.cancel_all_orders(symbol)
