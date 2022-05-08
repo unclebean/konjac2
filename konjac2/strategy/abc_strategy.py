@@ -107,9 +107,9 @@ class ABCStrategy(ABC):
         if last_trade is None or last_trade.opened_position is None:
             return
         result = (
-            position - last_trade.opened_position
+            last_trade.opened_position - position
             if tradeType == TradeType.short.name
-            else last_trade.opened_position - position
+            else position - last_trade.opened_position
         )
         session.delete(last_trade)
         last_trade.exit_signal = tradeType

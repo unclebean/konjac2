@@ -1,5 +1,5 @@
 from ..indicator.utils import TradeType
-from ..indicator.logistic_regression import LogisticRegressionModel
+from ..indicator.logistic_regression import LogisticRegressionModel, predict_xgb_next_ticker
 from ..models.trade import TradeStatus
 from .abc_strategy import ABCStrategy
 
@@ -14,7 +14,7 @@ class LogisticRegressionStrategy(ABCStrategy):
         last_trade = self.get_trade()
         if last_trade is None or last_trade.status == TradeStatus.closed.name:
             trend, _ = LogisticRegressionModel(candles.copy(deep=True))
-            trend = TradeType.long.name if trend[0] > 0.5 else TradeType.short.name
+            trend = TradeType.long.name if trend[0] < 0.5 else TradeType.short.name
             if trend == TradeType.long.name:
                 self._start_new_trade(trend, candles.index[-1])
 
@@ -31,7 +31,5 @@ class LogisticRegressionStrategy(ABCStrategy):
             close_price = candles.close[-1]
             change_pctg = (close_price - position) / position
 
-            trend, _ = LogisticRegressionModel(candles.copy(deep=True))
-            trend = TradeType.long.name if trend[0] > 0.5 else TradeType.short.name
             if change_pctg > 0.008 or change_pctg < -0.004:
-                self._update_close_trade(trend, candles.close[-1], "lr", "", candles.index[-1])
+                self._update_close_trade(TradeType.short.name, candles.close[-1], "lr", "", candles.index[-1])
