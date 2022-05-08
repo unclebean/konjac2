@@ -18,8 +18,8 @@ def LogisticRegressionModel(candles):
     split = int(0.8 * len(candles))
     candles["S_10"] = candles["close"].rolling(window=21).mean()
     candles["Corr"] = candles["close"].rolling(window=21).corr(candles["S_10"])
-    candles["Open-Close"] = candles["open"] - candles["close"].shift(1)
-    candles["Open-Open"] = candles["open"] - candles["open"].shift(1)
+    # candles["Open-Close"] = candles["open"] - candles["close"].shift(1)
+    # candles["Open-Open"] = candles["open"] - candles["open"].shift(1)
     ichimoku_df, _ = ichimoku(candles.high, candles.low, candles.close)
     candles["t-k"] = ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"]
     candles["s-s"] = ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"]
@@ -32,8 +32,8 @@ def LogisticRegressionModel(candles):
     candles["ema"] = ema_to_serires(candles.close)
 
     candles = candles.dropna()
-    X = candles.iloc[0:-1, :16]
-    y = np.where(candles["close"].shift(-1) > candles["close"], 1, -1)[1:]
+    X = candles.iloc[0:-2, :16]
+    y = np.where(candles["close"].shift(-1) > candles["close"], 1, -1)[2:]
     X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
     model = LogisticRegression()
     model = model.fit(X_train, y_train)
