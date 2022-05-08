@@ -30,8 +30,8 @@ def LogisticRegressionModel(candles):
     candles["ema"] = ema_to_serires(candles.close)
 
     candles = candles.dropna()
-    X = candles.iloc[0:-2, :16]
-    y = np.where(candles["close"].shift(-1) > candles["close"], 1, -1)[2:]
+    X = candles.iloc[0:-1, :16]
+    y = np.where(candles["close"].shift(-1) > candles["close"], 1, -1)[1:]
     X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
     model = LogisticRegression()
     model = model.fit(X_train, y_train)
