@@ -13,8 +13,7 @@ class LogisticRegressionStrategy(ABCStrategy):
     def seek_trend(self, candles):
         last_trade = self.get_trade()
         if last_trade is None or last_trade.status == TradeStatus.closed.name:
-            trend, _ = LogisticRegressionModel(candles.copy(deep=True))
-            trend = TradeType.long.name if trend[0] < 0.5 else TradeType.short.name
+            trend = self._get_signal(candles)
             if trend == TradeType.long.name:
                 self._start_new_trade(trend, candles.index[-1])
 
@@ -30,6 +29,14 @@ class LogisticRegressionStrategy(ABCStrategy):
             position = last_trade.opened_position
             close_price = candles.close[-1]
             change_pctg = (close_price - position) / position
-
-            if change_pctg > 0.008 or change_pctg < -0.004:
+            trend = self._get_signal(candles)
+            if trend != last_trade.trend or change_pctg > 0.008 or change_pctg < -0.005:
                 self._update_close_trade(TradeType.short.name, candles.close[-1], "lr", "", candles.index[-1])
+
+    def _get_signal(self, candles):
+        trend, accuracy = LogisticRegressionModel(candles.copy(deep=True))
+        if (trend[0] > 0.5 and accuracy >= 0.75):
+            return TradeType.long.name
+        elif (trend[0] < 0.5 and accuracy >= 0.75):
+            return TradeType.short.name
+        return None

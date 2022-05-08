@@ -18,17 +18,17 @@ def LogisticRegressionModel(candles):
     split = int(0.8 * len(candles))
     candles["S_10"] = candles["close"].rolling(window=21).mean()
     candles["Corr"] = candles["close"].rolling(window=21).corr(candles["S_10"])
-    # candles["Open-Close"] = candles["open"] - candles["close"].shift(1)
-    # candles["Open-Open"] = candles["open"] - candles["open"].shift(1)
+    candles["Open-Close"] = candles["open"] - candles["close"].shift(1)
+    candles["Open-Open"] = candles["open"] - candles["open"].shift(1)
     ichimoku_df, _ = ichimoku(candles.high, candles.low, candles.close)
     candles["t-k"] = ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"]
     candles["s-s"] = ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"]
     candles["macd"] = macd_to_series(candles.close)
-    candles["bbands"] = bbands_to_series(candles.close, 21)
-    candles["cci"] = cci_to_series(candles.high, candles.low, candles.close, 21)
-    candles["rsi"] = rsi_to_series(candles.close, 21)
+    candles["bbands"] = bbands_to_series(candles.close, 55)
+    candles["cci"] = cci_to_series(candles.high, candles.low, candles.close, 55)
+    candles["rsi"] = rsi_to_series(candles.close, 55)
     candles["vwap"] = vwap_to_series(candles, 0)
-    candles["efi"] = efi_to_series(candles.close, candles.volume, 13)
+    candles["efi"] = efi_to_series(candles.close, candles.volume, 21)
     candles["ema"] = ema_to_serires(candles.close)
 
     candles = candles.dropna()
@@ -249,6 +249,6 @@ def efi_to_series(close, volume, period):
 
 
 def ema_to_serires(close):
-    fast = ema(close, 20).values
-    slow = ema(close, 50).values
+    fast = ema(close, 144).values
+    slow = ema(close, 169).values
     return fast - slow
