@@ -26,12 +26,11 @@ class DemaSuperTrendStrategy(ABCStrategy):
         super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3.0"]
         last_order_status = self._can_open_new_trade()
         close_price = candles.close[-1]
-        print("close price {} super_trend {}".format(close_price, super_trend[-1]))
         if (
             last_order_status.ready_to_procceed
             and last_order_status.is_long
             and super_trend[-1] < close_price
-            # and super_trend[-2] >= close_price
+            and super_trend[-2] >= candles.close[-2]
         ):
             self._update_open_trade(
                 TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
@@ -40,7 +39,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             last_order_status.ready_to_procceed
             and last_order_status.is_short
             and super_trend[-1] > close_price
-            # and super_trend[-2] <= close_price
+            and super_trend[-2] <= candles.close[-2]
         ):
             self._update_open_trade(
                 TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
@@ -54,7 +53,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             last_order_status.ready_to_procceed
             and last_order_status.is_long
             and super_trend[-1] >= close_price
-            # and super_trend[-2] < close_price
+            and super_trend[-2] < candles.close[-2]
         ):
             self._update_close_trade(
                 TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
@@ -63,7 +62,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             last_order_status.ready_to_procceed
             and last_order_status.is_short
             and super_trend[-1] <= close_price
-            # and super_trend[-2] > close_price
+            and super_trend[-2] > candles.close[-2]
         ):
             self._update_close_trade(
                 TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
