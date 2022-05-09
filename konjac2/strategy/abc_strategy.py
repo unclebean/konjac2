@@ -2,12 +2,13 @@ from collections import namedtuple
 from datetime import datetime
 from abc import ABC, abstractclassmethod
 
+
 from ..indicator.utils import TradeType
 from ..models import apply_session
 from ..models.trade import Trade, TradeStatus, get_last_time_trade
-from ..models.signal import Signal
+from ..models.signal import Signal, get_open_trade_signals
 
-LastTradeStatus = namedtuple("LastTradeStatus", "ready_to_procceed is_long is_short")
+LastTradeStatus = namedtuple("LastTradeStatus", "ready_to_procceed is_long is_short opened_position")
 
 
 class ABCStrategy(ABC):
@@ -40,14 +41,16 @@ class ABCStrategy(ABC):
         )
         is_long = ready_to_new_trade and last_trade.trend == TradeType.long.name
         is_short = ready_to_new_trade and last_trade.trend == TradeType.short.name
-        return LastTradeStatus(ready_to_new_trade, is_long, is_short)
+        opened_position = last_trade.opened_position if ready_to_new_trade else 0
+        return LastTradeStatus(ready_to_new_trade, is_long, is_short, opened_position)
 
     def _can_close_trade(self) -> LastTradeStatus:
         last_trade = get_last_time_trade(self.symbol)
         ready_to_close = last_trade is not None and last_trade.status == TradeStatus.opened.name
         is_long = ready_to_close and last_trade.trend == TradeType.long.name
         is_short = ready_to_close and last_trade.trend == TradeType.short.name
-        return LastTradeStatus(ready_to_close, is_long, is_short)
+        opened_position = last_trade.opened_position if ready_to_close else 0
+        return LastTradeStatus(ready_to_close, is_long, is_short, opened_position)
 
     def _delete_last_in_progress_trade(self):
         last_trade = get_last_time_trade(self.symbol)
@@ -126,3 +129,7 @@ class ABCStrategy(ABC):
         )
         session.commit()
         session.close()
+
+    def _get_all_open_trade_signal_indicators(self, trade_id: str):
+        signals = get_open_trade_signals(trade_id)
+        return list(map(lambda s: s.indicator, signals))
