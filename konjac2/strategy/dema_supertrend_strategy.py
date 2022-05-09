@@ -23,27 +23,48 @@ class DemaSuperTrendStrategy(ABCStrategy):
             self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles):
-        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERTd_34_3.0"]
+        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3.0"]
         last_order_status = self._can_open_new_trade()
+        close_price = candles.close[-1]
+        print("close price {} super_trend {}".format(close_price, super_trend[-1]))
         if (
             last_order_status.ready_to_procceed
             and last_order_status.is_long
-            and super_trend[-1] == 1
-            and super_trend[-2] == -1
+            and super_trend[-1] < close_price
+            # and super_trend[-2] >= close_price
         ):
-            self._update_open_trade(TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1])
+            self._update_open_trade(
+                TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+            )
         if (
             last_order_status.ready_to_procceed
             and last_order_status.is_short
-            and super_trend[-1] == -1
-            and super_trend[-2] == 1
+            and super_trend[-1] > close_price
+            # and super_trend[-2] <= close_price
         ):
-            self._update_open_trade(TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1])
+            self._update_open_trade(
+                TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+            )
 
     def exit_signal(self, candles):
-        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERTd_34_3.0"]
+        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3.0"]
         last_order_status = self._can_close_trade()
-        if last_order_status.ready_to_procceed and last_order_status.is_long and super_trend[-1] == -1:
-            self._update_close_trade(TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1])
-        if last_order_status.ready_to_procceed and last_order_status.is_short and super_trend[-1] == 1:
-            self._update_close_trade(TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1])
+        close_price = candles.close[-1]
+        if (
+            last_order_status.ready_to_procceed
+            and last_order_status.is_long
+            and super_trend[-1] >= close_price
+            # and super_trend[-2] < close_price
+        ):
+            self._update_close_trade(
+                TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+            )
+        if (
+            last_order_status.ready_to_procceed
+            and last_order_status.is_short
+            and super_trend[-1] <= close_price
+            # and super_trend[-2] > close_price
+        ):
+            self._update_close_trade(
+                TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+            )
