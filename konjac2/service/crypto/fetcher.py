@@ -135,7 +135,7 @@ def open_position(symbol, tradeType, tp, sl):
 def close_position(symbol):
     exchange = get_context()
     positions = exchange.fetch_positions()
-    symbol_position = next(p for p in positions if p["future"] == symbol)
+    symbol_position = next(p for p in positions if p["info"]["future"] == symbol)["info"]
     side = symbol_position["side"]
     if side == "buy":
         exchange.create_market_sell_order(symbol, float(symbol_position["openSize"]))
