@@ -110,6 +110,8 @@ def prepare_indicators_data(candlestick, delta_hours=0):
 
     indicators = pd.DataFrame(
         {
+            "t-k": ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"],
+            "s-s": ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"],
             "close_shift1": close - close_shift1,
             "close_shift2": close - close_shift2,
             "close_shift3": close - close_shift3,
@@ -120,8 +122,8 @@ def prepare_indicators_data(candlestick, delta_hours=0):
     )
 
     (count_y,) = result.shape
-    # merged_indicators = indicators
-    merged_indicators = merge_lag_data(indicators)
+    merged_indicators = indicators
+    # merged_indicators = merge_lag_data(indicators)
 
     merged_indicators = pd.DataFrame(scaler.fit_transform(merged_indicators), columns=merged_indicators.columns)
 

@@ -10,7 +10,7 @@ from konjac2.models import apply_session
 from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
-from konjac2.strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
+from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Cryptos, Instruments
 
 
@@ -78,16 +78,16 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def eth_spot_long_bot():
-    strategy = DemaSuperTrendStrategy(symbol="ETH/USDT")
-    data = fetch_data("ETH/USDT", "M30", True, limit=1500)
+async def ltc_spot_long_bot():
+    strategy = LogisticRegressionStrategy(symbol="LTC/USDT")
+    data = fetch_data("LTC/USDT", "M30", True, limit=1500)
     strategy.seek_trend(data)
     strategy.entry_signal(data)
-    trade = get_last_time_trade("ETH/USDT")
+    trade = get_last_time_trade("LTC/USDT")
     if trade is not None and trade.status == TradeStatus.opened.name:
-        place_trade("ETH-PERP", "buy", trade.trend)
+        place_trade("LTC-PERP", "buy", trade.trend)
     strategy.exit_signal(data)
-    trade = get_last_time_trade("ETH/USDT")
+    trade = get_last_time_trade("LTC/USDT")
     if trade is not None and trade.status == TradeStatus.closed.name:
-        place_trade("ETH-PERP", "sell")
+        place_trade("LTC-PERP", "sell")
     log.info("job running done!")

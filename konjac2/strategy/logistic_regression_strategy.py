@@ -1,5 +1,6 @@
+from pandas_ta.overlap import dema
 from ..indicator.utils import TradeType
-from ..indicator.logistic_regression import LogisticRegressionModel, predict_xgb_next_ticker
+from ..indicator.logistic_regression import predict_xgb_next_ticker
 from ..models.trade import TradeStatus
 from .abc_strategy import ABCStrategy
 
@@ -11,15 +12,23 @@ class LogisticRegressionStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles):
-        last_trade = self.get_trade()
-        if last_trade is None or last_trade.status == TradeStatus.closed.name:
-            self._start_new_trade(TradeType.long.name, candles.index[-1])
+        dema144 = dema(candles.close)[-1]
+        dema169 = dema(candles.close)[-1]
+        close_price = candles.close[-1]
+        trend = None
+        if close_price > dema144 and close_price > dema169:
+            trend = TradeType.long.name
+        if close_price < dema144 and close_price < dema169:
+            trend = TradeType.short.name
+        if trend is not None:
+            self._delete_last_in_progress_trade()
+            self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles):
         last_trade = self.get_trade()
         if last_trade is not None and last_trade.status == TradeStatus.in_progress.name:
             trend, accuracy = self._get_signal(candles)
-            if trend is not None and trend == TradeType.long.name:
+            if trend is not None and trend == last_trade.trend:
                 self._update_open_trade(last_trade.trend, candles.close[-1], "lr", accuracy, candles.index[-1])
 
     def exit_signal(self, candles):
@@ -29,12 +38,10 @@ class LogisticRegressionStrategy(ABCStrategy):
             and last_trade.status == TradeStatus.opened.name
             and last_trade.entry_date != candles.index[-1]
         ):
-            position = last_trade.opened_position
             close_price = candles.close[-1]
-            change_pctg = (close_price - position) / position
             trend, accuracy = self._get_signal(candles)
             # if change_pctg > 0.004 or change_pctg < -0.004:
-            if (trend != last_trade.trend and trend is not None): # or change_pctg > 0.005 or change_pctg < -0.005:
+            if trend != last_trade.trend and trend is not None:  # or change_pctg > 0.005 or change_pctg < -0.005:
                 self._update_close_trade(TradeType.short.name, close_price, "lr", accuracy, candles.index[-1])
 
     def _get_signal(self, candles):
