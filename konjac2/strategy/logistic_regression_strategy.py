@@ -42,13 +42,12 @@ class LogisticRegressionStrategy(ABCStrategy):
             trend, accuracy = self._get_signal(candles)
             # if change_pctg > 0.004 or change_pctg < -0.004:
             if trend != last_trade.trend and trend is not None:  # or change_pctg > 0.005 or change_pctg < -0.005:
-                self._update_close_trade(TradeType.short.name, close_price, "lr", accuracy, candles.index[-1])
+                self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
 
     def _get_signal(self, candles):
         trend, accuracy = predict_xgb_next_ticker(candles.copy(deep=True))
         if trend is None:
             return None, 0
-        print(accuracy)
         if trend[0] > 0.5:
             return TradeType.long.name, accuracy
         elif trend[0] < 0.5:
