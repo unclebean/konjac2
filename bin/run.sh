@@ -14,7 +14,7 @@ case $1 in
     stop)
         pwd
         # Launch your program as a detached process
-        kill -15 `cat ${PIDFILE}`
+        kill -12 `cat ${PIDFILE}`
         # Now that it’s killed, don’t forget to remove the PID file
         rm ${PIDFILE}
     ;;
