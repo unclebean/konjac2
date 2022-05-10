@@ -99,52 +99,22 @@ def _get_params():
 
 def prepare_indicators_data(candlestick, delta_hours=0):
     result = candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    open = candlestick.open
     close = candlestick.close
-    high = candlestick.high
-    low = candlestick.low
-    close = candlestick.close
-    volume = candlestick.volume
-    macd_values = macd_to_series(close)
-    cci_values = cci_to_series(high, low, close, period)
-    bbands_values = bbands_to_series(close, period)
-    rsi_values = rsi_to_series(close, period)
-    efi_values = efi_to_series(close, volume, period)
-
-    cci_values21 = cci_to_series(high, low, close, period21)
-    bbands_values21 = bbands_to_series(close, period21)
-    rsi_values21 = rsi_to_series(close, period21)
-    efi_values21 = efi_to_series(close, volume, period21)
-
-    cci_values13 = cci_to_series(high, low, close, period13)
-    bbands_values13 = bbands_to_series(close, period13)
-    rsi_values13 = rsi_to_series(close, period13)
-    efi_values13 = efi_to_series(close, volume, period13)
-
-    vwap_values = vwap_to_series(candlestick, delta_hours)
-    ema_values = ema_to_serires(close)
+    close_shift1 = candlestick.close.shift(1)
+    close_shift2 = candlestick.close.shift(2)
+    close_shift3 = candlestick.close.shift(3)
+    close_shift4 = candlestick.close.shift(4)
+    close_shift5 = candlestick.close.shift(5)
 
     ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
 
     indicators = pd.DataFrame(
         {
-            "macd": macd_values,
-            "cci": cci_values,
-            "bbands": bbands_values,
-            "rsi": rsi_values,
-            "t-k": ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"],
-            "s-s": ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"],
-            "vwap": vwap_values,
-            "efi": efi_values,
-            "cci21": cci_values21,
-            "rsi21": rsi_values21,
-            "bbands21": bbands_values21,
-            "efi21": efi_values21,
-            "cci13": cci_values13,
-            "rsi13": rsi_values13,
-            "bbands13": bbands_values13,
-            "efi13": efi_values13,
-            "ema": ema_values,
+            "close_shift1": close - close_shift1,
+            "close_shift2": close - close_shift2,
+            "close_shift3": close - close_shift3,
+            "close_shift4": close - close_shift4,
+            "close_shift5": close - close_shift5,
         },
         index=candlestick.index,
     )
@@ -162,25 +132,15 @@ def prepare_indicators_data(candlestick, delta_hours=0):
 
 def merge_lag_data(df):
     index = df.index
-    df = df.append(pd.Series(), ignore_index=True)
+    df = df.append(pd.Series(dtype='float64'), ignore_index=True)
     merge_key = "order_day"
     df["order_day"] = [x for x in list(range(len(df)))]
     lag_cols = [
-        "macd",
-        "cci",
-        "bbands",
-        "rsi",
-        "vwap",
-        "efi",
-        "cci21",
-        "rsi21",
-        "bbands21",
-        "efi21",
-        "cci13",
-        "rsi13",
-        "bbands13",
-        "efi13",
-        "ema",
+        "close_shift1",
+        "close_shift2",
+        "close_shift3",
+        "close_shift4",
+        "close_shift5",
     ]
 
     def rename_col(x):

@@ -83,10 +83,11 @@ async def eth_spot_long_bot():
     data = fetch_data("ETH/USDT", "M30", True, limit=1500)
     strategy.seek_trend(data)
     strategy.entry_signal(data)
-    strategy.exit_signal(data)
     trade = get_last_time_trade("ETH/USDT")
     if trade is not None and trade.status == TradeStatus.opened.name:
         place_trade("ETH-PERP", "buy", trade.trend)
+    strategy.exit_signal(data)
+    trade = get_last_time_trade("ETH/USDT")
     if trade is not None and trade.status == TradeStatus.closed.name:
         place_trade("ETH-PERP", "sell")
     log.info("job running done!")
