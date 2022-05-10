@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime as dt
 from konjac2.models.trade import TradeStatus, get_last_time_trade
 from konjac2.service.crypto.fetcher import place_trade
@@ -11,6 +12,9 @@ from konjac2.indicator.utils import TradeType
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
 from . import Cryptos, Instruments
+
+
+log = logging.getLogger(__name__)
 
 
 def forex_scanner():
@@ -85,3 +89,4 @@ async def eth_spot_long_bot():
         place_trade("ETH-PERP", "buy", trade.trend)
     if trade is not None and trade.status == TradeStatus.closed.name:
         place_trade("ETH-PERP", "sell")
+    log.info("job running done!")
