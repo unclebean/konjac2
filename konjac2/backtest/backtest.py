@@ -51,9 +51,9 @@ def short_term_backtest(symbol: str):
     for window in m5_data.rolling(window=144 * 6):
         if len(window.index) < 144 * 6:
             continue
+        strategy.exit_signal(window)
         strategy.seek_trend(window)
         strategy.entry_signal(window)
-        strategy.exit_signal(window)
         print(strategy.get_trade())
     session = apply_session()
     total_result = session.query(

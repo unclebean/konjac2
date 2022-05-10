@@ -81,13 +81,16 @@ async def bbcci_scanner():
 async def ltc_spot_long_bot():
     strategy = LogisticRegressionStrategy(symbol="LTC/USDT")
     data = fetch_data("LTC/USDT", "M30", True, limit=1500)
+
+    strategy.exit_signal(data)
+    trade = get_last_time_trade("LTC/USDT")
+    if trade is not None and trade.status == TradeStatus.closed.name:
+        place_trade("LTC-PERP", "sell")
+
     strategy.seek_trend(data)
     strategy.entry_signal(data)
     trade = get_last_time_trade("LTC/USDT")
     if trade is not None and trade.status == TradeStatus.opened.name:
         place_trade("LTC-PERP", "buy", trade.trend)
-    strategy.exit_signal(data)
-    trade = get_last_time_trade("LTC/USDT")
-    if trade is not None and trade.status == TradeStatus.closed.name:
-        place_trade("LTC-PERP", "sell")
+
     log.info("job running done!")
