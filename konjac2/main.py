@@ -34,7 +34,7 @@ async def start_bot():
 async def start_job():
     if settings.run_cron_job:
         scheduler = AsyncIOScheduler()
-        scheduler.add_job(eth_spot_long_bot, CronTrigger.from_crontab("*/30 * * * *"))
+        scheduler.add_job(eth_spot_long_bot, CronTrigger.from_crontab("1,31 * * * *"))
         scheduler.start()
         print("***** loaded cron jobs *****")
 
