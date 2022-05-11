@@ -108,7 +108,7 @@ def place_trade(symbol, side, tradeType="", tp=0, sl=0):
         close_position(symbol)
 
 
-def open_position(symbol, tradeType, tp, sl):
+def open_position(symbol, tradeType, tp=0, sl=0):
     exchange = get_context()
     balance = get_ftx_balance()
     price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
@@ -116,20 +116,18 @@ def open_position(symbol, tradeType, tp, sl):
     side = "buy" if tradeType == "long" else "sell"
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
-    '''
-    gain_rate = price * 0.013 if tp == 0 else tp
-    loss_rate = price * 0.012 if sl == 0 else sl
+    # gain_rate = price * 0.013 if tp == 0 else tp
+    loss_rate = price * 0.05 if sl == 0 else sl
     if side == "buy":
-        gain = price + gain_rate
+        # gain = price + gain_rate
         loss = price - loss_rate
-        exchange.create_order(symbol, "takeProfit", "sell", amount, None, params={"triggerPrice": gain})
+        # exchange.create_order(symbol, "takeProfit", "sell", amount, None, params={"triggerPrice": gain})
         exchange.create_order(symbol, "stop", "sell", amount, None, params={"triggerPrice": loss})
     else:
-        gain = price - gain_rate
+        # gain = price - gain_rate
         loss = price + loss_rate
-        exchange.create_order(symbol, "takeProfit", "buy", amount, None, params={"triggerPrice": gain})
+        # exchange.create_order(symbol, "takeProfit", "buy", amount, None, params={"triggerPrice": gain})
         exchange.create_order(symbol, "stop", "buy", amount, None, params={"triggerPrice": loss})
-    '''
 
 
 def close_position(symbol):
@@ -142,3 +140,15 @@ def close_position(symbol):
     else:
         exchange.create_market_buy_order(symbol, float(symbol_position["openSize"]))
     exchange.cancel_all_orders(symbol)
+
+
+def opened_positions():
+    exchange = get_context()
+    positions = exchange.fetch_positions()
+    return list(p for p in positions if p["info"]["size"] != "0.0")
+
+
+def opened_position_by_symbol(symbol):
+    positions = opened_positions()
+    position = next((p for p in positions if p["info"]["future"] == symbol), None)
+    return position

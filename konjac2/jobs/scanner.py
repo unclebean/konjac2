@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime as dt
 from konjac2.models.trade import TradeStatus, get_last_time_trade
-from konjac2.service.crypto.fetcher import place_trade
+from konjac2.service.crypto.fetcher import opened_position_by_symbol, place_trade
 from konjac2.service.fetcher import fetch_data
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 from konjac2.indicator.squeeze_momentum import squeeze
@@ -81,16 +81,17 @@ async def bbcci_scanner():
 async def ltc_spot_long_bot():
     strategy = LogisticRegressionStrategy(symbol="LTC/USDT")
     data = fetch_data("LTC/USDT", "M30", True, limit=1500)
+    opened_position = opened_position_by_symbol("LTC-PERP")
 
     strategy.exit_signal(data)
     trade = get_last_time_trade("LTC/USDT")
-    if trade is not None and trade.status == TradeStatus.closed.name:
+    if opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
         place_trade("LTC-PERP", "sell")
 
     strategy.seek_trend(data)
     strategy.entry_signal(data)
     trade = get_last_time_trade("LTC/USDT")
-    if trade is not None and trade.status == TradeStatus.opened.name:
+    if opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         place_trade("LTC-PERP", "buy", trade.trend)
 
     log.info("job running done!")

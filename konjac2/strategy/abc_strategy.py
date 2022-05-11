@@ -110,11 +110,18 @@ class ABCStrategy(ABC):
             if last_trade.trend == TradeType.short.name
             else position - last_trade.opened_position
         )
+        fee = last_trade.opened_position * (0.07 / 100) * 2
+        result = result - fee
         session.delete(last_trade)
         last_trade.exit_signal = tradeType
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
+        '''
+        loss_rate = last_trade.opened_position * 0.1
+        if abs(result) > loss_rate:
+            result = loss_rate if result > 0 else -loss_rate
+        '''
         last_trade.result = result
         session.add(last_trade)
         session.add(
