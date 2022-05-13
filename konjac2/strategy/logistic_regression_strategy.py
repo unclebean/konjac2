@@ -14,8 +14,8 @@ class LogisticRegressionStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles):
-        dema144 = dema(candles.close)[-1]
-        dema169 = dema(candles.close)[-1]
+        dema144 = dema(candles.close, 144)[-1]
+        dema169 = dema(candles.close, 169)[-1]
         close_price = candles.close[-1]
         trend = None
         if close_price > dema144 and close_price > dema169:
@@ -42,7 +42,7 @@ class LogisticRegressionStrategy(ABCStrategy):
         ):
             close_price = candles.close[-1]
             trend, accuracy = self._get_signal(candles)
-            say_something("{} exit signal {} accuracy {}".format(self.symbol, trend, accuracy))
+            # say_something("{} exit signal {} accuracy {}".format(self.symbol, trend, accuracy))
             if trend != last_trade.trend and trend is not None:  # or change_pctg > 0.005 or change_pctg < -0.005:
                 self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
 
