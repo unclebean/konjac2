@@ -118,9 +118,9 @@ class ABCStrategy(ABC):
         last_trade.closed_position = position
         loss_rate = last_trade.opened_position * 0.03
         if abs(result) > loss_rate:
-            result = loss_rate if result > 0 else -loss_rate
+            result = loss_rate if result > 0 else -last_trade.opened_position * 0.028
 
-        fee = last_trade.opened_position * (0.07 / 100) * 2
+        fee = last_trade.opened_position * (0.064505 / 100) * 2
         last_trade.result = result - fee
         session.add(last_trade)
         session.add(

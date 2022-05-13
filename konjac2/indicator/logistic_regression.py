@@ -105,6 +105,7 @@ def prepare_indicators_data(candlestick, delta_hours=0):
     close_shift3 = candlestick.close.shift(3)
     close_shift4 = candlestick.close.shift(4)
     close_shift5 = candlestick.close.shift(5)
+    close_shift6 = candlestick.close.shift(6)
 
     ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
 
@@ -117,6 +118,7 @@ def prepare_indicators_data(candlestick, delta_hours=0):
             "close_shift3": close - close_shift3,
             "close_shift4": close - close_shift4,
             "close_shift5": close - close_shift5,
+            "close_shift6": close - close_shift6,
         },
         index=candlestick.index,
     )
