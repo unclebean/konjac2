@@ -78,20 +78,20 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def ltc_spot_long_bot():
-    strategy = LogisticRegressionStrategy(symbol="LTC/USDT")
-    data = fetch_data("LTC/USDT", "H1", True, limit=1500)
+async def xrp_spot_long_bot():
+    strategy = LogisticRegressionStrategy(symbol="XRP/USDT")
+    data = fetch_data("XRP/USDT", "H1", True, limit=1500)
     opened_position = opened_position_by_symbol("LTC-PERP")
 
     strategy.exit_signal(data)
-    trade = get_last_time_trade("LTC/USDT")
+    trade = get_last_time_trade("XRP/USDT")
     if opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
-        place_trade("LTC-PERP", "sell")
+        place_trade("XRP-PERP", "sell")
 
     strategy.seek_trend(data)
     strategy.entry_signal(data)
-    trade = get_last_time_trade("LTC/USDT")
+    trade = get_last_time_trade("XRP/USDT")
     if opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
-        place_trade("LTC-PERP", "buy", trade.trend)
+        place_trade("XRP-PERP", "buy", trade.trend)
 
     log.info("job running done!")

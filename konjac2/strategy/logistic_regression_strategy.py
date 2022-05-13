@@ -46,8 +46,18 @@ class LogisticRegressionStrategy(ABCStrategy):
                 if last_trade.trend == TradeType.short.name
                 else close_price - last_trade.opened_position
             )
-            loss_rate = last_trade.opened_position * 0.06
-            if (trend != last_trade.trend and trend is not None) or (abs(result) > loss_rate):
+            loss_rate = last_trade.opened_position * 0.03
+            """
+            dema144 = dema(candles.close, 144)[-1]
+            dema169 = dema(candles.close, 169)[-1]
+            dema_should_close = False
+            if last_trade.trend == TradeType.long.nameand (dema144 > close_price or dema169 > close_price):
+                dema_should_close = True
+            if last_trade.trend == TradeType.short.name and (dema144 < close_price or dema169 < close_price):
+                dema_should_close = True
+            """
+
+            if (trend != last_trade.trend and trend is not None) or (abs(result) > loss_rate):  # or dema_should_close:
                 self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
 
     def _get_signal(self, candles):
