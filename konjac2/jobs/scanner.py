@@ -80,7 +80,7 @@ async def bbcci_scanner():
 
 async def ltc_spot_long_bot():
     strategy = LogisticRegressionStrategy(symbol="LTC/USDT")
-    data = fetch_data("LTC/USDT", "M30", True, limit=1500)
+    data = fetch_data("LTC/USDT", "H1", True, limit=1500)
     opened_position = opened_position_by_symbol("LTC-PERP")
 
     strategy.exit_signal(data)
