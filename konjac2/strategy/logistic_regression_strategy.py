@@ -1,6 +1,5 @@
 from pandas_ta.overlap import dema
 
-from ..bot.telegram_bot import say_something
 from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
 from ..models.trade import TradeStatus
@@ -42,8 +41,13 @@ class LogisticRegressionStrategy(ABCStrategy):
         ):
             close_price = candles.close[-1]
             trend, accuracy = self._get_signal(candles)
-            # say_something("{} exit signal {} accuracy {}".format(self.symbol, trend, accuracy))
-            if trend != last_trade.trend and trend is not None:  # or change_pctg > 0.005 or change_pctg < -0.005:
+            result = (
+                last_trade.opened_position - close_price
+                if last_trade.trend == TradeType.short.name
+                else close_price - last_trade.opened_position
+            )
+            loss_rate = last_trade.opened_position * 0.06
+            if (trend != last_trade.trend and trend is not None) or (abs(result) > loss_rate and result < 0):
                 self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
 
     def _get_signal(self, candles):

@@ -117,11 +117,9 @@ class ABCStrategy(ABC):
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
-        '''
-        loss_rate = last_trade.opened_position * 0.1
+        loss_rate = last_trade.opened_position * 0.06
         if abs(result) > loss_rate:
             result = loss_rate if result > 0 else -loss_rate
-        '''
         last_trade.result = result
         session.add(last_trade)
         session.add(
