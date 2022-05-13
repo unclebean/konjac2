@@ -47,7 +47,7 @@ class LogisticRegressionStrategy(ABCStrategy):
                 else close_price - last_trade.opened_position
             )
             loss_rate = last_trade.opened_position * 0.06
-            if (trend != last_trade.trend and trend is not None) or (abs(result) > loss_rate and result < 0):
+            if (trend != last_trade.trend and trend is not None) or (abs(result) > loss_rate):
                 self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
 
     def _get_signal(self, candles):
