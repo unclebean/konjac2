@@ -81,7 +81,7 @@ async def bbcci_scanner():
 async def xrp_spot_long_bot():
     strategy = LogisticRegressionStrategy(symbol="XRP/USDT")
     data = fetch_data("XRP/USDT", "H1", True, limit=1500)
-    opened_position = opened_position_by_symbol("LTC-PERP")
+    opened_position = opened_position_by_symbol("XRP-PERP")
 
     strategy.exit_signal(data)
     trade = get_last_time_trade("XRP/USDT")
