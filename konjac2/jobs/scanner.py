@@ -83,15 +83,25 @@ async def xrp_spot_long_bot():
     data = fetch_data("XRP/USDT", "H1", True, limit=1500)
     opened_position = opened_position_by_symbol("XRP-PERP")
 
-    strategy.exit_signal(data)
+    exit_trade = strategy.exit_signal(data)
     trade = get_last_time_trade("XRP/USDT")
-    if opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
+    if (
+        exit_trade is not None
+        and opened_position is not None
+        and trade is not None
+        and trade.status == TradeStatus.closed.name
+    ):
         place_trade("XRP-PERP", "sell")
 
     strategy.seek_trend(data)
-    strategy.entry_signal(data)
+    opened_trade = strategy.entry_signal(data)
     trade = get_last_time_trade("XRP/USDT")
-    if opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
+    if (
+        opened_trade is not None
+        and opened_position is None
+        and trade is not None
+        and trade.status == TradeStatus.opened.name
+    ):
         place_trade("XRP-PERP", "buy", trade.trend)
 
     log.info("job running done!")

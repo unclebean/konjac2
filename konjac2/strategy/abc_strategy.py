@@ -22,11 +22,11 @@ class ABCStrategy(ABC):
         pass
 
     @abstractclassmethod
-    def entry_signal(self, candles):
+    def entry_signal(self, candles) -> Trade:
         pass
 
     @abstractclassmethod
-    def exit_signal(self, candles):
+    def exit_signal(self, candles) -> Trade:
         pass
 
     def get_trade(self):
@@ -99,6 +99,7 @@ class ABCStrategy(ABC):
         )
         session.commit()
         session.close()
+        return last_trade
 
     def _update_close_trade(self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now()):
         last_trade = get_last_time_trade(self.symbol)
@@ -135,6 +136,7 @@ class ABCStrategy(ABC):
         )
         session.commit()
         session.close()
+        return last_trade
 
     def _get_all_open_trade_signal_indicators(self, trade_id: str):
         signals = get_open_trade_signals(trade_id)
