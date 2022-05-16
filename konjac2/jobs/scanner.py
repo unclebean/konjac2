@@ -11,7 +11,7 @@ from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
-from . import TrustCrypto, Instruments
+from . import TrustCrypto, Instruments, Cryptos
 
 
 log = logging.getLogger(__name__)
@@ -78,31 +78,23 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def xrp_spot_long_bot():
-    strategy = LogisticRegressionStrategy(symbol="XRP/USDT")
-    data = fetch_data("XRP/USDT", "H1", True, limit=1500)
-    opened_position = opened_position_by_symbol("XRP-PERP")
+async def smart_bot():
+    query_symbol = "DOGE/USDT"
+    trade_symbol = "DOGE-PERP"
+    strategy = LogisticRegressionStrategy(symbol=query_symbol)
+    data = fetch_data(query_symbol, "H1", True, limit=1500)
+    opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data)
-    trade = get_last_time_trade("XRP/USDT")
-    if (
-        is_exit_trade
-        and opened_position is not None
-        and trade is not None
-        and trade.status == TradeStatus.closed.name
-    ):
-        place_trade("XRP-PERP", "sell")
+    trade = get_last_time_trade(query_symbol)
+    if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
+        place_trade(trade_symbol, "sell")
 
     strategy.seek_trend(data)
     is_opened_trade = strategy.entry_signal(data)
-    trade = get_last_time_trade("XRP/USDT")
-    if (
-        is_opened_trade
-        and opened_position is None
-        and trade is not None
-        and trade.status == TradeStatus.opened.name
-    ):
-        place_trade("XRP-PERP", "buy", trade.trend)
+    trade = get_last_time_trade(query_symbol)
+    if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
+        place_trade(trade_symbol, "buy", trade.trend)
 
     log.info("job running done!")
 
