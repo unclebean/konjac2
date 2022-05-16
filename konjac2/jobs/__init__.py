@@ -19,6 +19,14 @@ Instruments = [
     "WTICO_USD",
 ]
 
+TrustCrypto = [
+    "ADA/USDT",
+    "XRP/USDT",
+    "LTC/USDT",
+    "TRX/USDT",
+    "DOGE/USDT",
+]
+
 Cryptos = [
     "AAVE/USDT",
     "ADA/USDT",

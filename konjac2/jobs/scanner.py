@@ -11,7 +11,7 @@ from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
-from . import Cryptos, Instruments
+from . import TrustCrypto, Instruments
 
 
 log = logging.getLogger(__name__)
@@ -83,10 +83,10 @@ async def xrp_spot_long_bot():
     data = fetch_data("XRP/USDT", "H1", True, limit=1500)
     opened_position = opened_position_by_symbol("XRP-PERP")
 
-    exit_trade = strategy.exit_signal(data)
+    is_exit_trade = strategy.exit_signal(data)
     trade = get_last_time_trade("XRP/USDT")
     if (
-        exit_trade is not None
+        is_exit_trade
         and opened_position is not None
         and trade is not None
         and trade.status == TradeStatus.closed.name
@@ -94,10 +94,10 @@ async def xrp_spot_long_bot():
         place_trade("XRP-PERP", "sell")
 
     strategy.seek_trend(data)
-    opened_trade = strategy.entry_signal(data)
+    is_opened_trade = strategy.entry_signal(data)
     trade = get_last_time_trade("XRP/USDT")
     if (
-        opened_trade is not None
+        is_opened_trade
         and opened_position is None
         and trade is not None
         and trade.status == TradeStatus.opened.name
@@ -105,3 +105,12 @@ async def xrp_spot_long_bot():
         place_trade("XRP-PERP", "buy", trade.trend)
 
     log.info("job running done!")
+
+
+async def scan_crypto():
+    for crypto in TrustCrypto:
+        strategy = LogisticRegressionStrategy(symbol=crypto)
+        data = fetch_data(crypto, "H1", True, limit=1500)
+        strategy.exit_signal(data)
+        strategy.seek_trend(data)
+        strategy.entry_signal(data)
