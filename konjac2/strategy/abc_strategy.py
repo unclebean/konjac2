@@ -120,9 +120,9 @@ class ABCStrategy(ABC):
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
-        loss_rate = last_trade.opened_position * 0.03
+        loss_rate = last_trade.opened_position * 0.05
         if abs(result) > loss_rate:
-            result = loss_rate if result > 0 else -last_trade.opened_position * 0.028
+            result = loss_rate if result > 0 else -last_trade.opened_position * 0.04
         result = last_trade.quantity * result
 
         fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (

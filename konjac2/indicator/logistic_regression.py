@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from pandas_ta.overlap import ema, ichimoku
+from pandas_ta.overlap import ema, ichimoku, dema
 from pandas_ta.volatility import bbands
 from pandas_ta.momentum import macd, cci, rsi
 from sklearn.linear_model import LogisticRegression
@@ -105,12 +105,14 @@ def prepare_indicators_data(candlestick, delta_hours=0):
     close_shift3 = candlestick.close.shift(3)
     close_shift4 = candlestick.close.shift(4)
     close_shift5 = candlestick.close.shift(5)
-    close_shift6 = candlestick.close.shift(6)
 
+    dema144 = dema(candlestick.close, 144)
+    dema169 = dema(candlestick.close, 169)
     ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
 
     indicators = pd.DataFrame(
         {
+            "dema144-169": dema144 - dema169,
             "t-k": ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"],
             "s-s": ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"],
             "close_shift1": close - close_shift1,
@@ -118,7 +120,6 @@ def prepare_indicators_data(candlestick, delta_hours=0):
             "close_shift3": close - close_shift3,
             "close_shift4": close - close_shift4,
             "close_shift5": close - close_shift5,
-            "close_shift6": close - close_shift6,
         },
         index=candlestick.index,
     )

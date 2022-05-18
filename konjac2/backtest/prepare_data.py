@@ -31,7 +31,7 @@ def prepare_forex_backtest_data(symbol: str, timeframe: str, step_hours=1, step_
 
 
 def prepare_crypto_backtest_data(symbol: str, timeframe: str, step_hours=1, step_mins=0):
-    dates = generate_dates(start_date="2021-01-01T00:00:00", step_hours=step_hours, step_mins=step_mins)
+    dates = generate_dates(start_date="2019-01-01T00:00:00", step_hours=step_hours, step_mins=step_mins)
     datasets = None
     for date in dates:
         predict_date = int(datetime.timestamp(date) * 1000)

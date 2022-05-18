@@ -1,8 +1,8 @@
-from pandas_ta.overlap import dema
+from pandas_ta.overlap import dema, ichimoku
 
 from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
-from ..models.trade import Trade, TradeStatus
+from ..models.trade import TradeStatus
 from .abc_strategy import ABCStrategy
 
 
@@ -15,11 +15,17 @@ class LogisticRegressionStrategy(ABCStrategy):
     def seek_trend(self, candles):
         dema144 = dema(candles.close, 144)[-1]
         dema169 = dema(candles.close, 169)[-1]
+
+        ichimoku_df, _ = ichimoku(candles.high, candles.low, candles.close)
+        span_a = ichimoku_df["ISA_9"][-1]
+        span_b = ichimoku_df["ISB_26"][-1]
+        # kijun_sen = ichimoku_df["ITS_9"][-1]
+        # tenkan_sen = ichimoku_df["IKS_26"][-1]
         close_price = candles.close[-1]
         trend = None
-        if close_price > dema144 and close_price > dema169:
+        if close_price > span_a and close_price > span_b and close_price > dema144 and close_price > dema169:
             trend = TradeType.long.name
-        if close_price < dema144 and close_price < dema169:
+        if close_price < span_a and close_price < span_b and close_price < dema144 and close_price < dema169:
             trend = TradeType.short.name
         if trend is not None:
             self._delete_last_in_progress_trade()
@@ -46,18 +52,15 @@ class LogisticRegressionStrategy(ABCStrategy):
                 if last_trade.trend == TradeType.short.name
                 else close_price - last_trade.opened_position
             )
-            loss_rate = last_trade.opened_position * 0.03
-            """
-            dema144 = dema(candles.close, 144)[-1]
-            dema169 = dema(candles.close, 169)[-1]
-            dema_should_close = False
-            if last_trade.trend == TradeType.long.nameand (dema144 > close_price or dema169 > close_price):
-                dema_should_close = True
-            if last_trade.trend == TradeType.short.name and (dema144 < close_price or dema169 < close_price):
-                dema_should_close = True
-            """
+            win_rate = last_trade.opened_position * 0.05
+            loss_rate = last_trade.opened_position * 0.04
+            # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
 
-            if (trend != last_trade.trend and trend is not None) or (abs(result) > loss_rate):  # or dema_should_close:
+            if (
+                (trend != last_trade.trend and trend is not None)
+                or (result > 0 and result > win_rate)
+                or (result < 0 and abs(result) > loss_rate)
+            ):
                 return self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
 
     def _get_signal(self, candles):
