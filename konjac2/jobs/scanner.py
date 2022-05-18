@@ -106,3 +106,12 @@ async def scan_crypto():
         strategy.exit_signal(data)
         strategy.seek_trend(data)
         strategy.entry_signal(data)
+
+
+async def scan_fx():
+    for fx in ["EUR_USD"]:
+        strategy = LogisticRegressionStrategy(symbol=fx)
+        data = fetch_data(fx, "M30", True, limit=1500)
+        strategy.exit_signal(data)
+        strategy.seek_trend(data)
+        strategy.entry_signal(data)

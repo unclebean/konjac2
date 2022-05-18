@@ -60,4 +60,5 @@ def short_term_backtest(symbol: str):
         func.sum(Trade.result).label("total_result"),
     ).filter(Trade.symbol == symbol)
     session.close()
+    print(strategy.balance)
     return total_result.scalar()

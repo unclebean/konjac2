@@ -13,6 +13,7 @@ LastTradeStatus = namedtuple("LastTradeStatus", "ready_to_procceed is_long is_sh
 
 class ABCStrategy(ABC):
     strategy_name = "abc strategy"
+    balance = 10000
 
     def __init__(self, symbol: str):
         self.symbol = symbol
@@ -86,6 +87,7 @@ class ABCStrategy(ABC):
         last_trade.entry_date = entry_date
         last_trade.status = TradeStatus.opened.name
         last_trade.opened_position = position
+        last_trade.quantity = self.balance / position
         session.add(last_trade)
         session.add(
             Signal(
@@ -97,6 +99,7 @@ class ABCStrategy(ABC):
                 trade_id=last_trade.id,
             )
         )
+        self.balance = self.balance - last_trade.quantity * position
         session.commit()
         session.close()
         return True
@@ -120,8 +123,13 @@ class ABCStrategy(ABC):
         loss_rate = last_trade.opened_position * 0.03
         if abs(result) > loss_rate:
             result = loss_rate if result > 0 else -last_trade.opened_position * 0.028
+        result = last_trade.quantity * result
 
-        fee = last_trade.opened_position * (0.064505 / 100) * 2
+        fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (
+            last_trade.closed_position * (0.064505 / 100) * last_trade.quantity
+        )
+        self.balance += last_trade.opened_position * last_trade.quantity + result - fee
+        print("balance is {}".format(self.balance))
         last_trade.result = result - fee
         session.add(last_trade)
         session.add(
