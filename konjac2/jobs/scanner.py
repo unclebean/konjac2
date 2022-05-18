@@ -96,7 +96,7 @@ async def smart_bot():
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         atr_value = atr(data.high, data.low, data.close)[-1]
-        place_trade(trade_symbol, "buy", trade.trend, tp=atr_value * 2, sl=atr_value * 2)
+        place_trade(trade_symbol, "buy", trade.trend, tp=atr_value * 3.2, sl=atr_value * 3)
 
     log.info("job running done!")
 

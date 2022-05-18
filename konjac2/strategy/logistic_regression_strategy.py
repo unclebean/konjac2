@@ -54,8 +54,8 @@ class LogisticRegressionStrategy(ABCStrategy):
                 else close_price - last_trade.opened_position
             )
             atr_value = atr(candles.high, candles.low, candles.close)[-1]
-            win_rate = last_trade.opened_position + atr_value * 2
-            loss_rate = last_trade.opened_position + atr_value * 2
+            win_rate = last_trade.opened_position + atr_value * 3.2
+            loss_rate = last_trade.opened_position + atr_value * 3
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
 
             if (
