@@ -1,4 +1,5 @@
 from pandas_ta.overlap import dema, ichimoku
+from pandas_ta.volatility import atr
 
 from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
@@ -52,8 +53,9 @@ class LogisticRegressionStrategy(ABCStrategy):
                 if last_trade.trend == TradeType.short.name
                 else close_price - last_trade.opened_position
             )
-            win_rate = last_trade.opened_position * 0.05
-            loss_rate = last_trade.opened_position * 0.04
+            atr_value = atr(candles.high, candles.low, candles.close)[-1]
+            win_rate = last_trade.opened_position + atr_value * 2
+            loss_rate = last_trade.opened_position + atr_value * 2
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
 
             if (
@@ -61,7 +63,9 @@ class LogisticRegressionStrategy(ABCStrategy):
                 or (result > 0 and result > win_rate)
                 or (result < 0 and abs(result) > loss_rate)
             ):
-                return self._update_close_trade(trend, close_price, "lr", accuracy, candles.index[-1])
+                return self._update_close_trade(
+                    trend, close_price, "lr", accuracy, candles.index[-1], atr_value * 3, atr_value * 3
+                )
 
     def _get_signal(self, candles):
         trend, accuracy = predict_xgb_next_ticker(candles.copy(deep=True))

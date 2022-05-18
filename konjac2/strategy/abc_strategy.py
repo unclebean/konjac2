@@ -1,5 +1,6 @@
 from collections import namedtuple
 from datetime import datetime
+from pandas_ta.volatility import atr
 from abc import ABC, abstractclassmethod
 
 
@@ -104,7 +105,7 @@ class ABCStrategy(ABC):
         session.close()
         return True
 
-    def _update_close_trade(self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now()):
+    def _update_close_trade(self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now(), take_profit=0, stop_loss=0):
         last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
         if last_trade is None or last_trade.opened_position is None:
@@ -120,9 +121,10 @@ class ABCStrategy(ABC):
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
-        loss_rate = last_trade.opened_position * 0.05
-        if abs(result) > loss_rate:
-            result = loss_rate if result > 0 else -last_trade.opened_position * 0.04
+        if result > 0 and result > take_profit:
+            result = take_profit
+        if result < 0 and abs(result) > stop_loss:
+            result = -stop_loss
         result = last_trade.quantity * result
 
         fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (
