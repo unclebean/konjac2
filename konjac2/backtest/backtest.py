@@ -48,8 +48,8 @@ def short_term_backtest(symbol: str):
     session.close()
     m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True)
     strategy = LogisticRegressionStrategy(symbol=symbol)
-    for window in m5_data.rolling(window=144 * 6):
-        if len(window.index) < 144 * 6:
+    for window in m5_data.rolling(window=999):
+        if len(window.index) < 999:
             continue
         strategy.exit_signal(window)
         strategy.seek_trend(window)
