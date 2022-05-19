@@ -28,8 +28,8 @@ class LogisticRegressionStrategy(ABCStrategy):
             trend = TradeType.long.name
         if close_price < span_a and close_price < span_b and close_price < dema144 and close_price < dema169:
             trend = TradeType.short.name
+        self._delete_last_in_progress_trade()
         if trend is not None:
-            self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles) -> bool:
