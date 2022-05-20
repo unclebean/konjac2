@@ -105,7 +105,9 @@ class ABCStrategy(ABC):
         session.close()
         return True
 
-    def _update_close_trade(self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now(), take_profit=0, stop_loss=0):
+    def _update_close_trade(
+        self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now(), take_profit=0, stop_loss=0
+    ):
         last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
         if last_trade is None or last_trade.opened_position is None:
@@ -114,7 +116,7 @@ class ABCStrategy(ABC):
             last_trade.opened_position - position
             if last_trade.trend == TradeType.short.name
             else position - last_trade.opened_position
-        )
+        ) * last_trade.quantity
 
         session.delete(last_trade)
         last_trade.exit_signal = tradeType
@@ -125,7 +127,6 @@ class ABCStrategy(ABC):
             result = take_profit
         if result < 0 and abs(result) > stop_loss:
             result = -stop_loss
-        result = last_trade.quantity * result
 
         fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (
             last_trade.closed_position * (0.064505 / 100) * last_trade.quantity
