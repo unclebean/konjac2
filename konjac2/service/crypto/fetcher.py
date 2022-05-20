@@ -116,16 +116,17 @@ def open_position(symbol, tradeType, tp=0, sl=0):
     side = "buy" if tradeType == "long" else "sell"
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
-    gain_rate = amount * price * 0.02 if tp == 0 else tp
-    loss_rate = amount * price * 0.01 if sl == 0 else sl
+    quantity_price = amount * price
+    gain_rate = 0.02 if tp == 0 else tp
+    loss_rate = 0.01 if sl == 0 else sl
     if side == "buy":
-        gain = price + gain_rate
-        loss = price - loss_rate
+        gain = (quantity_price + quantity_price * gain_rate) / amount
+        loss = (quantity_price - quantity_price * loss_rate) / amount
         exchange.create_order(symbol, "takeProfit", "sell", amount, None, params={"triggerPrice": gain})
         exchange.create_order(symbol, "stop", "sell", amount, None, params={"triggerPrice": loss})
     else:
-        gain = price - gain_rate
-        loss = price + loss_rate
+        gain = (quantity_price - quantity_price * gain_rate) / amount
+        loss = (quantity_price + quantity_price * loss_rate) / amount
         exchange.create_order(symbol, "takeProfit", "buy", amount, None, params={"triggerPrice": gain})
         exchange.create_order(symbol, "stop", "buy", amount, None, params={"triggerPrice": loss})
 
