@@ -53,8 +53,9 @@ class LogisticRegressionStrategy(ABCStrategy):
                 else close_price - last_trade.opened_position
             ) * last_trade.quantity
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.015
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.02
             stop_loss = last_trade.opened_position * last_trade.quantity * 0.01
+            print("result {} profit {} loss {}".format(result, take_profit, stop_loss))
             if (
                 (trend != last_trade.trend and trend is not None)
                 or (result > 0 and result > take_profit)

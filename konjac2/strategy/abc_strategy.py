@@ -134,6 +134,7 @@ class ABCStrategy(ABC):
         self.balance += last_trade.opened_position * last_trade.quantity + result - fee
         # print("balance is {}".format(self.balance))
         last_trade.result = result - fee
+        print("close order result {} fee {}".format(result - fee, fee))
         session.add(last_trade)
         session.add(
             Signal(

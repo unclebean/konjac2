@@ -110,6 +110,8 @@ def prepare_indicators_data(candlestick, delta_hours=0):
     dema169 = dema(candlestick.close, 169)
     ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
 
+    vwap, _, _ = VWAP(candlestick=candlestick, delta_hours=delta_hours, group_by="day")
+
     indicators = pd.DataFrame(
         {
             "dema144-169": dema144 - dema169,
@@ -120,6 +122,7 @@ def prepare_indicators_data(candlestick, delta_hours=0):
             "close_shift3": close - close_shift3,
             "close_shift4": close - close_shift4,
             "close_shift5": close - close_shift5,
+            "close_vwap": close - vwap
         },
         index=candlestick.index,
     )

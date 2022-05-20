@@ -116,8 +116,8 @@ def open_position(symbol, tradeType, tp=0, sl=0):
     side = "buy" if tradeType == "long" else "sell"
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
-    gain_rate = 0.015 if tp == 0 else tp
-    loss_rate = 0.01 if sl == 0 else sl
+    gain_rate = amount * price * 0.02 if tp == 0 else tp
+    loss_rate = amount * price * 0.01 if sl == 0 else sl
     if side == "buy":
         gain = price + gain_rate
         loss = price - loss_rate
