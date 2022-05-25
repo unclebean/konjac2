@@ -88,13 +88,23 @@ async def smart_bot():
     is_exit_trade = strategy.exit_signal(data)
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
-        place_trade(trade_symbol, "sell")
+        try:
+            place_trade(trade_symbol, "sell")
+            log.info("closed position!")
+        except Exception as err:
+            log.error("close position error! {}".format(err))
+            place_trade(trade_symbol, "sell")
 
     strategy.seek_trend(data)
     is_opened_trade = strategy.entry_signal(data)
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
-        place_trade(trade_symbol, "buy", trade.trend)
+        try:
+            place_trade(trade_symbol, "buy", trade.trend)
+            log.info("opened position!")
+        except Exception as err:
+            log.error("open position error! {}".format(err))
+            place_trade(trade_symbol, "buy", trade.trend)
 
     log.info("job running done!")
 

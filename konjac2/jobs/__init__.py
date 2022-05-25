@@ -25,6 +25,7 @@ TrustCrypto = [
     "LTC/USDT",
     "TRX/USDT",
     "DOGE/USDT",
+    "SOL/USDT",
 ]
 
 Cryptos = [
