@@ -1,6 +1,5 @@
 from collections import namedtuple
 from datetime import datetime
-from pandas_ta.volatility import atr
 from abc import ABC, abstractclassmethod
 
 
@@ -106,7 +105,16 @@ class ABCStrategy(ABC):
         return True
 
     def _update_close_trade(
-        self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now(), take_profit=0, stop_loss=0
+        self,
+        tradeType,
+        position,
+        indicator,
+        indicator_value=0,
+        exit_date=datetime.now(),
+        high_price=0,
+        low_price=0,
+        take_profit=0,
+        stop_loss=0,
     ):
         last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
@@ -118,15 +126,23 @@ class ABCStrategy(ABC):
             else position - last_trade.opened_position
         ) * last_trade.quantity
 
+        loss_or_profit = (
+            last_trade.opened_position - low_price
+            if last_trade.trend == TradeType.short.name
+            else high_price - last_trade.opened_position
+        ) * last_trade.quantity
+
         session.delete(last_trade)
         last_trade.exit_signal = tradeType
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
-        if result > 0 and result > take_profit:
+        if loss_or_profit > 0 and loss_or_profit > take_profit:
             result = take_profit
-        if result < 0 and abs(result) > stop_loss:
+            # print("close order with take profit")
+        if loss_or_profit < 0 and abs(loss_or_profit) > stop_loss:
             result = -stop_loss
+            # print("close order with stop loss")
 
         fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (
             last_trade.closed_position * (0.064505 / 100) * last_trade.quantity

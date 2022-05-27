@@ -1,6 +1,10 @@
+import logging
 import pandas as pd
 from datetime import datetime
 from .context import get_context, get_binance_context
+
+
+log = logging.getLogger(__name__)
 
 TIMEFRAME_CCXT_MAPPER = {
     "S15": "15s",
@@ -111,6 +115,7 @@ def place_trade(symbol, side, tradeType="", tp=0, sl=0):
 def open_position(symbol, tradeType, tp=0, sl=0):
     exchange = get_context()
     balance = get_ftx_balance()
+    log.info("open position for {} current balance {}".format(symbol, balance))
     price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
     amount = balance / price * 3
     side = "buy" if tradeType == "long" else "sell"

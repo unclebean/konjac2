@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from pandas_ta.overlap import ema, ichimoku, dema
-from pandas_ta.volatility import bbands
+from pandas_ta.volatility import bbands, atr
 from pandas_ta.momentum import macd, cci, rsi
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
@@ -138,9 +138,47 @@ def prepare_indicators_data(candlestick, delta_hours=0):
     return result[(count_y - row_x) :], merged_indicators
 
 
+def sol_params(candlestick, delta_hours=0):
+    close = candlestick.close
+    close_shift1 = candlestick.close.shift(1)
+    close_shift2 = candlestick.close.shift(2)
+    close_shift3 = candlestick.close.shift(3)
+    close_shift4 = candlestick.close.shift(4)
+    close_shift5 = candlestick.close.shift(5)
+
+    ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
+
+    vwap, _, _ = VWAP(candlestick=candlestick, delta_hours=delta_hours, group_by="day")
+    atr_values = atr(candlestick.high, candlestick.low, candlestick.close)
+    atr_shift1 = atr_values.shift(1)
+    atr_shift2 = atr_values.shift(2)
+    atr_shift3 = atr_values.shift(3)
+    atr_shift4 = atr_values.shift(4)
+    atr_shift5 = atr_values.shift(5)
+
+    return pd.DataFrame(
+        {
+            "t-k": ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"],
+            "s-s": ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"],
+            "close_shift1": close - close_shift1,
+            "close_shift2": close - close_shift2,
+            "close_shift3": close - close_shift3,
+            "close_shift4": close - close_shift4,
+            "close_shift5": close - close_shift5,
+            "close_vwap": close - vwap,
+            "atr_shift1": atr_values - atr_shift1,
+            "atr_shift2": atr_values - atr_shift2,
+            "atr_shift3": atr_values - atr_shift3,
+            "atr_shift4": atr_values - atr_shift4,
+            "atr_shift5": atr_values - atr_shift5,
+        },
+        index=candlestick.index,
+    )
+
+
 def merge_lag_data(df):
     index = df.index
-    df = df.append(pd.Series(dtype='float64'), ignore_index=True)
+    df = df.append(pd.Series(dtype="float64"), ignore_index=True)
     merge_key = "order_day"
     df["order_day"] = [x for x in list(range(len(df)))]
     lag_cols = [
