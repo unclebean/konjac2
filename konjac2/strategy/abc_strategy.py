@@ -1,5 +1,6 @@
 from collections import namedtuple
 from datetime import datetime
+from pandas_ta.volatility import atr
 from abc import ABC, abstractclassmethod
 
 
@@ -105,13 +106,7 @@ class ABCStrategy(ABC):
         return True
 
     def _update_close_trade(
-        self,
-        tradeType,
-        position,
-        indicator,
-        indicator_value=0,
-        exit_date=datetime.now(),
-        candles=[],
+        self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now(), take_profit=0, stop_loss=0
     ):
         last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
@@ -128,15 +123,10 @@ class ABCStrategy(ABC):
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
-
-        is_take_profite, take_profit = self._is_take_profit(candles)
-        is_stop_loss, stop_loss = self._is_stop_loss(candles)
-        if is_take_profite:
+        if result > 0 and result > take_profit:
             result = take_profit
-            print("close order with take profit")
-        if is_stop_loss:
+        if result < 0 and abs(result) > stop_loss:
             result = -stop_loss
-            print("close order with stop loss")
 
         fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (
             last_trade.closed_position * (0.064505 / 100) * last_trade.quantity
@@ -163,43 +153,3 @@ class ABCStrategy(ABC):
     def _get_all_open_trade_signal_indicators(self, trade_id: str):
         signals = get_open_trade_signals(trade_id)
         return list(map(lambda s: s.indicator, signals))
-
-    def _is_take_profit(self, candles):
-        last_trade = self.get_trade()
-        if last_trade is not None and last_trade.status == TradeStatus.opened.name:
-            low_price = candles.low[-1]
-            high_price = candles.high[-1]
-
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.02
-
-            profit = (high_price - last_trade.opened_position) * last_trade.quantity
-            if last_trade.trend == TradeType.short.name:
-                profit = (last_trade.opened_position - low_price) * last_trade.quantity
-
-            print(
-                "high: {} low: {} position: {} quantity: {} result: {} take profit: {}".format(
-                    high_price, low_price, last_trade.opened_position, last_trade.quantity, profit, take_profit
-                )
-            )
-
-            return profit >= take_profit, take_profit
-
-    def _is_stop_loss(self, candles):
-        last_trade = self.get_trade()
-        if last_trade is not None and last_trade.status == TradeStatus.opened.name:
-            low_price = candles.low[-1]
-            high_price = candles.high[-1]
-
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.01
-
-            loss = (last_trade.opened_position - low_price) * last_trade.quantity
-            if last_trade.trend == TradeType.short.name:
-                loss = (high_price - last_trade.opened_position) * last_trade.quantity 
-
-            print(
-                "high: {} low: {} position: {} quantity: {} result: {} stop loss:: {}".format(
-                    high_price, low_price, last_trade.opened_position, last_trade.quantity, loss, stop_loss
-                )
-            )
-
-            return loss >= stop_loss, stop_loss

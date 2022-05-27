@@ -47,14 +47,22 @@ class LogisticRegressionStrategy(ABCStrategy):
         ):
             close_price = candles.close[-1]
             trend, accuracy = self._get_signal(candles)
-
+            result = (
+                last_trade.opened_position - close_price
+                if last_trade.trend == TradeType.short.name
+                else close_price - last_trade.opened_position
+            ) * last_trade.quantity
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
-            is_take_profite, _ = self._is_take_profit(candles)
-            is_stop_loss, _ = self._is_stop_loss(candles)
-
-            if (trend != last_trade.trend and trend is not None) or is_take_profite or is_stop_loss:
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.02
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.01
+            # print("result {} profit {} loss {}".format(result, take_profit, stop_loss))
+            if (
+                (trend != last_trade.trend and trend is not None)
+                or (result > 0 and result > take_profit)
+                or (result < 0 and abs(result) > stop_loss)
+            ):
                 return self._update_close_trade(
-                    trend, close_price, "lr", accuracy, candles.index[-1], candles
+                    trend, close_price, "lr", accuracy, candles.index[-1], take_profit, stop_loss
                 )
 
     def _get_signal(self, candles):
