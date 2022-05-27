@@ -46,33 +46,15 @@ class LogisticRegressionStrategy(ABCStrategy):
             and last_trade.entry_date != candles.index[-1]
         ):
             close_price = candles.close[-1]
-            low_price = candles.low[-1]
-            high_price = candles.high[-1]
             trend, accuracy = self._get_signal(candles)
 
-            loss_or_profit = (
-                last_trade.opened_position - low_price
-                if last_trade.trend == TradeType.short.name
-                else high_price - last_trade.opened_position
-            ) * last_trade.quantity
-
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.02
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.01
-            '''
-            print(
-                "high: {} low: {} close: {} position: {} quantity: {} result: {} take profit: {} stop loss: {}".format(
-                    high_price, low_price, close_price, last_trade.opened_position, last_trade.quantity, loss_or_profit, take_profit, stop_loss
-                )
-            )
-            '''
-            if (
-                (trend != last_trade.trend and trend is not None)
-                or (loss_or_profit > 0 and loss_or_profit > take_profit)
-                or (loss_or_profit < 0 and abs(loss_or_profit) > stop_loss)
-            ):
+            is_take_profite, _ = self._is_take_profit(candles)
+            is_stop_loss, _ = self._is_stop_loss(candles)
+
+            if (trend != last_trade.trend and trend is not None) or is_take_profite or is_stop_loss:
                 return self._update_close_trade(
-                    trend, close_price, "lr", accuracy, candles.index[-1], high_price, low_price, take_profit, stop_loss
+                    trend, close_price, "lr", accuracy, candles.index[-1], candles
                 )
 
     def _get_signal(self, candles):
