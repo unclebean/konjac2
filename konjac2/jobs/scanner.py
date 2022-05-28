@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime as dt
+from konjac2.bot.telegram_bot import say_something
 from konjac2.models.trade import TradeStatus, get_last_time_trade
 from konjac2.service.crypto.fetcher import opened_position_by_symbol, place_trade
 from konjac2.service.fetcher import fetch_data
@@ -91,8 +92,9 @@ async def smart_bot():
         try:
             place_trade(trade_symbol, "sell")
             log.info("closed position!")
+            say_something("closed position {}".format(query_symbol))
         except Exception as err:
-            log.error("close position error! {}".format(err))
+            log.error("closed position error! {}".format(err))
             place_trade(trade_symbol, "sell")
 
     strategy.seek_trend(data)
@@ -102,9 +104,11 @@ async def smart_bot():
         try:
             place_trade(trade_symbol, "buy", trade.trend)
             log.info("opened position!")
+            say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
             place_trade(trade_symbol, "buy", trade.trend)
+            say_something("opened position failed!")
 
     log.info("job running done!")
 
