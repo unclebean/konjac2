@@ -80,8 +80,8 @@ async def bbcci_scanner():
 
 
 async def smart_bot():
-    query_symbol = "DOGE/USDT"
-    trade_symbol = "DOGE-PERP"
+    query_symbol = "LTC/USDT"
+    trade_symbol = "LTC-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
