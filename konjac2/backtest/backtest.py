@@ -46,8 +46,8 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2021-11-20 00:00:00":]
-    strategy = LogisticRegressionStrategy(symbol=symbol)
+    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) # .loc["2021-11-20 00:00:00":]
+    strategy = BBCCIStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):
         if len(window.index) < 999:
             continue

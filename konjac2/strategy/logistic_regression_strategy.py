@@ -19,8 +19,6 @@ class LogisticRegressionStrategy(ABCStrategy):
         ichimoku_df, _ = ichimoku(candles.high, candles.low, candles.close)
         span_a = ichimoku_df["ISA_9"][-1]
         span_b = ichimoku_df["ISB_26"][-1]
-        # kijun_sen = ichimoku_df["ITS_9"][-1]
-        # tenkan_sen = ichimoku_df["IKS_26"][-1]
         close_price = candles.close[-1]
         trend = None
         if close_price > span_a and close_price > span_b and close_price > dema144 and close_price > dema169:
@@ -47,22 +45,21 @@ class LogisticRegressionStrategy(ABCStrategy):
         ):
             close_price = candles.close[-1]
             trend, accuracy = self._get_signal(candles)
-            result = (
-                last_trade.opened_position - close_price
-                if last_trade.trend == TradeType.short.name
-                else close_price - last_trade.opened_position
-            ) * last_trade.quantity
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.02
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.01
-            # print("result {} profit {} loss {}".format(result, take_profit, stop_loss))
-            if (
-                (trend != last_trade.trend and trend is not None)
-                or (result > 0 and result > take_profit)
-                or (result < 0 and abs(result) > stop_loss)
-            ):
+
+            is_profit, take_profit = self._is_take_profit(candles)
+            is_loss, stop_loss = self._is_stop_loss(candles)
+            if (trend != last_trade.trend and trend is not None) or is_profit or is_loss:
                 return self._update_close_trade(
-                    trend, close_price, "lr", accuracy, candles.index[-1], take_profit, stop_loss
+                    trend,
+                    close_price,
+                    "lr",
+                    accuracy,
+                    candles.index[-1],
+                    is_profit,
+                    is_loss,
+                    take_profit,
+                    stop_loss,
                 )
 
     def _get_signal(self, candles):

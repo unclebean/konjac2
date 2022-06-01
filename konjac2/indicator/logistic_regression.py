@@ -54,7 +54,7 @@ def predict_xgb_next_ticker(candelstick, predict_step=1, model=None, delta_hours
     data_dmatrix = xgb.DMatrix(data=train_x, label=train_y)
     accuracy = _cross_validate(data_dmatrix)
     model = xgb.train(_get_params(), data_dmatrix)
-
+    # feature_importance(model)
     predict_score = model.predict(xgb.DMatrix(test_x))
     return predict_score, accuracy
 
@@ -99,7 +99,11 @@ def _get_params():
 
 def prepare_indicators_data(candlestick, delta_hours=0):
     result = candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
+    open_price = candlestick.open
+    high_price = candlestick.high
+    low_price = candlestick.low
     close = candlestick.close
+
     close_shift1 = candlestick.close.shift(1)
     close_shift2 = candlestick.close.shift(2)
     close_shift3 = candlestick.close.shift(3)
@@ -122,7 +126,10 @@ def prepare_indicators_data(candlestick, delta_hours=0):
             "close_shift3": close - close_shift3,
             "close_shift4": close - close_shift4,
             "close_shift5": close - close_shift5,
-            "close_vwap": close - vwap
+            "close_vwap": close - vwap,
+            "close_open": close - open_price,
+            "close_low": close - low_price,
+            "close_high": close - high_price,
         },
         index=candlestick.index,
     )

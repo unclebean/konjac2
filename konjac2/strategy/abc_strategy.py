@@ -1,6 +1,5 @@
 from collections import namedtuple
 from datetime import datetime
-from pandas_ta.volatility import atr
 from abc import ABC, abstractclassmethod
 
 
@@ -106,30 +105,41 @@ class ABCStrategy(ABC):
         return True
 
     def _update_close_trade(
-        self, tradeType, position, indicator, indicator_value=0, exit_date=datetime.now(), take_profit=0, stop_loss=0
+        self,
+        tradeType,
+        position,
+        indicator,
+        indicator_value=0,
+        exit_date=datetime.now(),
+        is_profit=False,
+        is_loss=False,
+        take_profit=0,
+        stop_loss=0,
     ):
         last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
         if last_trade is None or last_trade.opened_position is None:
             return
-        result = (
-            last_trade.opened_position - position
-            if last_trade.trend == TradeType.short.name
-            else position - last_trade.opened_position
-        ) * last_trade.quantity
 
         session.delete(last_trade)
         last_trade.exit_signal = tradeType
         last_trade.exit_date = exit_date
         last_trade.status = TradeStatus.closed.name
         last_trade.closed_position = position
-        if result > 0 and result > take_profit:
+
+        result = (
+            last_trade.opened_position - position
+            if last_trade.trend == TradeType.short.name
+            else position - last_trade.opened_position
+        ) * last_trade.quantity
+
+        if is_profit:
             result = take_profit
-        if result < 0 and abs(result) > stop_loss:
+        if is_loss:
             result = -stop_loss
 
-        fee = (last_trade.opened_position * (0.064505 / 100) * last_trade.quantity) + (
-            last_trade.closed_position * (0.064505 / 100) * last_trade.quantity
+        fee = (last_trade.opened_position * (0.061110 / 100) * last_trade.quantity) + (
+            last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
         )
         self.balance += last_trade.opened_position * last_trade.quantity + result - fee
         # print("balance is {}".format(self.balance))
@@ -153,3 +163,44 @@ class ABCStrategy(ABC):
     def _get_all_open_trade_signal_indicators(self, trade_id: str):
         signals = get_open_trade_signals(trade_id)
         return list(map(lambda s: s.indicator, signals))
+
+    def _is_take_profit(self, candles):
+        last_trade = self.get_trade()
+        if last_trade is not None and last_trade.status == TradeStatus.opened.name:
+            low_price = candles.low[-1]
+            high_price = candles.high[-1]
+
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.03
+
+            profit = (high_price - last_trade.opened_position) * last_trade.quantity
+            if last_trade.trend == TradeType.short.name:
+                profit = (last_trade.opened_position - low_price) * last_trade.quantity
+
+            """
+            print(
+                "high: {} low: {} position: {} quantity: {} result: {} take profit: {}".format(
+                    high_price, low_price, last_trade.opened_position, last_trade.quantity, profit, take_profit
+                )
+            )
+            """
+
+            return profit >= take_profit, take_profit
+
+    def _is_stop_loss(self, candles):
+        last_trade = self.get_trade()
+        if last_trade is not None and last_trade.status == TradeStatus.opened.name:
+            # close_price = candles.close[-1]
+            low_price = candles.low[-1]
+            high_price = candles.high[-1]
+
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.01
+
+            loss = (last_trade.opened_position - low_price) * last_trade.quantity
+            if last_trade.trend == TradeType.short.name:
+                loss = (high_price - last_trade.opened_position) * last_trade.quantity
+
+            # print(last_trade)
+            # print(last_trade.opened_position, close_price, low_price, high_price, last_trade.quantity)
+            # print("loss: {} stop loss:: {}".format(loss, stop_loss))
+
+            return loss >= stop_loss, stop_loss
