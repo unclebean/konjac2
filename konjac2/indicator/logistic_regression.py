@@ -1,8 +1,10 @@
+from os.path import exists
 import numpy as np
 import pandas as pd
-from pandas_ta.overlap import ema, ichimoku, dema
-from pandas_ta.volatility import bbands, atr
+from pandas_ta.overlap import ema, ichimoku
+from pandas_ta.volatility import bbands
 from pandas_ta.momentum import macd, cci, rsi
+from pandas_ta.volume import obv
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler
@@ -33,7 +35,7 @@ def LogisticRegressionModel(candles):
 
     candles = candles.dropna()
     X = candles.iloc[0:-2, :16]
-    y = np.where(candles["close"].shift(-1) > candles["close"], 1, -1)[2:]
+    y = np.where(candles["close"].shift(-1) > candles["high"], 1, -1)[2:]
     X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
     model = LogisticRegression()
     model = model.fit(X_train, y_train)
@@ -53,17 +55,22 @@ def predict_xgb_next_ticker(candelstick, predict_step=1, model=None, delta_hours
 
     data_dmatrix = xgb.DMatrix(data=train_x, label=train_y)
     accuracy = _cross_validate(data_dmatrix)
-    model = xgb.train(_get_params(), data_dmatrix)
-    # feature_importance(model)
+    if exists("lr.model"):
+        model = xgb.train(_get_params(), data_dmatrix, xgb_model="lr.model")
+    else:
+        model = xgb.train(_get_params(), data_dmatrix)
+    model.save_model("lr.model")
+    # model = xgb.train(_get_params(), data_dmatrix)
+    features = feature_importance(model)
     predict_score = model.predict(xgb.DMatrix(test_x))
-    return predict_score, accuracy
+    return predict_score, accuracy, features
 
 
 def feature_importance(model):
     feat_importances = []
     for ft, score in model.get_fscore().items():
         feat_importances.append({"Feature": ft, "Importance": score})
-    print(feat_importances)
+    return feat_importances
 
 
 def _cross_validate(trainData):
@@ -98,41 +105,9 @@ def _get_params():
 
 
 def prepare_indicators_data(candlestick, delta_hours=0):
-    result = candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    open_price = candlestick.open
-    high_price = candlestick.high
-    low_price = candlestick.low
-    close = candlestick.close
-
-    close_shift1 = candlestick.close.shift(1)
-    close_shift2 = candlestick.close.shift(2)
-    close_shift3 = candlestick.close.shift(3)
-    close_shift4 = candlestick.close.shift(4)
-    close_shift5 = candlestick.close.shift(5)
-
-    dema144 = dema(candlestick.close, 144)
-    dema169 = dema(candlestick.close, 169)
-    ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
-
-    vwap, _, _ = VWAP(candlestick=candlestick, delta_hours=delta_hours, group_by="day")
-
-    indicators = pd.DataFrame(
-        {
-            "dema144-169": dema144 - dema169,
-            "t-k": ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"],
-            "s-s": ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"],
-            "close_shift1": close - close_shift1,
-            "close_shift2": close - close_shift2,
-            "close_shift3": close - close_shift3,
-            "close_shift4": close - close_shift4,
-            "close_shift5": close - close_shift5,
-            "close_vwap": close - vwap,
-            "close_open": close - open_price,
-            "close_low": close - low_price,
-            "close_high": close - high_price,
-        },
-        index=candlestick.index,
-    )
+    result = np.where(candlestick["close"].shift(-1) > candlestick["high"], 1, 0)
+    # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
+    indicators = sol_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
@@ -146,38 +121,17 @@ def prepare_indicators_data(candlestick, delta_hours=0):
 
 
 def sol_params(candlestick, delta_hours=0):
-    close = candlestick.close
-    close_shift1 = candlestick.close.shift(1)
-    close_shift2 = candlestick.close.shift(2)
-    close_shift3 = candlestick.close.shift(3)
-    close_shift4 = candlestick.close.shift(4)
-    close_shift5 = candlestick.close.shift(5)
+    close_price = candlestick.close
 
-    ichimoku_df, _ = ichimoku(candlestick.high, candlestick.low, candlestick.close)
+    obv_values = obv(candlestick.close, candlestick.volume)
+    obv_ema200 = ema(obv_values, 200)
 
-    vwap, _, _ = VWAP(candlestick=candlestick, delta_hours=delta_hours, group_by="day")
-    atr_values = atr(candlestick.high, candlestick.low, candlestick.close)
-    atr_shift1 = atr_values.shift(1)
-    atr_shift2 = atr_values.shift(2)
-    atr_shift3 = atr_values.shift(3)
-    atr_shift4 = atr_values.shift(4)
-    atr_shift5 = atr_values.shift(5)
+    ema144 = ema(candlestick.close, 144)
 
     return pd.DataFrame(
         {
-            "t-k": ichimoku_df["ITS_9"] - ichimoku_df["IKS_26"],
-            "s-s": ichimoku_df["ISA_9"] - ichimoku_df["ISB_26"],
-            "close_shift1": close - close_shift1,
-            "close_shift2": close - close_shift2,
-            "close_shift3": close - close_shift3,
-            "close_shift4": close - close_shift4,
-            "close_shift5": close - close_shift5,
-            "close_vwap": close - vwap,
-            "atr_shift1": atr_values - atr_shift1,
-            "atr_shift2": atr_values - atr_shift2,
-            "atr_shift3": atr_values - atr_shift3,
-            "atr_shift4": atr_values - atr_shift4,
-            "atr_shift5": atr_values - atr_shift5,
+            "obv_ema": obv_values - obv_ema200,
+            "close_ema144": close_price - ema144,
         },
         index=candlestick.index,
     )
@@ -189,24 +143,28 @@ def merge_lag_data(df):
     merge_key = "order_day"
     df["order_day"] = [x for x in list(range(len(df)))]
     lag_cols = [
+        "open_vwap",
+        "high_vwap",
+        "low_vwap",
+        "close_vwap",
+        "obv_ema",
+        "rsi_ema",
+        "cci_ema",
+        "close_ema",
         "close_shift1",
-        "close_shift2",
-        "close_shift3",
-        "close_shift4",
-        "close_shift5",
     ]
 
     def rename_col(x):
         return "{}_lag_{}".format(x, shift) if x in lag_cols else x
 
-    for shift in [x + 1 for x in range(3)]:
+    for shift in [x + 1 for x in range(5)]:
         shift_data = df[[merge_key] + lag_cols].copy()
         shift_data[merge_key] = shift_data[merge_key] + shift
         shift_data = shift_data.rename(columns=rename_col)
         df = pd.merge(df, shift_data, on=[merge_key], how="left")
     df = df.drop(columns=lag_cols + [merge_key])[1:]
     df.index = index
-    return df[3:]
+    return df[5:]
 
 
 def macd_to_series(close):

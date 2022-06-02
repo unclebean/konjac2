@@ -3,7 +3,6 @@ from pandas_ta.momentum import cci
 from .abc_strategy import ABCStrategy
 from ..indicator.utils import TradeType, is_crossing_up, is_crossing_down
 from ..indicator.bb_cci_momentum import bb_cci_mom
-from ..bot.telegram_bot import say_something
 
 
 class BBCCIStrategy(ABCStrategy):
