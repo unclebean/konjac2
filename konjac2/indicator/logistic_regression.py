@@ -1,10 +1,10 @@
-from os.path import exists
 import numpy as np
 import pandas as pd
 from pandas_ta.overlap import ema, ichimoku
-from pandas_ta.volatility import bbands
-from pandas_ta.momentum import macd, cci, rsi
+from pandas_ta.volatility import bbands, atr
+from pandas_ta.momentum import macd, cci, rsi, stoch, mom
 from pandas_ta.volume import obv
+from pandas_ta.trend import adx
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler
@@ -55,11 +55,8 @@ def predict_xgb_next_ticker(candelstick, predict_step=1, model=None, delta_hours
 
     data_dmatrix = xgb.DMatrix(data=train_x, label=train_y)
     accuracy = _cross_validate(data_dmatrix)
-    if exists("lr.model"):
-        model = xgb.train(_get_params(), data_dmatrix, xgb_model="lr.model")
-    else:
-        model = xgb.train(_get_params(), data_dmatrix)
-    model.save_model("lr.model")
+
+    model = xgb.train(_get_params(), data_dmatrix)
     # model = xgb.train(_get_params(), data_dmatrix)
     features = feature_importance(model)
     predict_score = model.predict(xgb.DMatrix(test_x))
@@ -105,9 +102,9 @@ def _get_params():
 
 
 def prepare_indicators_data(candlestick, delta_hours=0):
-    result = np.where(candlestick["close"].shift(-1) > candlestick["high"], 1, 0)
+    result = np.where(candlestick["close"].shift(-1) > candlestick["close"], 1, 0)[1:]
     # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    indicators = sol_params(candlestick)
+    indicators = new_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
@@ -117,7 +114,7 @@ def prepare_indicators_data(candlestick, delta_hours=0):
 
     row_x, _ = merged_indicators.shape
 
-    return result[(count_y - row_x) :], merged_indicators
+    return result, merged_indicators[1:]
 
 
 def sol_params(candlestick, delta_hours=0):
@@ -134,6 +131,69 @@ def sol_params(candlestick, delta_hours=0):
             "close_ema144": close_price - ema144,
         },
         index=candlestick.index,
+    )
+
+
+def new_params(candles):
+    # ema3
+    ema3 = ema(candles.close, 3)
+    # ema10
+    ema10 = ema(candles.close, 10)
+    # ema100
+    ema100 = ema(candles.close, 100)
+    # macd
+    macd_df = macd(candles.close)
+    macd_values = macd_df["MACD_12_26_9"]
+    # macd signal diff
+    macd_signals = macd_df["MACDs_12_26_9"]
+    # adx 20
+    adx_df = adx(candles.high, candles.low, candles.close, 20)
+    adx20 = adx_df["ADX_20"]
+    # pdi mdi diff
+    # sto slowk
+    sto_df = stoch(candles.high, candles.low, candles.close)
+
+    sto_k = sto_df["STOCHk_14_3_3"]
+    # sto diff
+    sto_d = sto_df["STOCHd_14_3_3"]
+    # cci3
+    cci3 = cci(candles.high, candles.low, candles.close, 3)
+    # cci10
+    cci10 = cci(candles.high, candles.low, candles.close, 10)
+    # mom3
+    mom3 = mom(candles.close, 3)
+    # mom10
+    mom10 = mom(candles.close, 10)
+    # atr3
+    atr3 = atr(candles.high, candles.low, candles.close, 3)
+    # atr10
+    atr10 = atr(candles.high, candles.low, candles.close, 10)
+    # bbands3
+    bb3 = bbands(candles.close, 3)
+    bb3_diff = bb3["BBU_3_2.0"] - bb3["BBL_3_2.0"]
+    # bbands10
+    bb10 = bbands(candles.close, 10)
+    bb10_diff = bb10["BBU_10_2.0"] - bb10["BBL_10_2.0"]
+    return pd.DataFrame(
+        {
+            "ema3": ema3,
+            "ema10": ema10,
+            "ema100": ema100,
+            "macd_values": macd_values,
+            "macd_signals": macd_signals,
+            "adx20": adx20,
+            "sto_k": sto_k,
+            "sto_d": sto_d,
+            "cci3": cci3,
+            "cci10": cci10,
+            "mom3": mom3,
+            "mom10": mom10,
+            "atr3": atr3,
+            "atr10": atr10,
+            "bb3_diff": bb3_diff,
+            "bb10_diff": bb10_diff,
+        },
+        index=candles.index,
     )
 
 

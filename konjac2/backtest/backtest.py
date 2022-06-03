@@ -46,13 +46,16 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2022-01-20 00:00:00":]
+    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2021-11-20 00:00:00":]
+    daily_data = pd.read_csv(f"{symbol}_24_0.csv", index_col="date", parse_dates=True)
     strategy = LogisticRegressionStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):
         if len(window.index) < 999:
             continue
+        last_day = window.index[-1].strftime("%Y-%m-%d")
+        current_day_data = daily_data.loc[:last_day]
         strategy.exit_signal(window)
-        strategy.seek_trend(window)
+        strategy.seek_trend(window, current_day_data)
         strategy.entry_signal(window)
         print(strategy.get_trade())
     session = apply_session()
