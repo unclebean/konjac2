@@ -99,7 +99,7 @@ async def smart_bot():
             place_trade(trade_symbol, "sell")
 
     strategy.seek_trend(data, h4_data)
-    is_opened_trade = strategy.entry_signal(data)
+    is_opened_trade = strategy.entry_signal(data, h4_data)
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         try:
@@ -121,7 +121,7 @@ async def scan_crypto():
         h4_data = fetch_data(crypto, "H4", True, limit=1500)
         strategy.exit_signal(data)
         strategy.seek_trend(data, h4_data)
-        strategy.entry_signal(data)
+        strategy.entry_signal(data, h4_data)
 
 
 async def scan_fx():

@@ -72,7 +72,7 @@ def short_term_backtest(symbol: str):
         # print(current_day_data)
         strategy.exit_signal(window)
         strategy.seek_trend(window, current_day_data)
-        strategy.entry_signal(window)
+        strategy.entry_signal(window, current_day_data)
         print(strategy.get_trade())
     session = apply_session()
     total_result = session.query(
