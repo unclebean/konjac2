@@ -80,11 +80,11 @@ async def bbcci_scanner():
 
 
 async def smart_bot():
-    query_symbol = "LTC/USDT"
-    trade_symbol = "LTC-PERP"
+    query_symbol = "SOL/USDT"
+    trade_symbol = "SOL-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
-    daily_data = fetch_data(query_symbol, "D", False, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", False, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data)
@@ -98,7 +98,7 @@ async def smart_bot():
             log.error("closed position error! {}".format(err))
             place_trade(trade_symbol, "sell")
 
-    strategy.seek_trend(data, daily_data)
+    strategy.seek_trend(data, h4_data)
     is_opened_trade = strategy.entry_signal(data)
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
@@ -118,9 +118,9 @@ async def scan_crypto():
     for crypto in TrustCrypto:
         strategy = LogisticRegressionStrategy(symbol=crypto)
         data = fetch_data(crypto, "H1", True, limit=1500)
-        daily_data = fetch_data(crypto, "D", False, limit=1500)
+        h4_data = fetch_data(crypto, "H4", False, limit=1500)
         strategy.exit_signal(data)
-        strategy.seek_trend(data, daily_data)
+        strategy.seek_trend(data, h4_data)
         strategy.entry_signal(data)
 
 

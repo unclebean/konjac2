@@ -63,24 +63,23 @@ class LogisticRegressionStrategy(ABCStrategy):
     def _get_open_signal(self, candles):
         trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True))
         most_important_feature = max(features, key=lambda f: f["Importance"])
-        print(accuracy)
-        if trend is None or accuracy < 0.5:
+        if trend is None:
             return None, 0, 0
         if trend[0] > 0.5:
-            return TradeType.short.name, trend[0], most_important_feature["Feature"]
-        elif trend[0] < 0.5:
             return TradeType.long.name, trend[0], most_important_feature["Feature"]
+        elif trend[0] < 0.5:
+            return TradeType.short.name, trend[0], most_important_feature["Feature"]
         return None, 0, 0
 
     def _get_signal(self, candles):
         trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True))
         most_important_feature = max(features, key=lambda f: f["Importance"])
-        if trend is None or accuracy < 0.5:
+        if trend is None:
             return None, 0, 0
         if trend[0] > 0.5:
-            return TradeType.short.name, trend[0], most_important_feature["Feature"]
-        elif trend[0] < 0.5:
             return TradeType.long.name, trend[0], most_important_feature["Feature"]
+        elif trend[0] < 0.5:
+            return TradeType.short.name, trend[0], most_important_feature["Feature"]
         return None, 0, 0
 
     def _get_trend(self, candles):
