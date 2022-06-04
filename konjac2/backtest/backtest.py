@@ -47,7 +47,7 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2021-01-20 00:00:00":]
+    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2019-01-20 00:00:00":]
     h4_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
     strategy = LogisticRegressionStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):
@@ -55,18 +55,21 @@ def short_term_backtest(symbol: str):
             continue
         # last_day = window.index[-1].strftime("%Y-%m-%d")
         last_index = window.index[-1]
-        if last_index.hour < 8:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 08:00:00"
+        if last_index.hour < 4:
+            last_h4_index = last_index.strftime("%Y-%m-%d") + " 00:00:00"
+        elif last_index.hour < 8:
+            last_h4_index = last_index.strftime("%Y-%m-%d") + " 04:00:00"
         elif last_index.hour < 12:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 12:00:00"
+            last_h4_index = last_index.strftime("%Y-%m-%d") + " 08:00:00"
         elif last_index.hour < 16:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 16:00:00"
+            last_h4_index = last_index.strftime("%Y-%m-%d") + " 12:00:00"
         elif last_index.hour < 20:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 20:00:00"
+            last_h4_index = last_index.strftime("%Y-%m-%d") + " 16:00:00"
         else:
-            last_h4_index = (last_index + timedelta(days=1)).strftime("%Y-%m-%d") + " 00:00:00"
-
+            last_h4_index = last_index.strftime("%Y-%m-%d") + " 20:00:00"
+        # print(window)
         current_day_data = h4_data.loc[:last_h4_index]
+        # print(current_day_data)
         strategy.exit_signal(window)
         strategy.seek_trend(window, current_day_data)
         strategy.entry_signal(window)

@@ -84,7 +84,7 @@ async def smart_bot():
     trade_symbol = "SOL-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", False, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data)
@@ -118,7 +118,7 @@ async def scan_crypto():
     for crypto in TrustCrypto:
         strategy = LogisticRegressionStrategy(symbol=crypto)
         data = fetch_data(crypto, "H1", True, limit=1500)
-        h4_data = fetch_data(crypto, "H4", False, limit=1500)
+        h4_data = fetch_data(crypto, "H4", True, limit=1500)
         strategy.exit_signal(data)
         strategy.seek_trend(data, h4_data)
         strategy.entry_signal(data)
