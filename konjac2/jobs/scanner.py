@@ -131,3 +131,37 @@ async def scan_fx():
         strategy.exit_signal(data)
         strategy.seek_trend(data)
         strategy.entry_signal(data)
+
+
+async def short_smart_bot():
+    query_symbol = "SOL/USDT"
+    trade_symbol = "SOL-PERP"
+    strategy = BBCCIStrategy(symbol=query_symbol)
+    data = fetch_data(query_symbol, "M5", True, limit=1500)
+    opened_position = opened_position_by_symbol(trade_symbol)
+
+    is_exit_trade = strategy.exit_signal(data)
+    trade = get_last_time_trade(query_symbol)
+    if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
+        try:
+            place_trade(trade_symbol, "sell")
+            log.info("closed position!")
+            say_something("closed position {}".format(query_symbol))
+        except Exception as err:
+            log.error("closed position error! {}".format(err))
+            place_trade(trade_symbol, "sell")
+
+    strategy.seek_trend(data)
+    is_opened_trade = strategy.entry_signal(data)
+    trade = get_last_time_trade(query_symbol)
+    if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
+        try:
+            place_trade(trade_symbol, "buy", trade.trend)
+            log.info("opened position!")
+            say_something("opened position {}".format(query_symbol))
+        except Exception as err:
+            log.error("open position error! {}".format(err))
+            place_trade(trade_symbol, "buy", trade.trend)
+            say_something("opened position failed!")
+
+    log.info("job running done!")

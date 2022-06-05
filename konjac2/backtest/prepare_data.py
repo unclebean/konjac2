@@ -22,9 +22,12 @@ def prepare_forex_backtest_data(symbol: str, timeframe: str, step_hours=1, step_
     dates = generate_dates(start_date="2020-12-01T00:00:00", step_hours=step_hours, step_mins=step_mins)
     datasets = None
     for date in dates:
-        predict_date = date.strftime("%Y-%m-%dT%H:%M:%S")
-        m30 = fetch_data(symbol, timeframe, True, counts=5000, till_date=predict_date)
-        datasets = m30 if datasets is None else pd.concat([datasets, m30], axis=0)
+        try:
+            predict_date = date.strftime("%Y-%m-%dT%H:%M:%S")
+            m30 = fetch_data(symbol, timeframe, True, counts=5000, till_date=predict_date)
+            datasets = m30 if datasets is None else pd.concat([datasets, m30], axis=0)
+        except Exception:
+            break
     datasets = datasets.reset_index().drop_duplicates(subset="date", keep="first").set_index("date")
     datasets.to_csv(f"{symbol}_{step_hours}_{step_mins}.csv")
     return datasets
