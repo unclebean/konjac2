@@ -156,12 +156,12 @@ async def short_smart_bot():
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         try:
-            place_trade(trade_symbol, "buy", trade.trend)
+            place_trade(trade_symbol, "buy", trade.trend, tp=0.023, sl=0.013)
             log.info("opened position!")
             say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
-            place_trade(trade_symbol, "buy", trade.trend)
+            place_trade(trade_symbol, "buy", trade.trend, tp=0.023, sl=0.013)
             say_something("opened position failed!")
 
     log.info("job running done!")
