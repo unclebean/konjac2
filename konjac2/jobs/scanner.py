@@ -80,8 +80,8 @@ async def bbcci_scanner():
 
 
 async def smart_bot():
-    query_symbol = "SOL/USDT"
-    trade_symbol = "SOL-PERP"
+    query_symbol = "ADA/USDT"
+    trade_symbol = "ADA-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
