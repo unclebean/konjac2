@@ -134,8 +134,8 @@ async def scan_fx():
 
 
 async def short_smart_bot():
-    query_symbol = "XTZ/USDT"
-    trade_symbol = "XTZ-PERP"
+    query_symbol = "DOGE/USDT"
+    trade_symbol = "DOGE-PERP"
     strategy = BBCCIStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "M5", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
