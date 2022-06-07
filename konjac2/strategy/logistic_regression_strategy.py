@@ -1,3 +1,4 @@
+import logging
 from pandas_ta.overlap import ema
 from pandas_ta.volume import obv
 
@@ -7,6 +8,8 @@ from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
 from ..models.trade import TradeStatus
 from .abc_strategy import ABCStrategy
+
+log = logging.getLogger(__name__)
 
 
 class LogisticRegressionStrategy(ABCStrategy):
@@ -28,7 +31,11 @@ class LogisticRegressionStrategy(ABCStrategy):
             longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, longer_timeframe_candles)
             trend, accuracy, _ = self._get_open_signal(candles)
             if trend is not None and trend == last_trade.trend and trend == longer_timeframe_trend:
-                return self._update_open_trade(last_trade.trend, candles.close[-1], "lr", accuracy, candles.index[-1])
+                status = self._update_open_trade(last_trade.trend, candles.close[-1], "lr", accuracy, candles.index[-1])
+                _, take_profit = self._is_take_profit(candles)
+                _, stop_loss = self._is_stop_loss(candles)
+                log.info(f"open position for {self.symbol} take profit {take_profit} stop loss {stop_loss}")
+                return status
 
     def exit_signal(self, candles) -> bool:
         last_trade = self.get_trade()
