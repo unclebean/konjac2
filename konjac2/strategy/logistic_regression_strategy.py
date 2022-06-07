@@ -16,12 +16,11 @@ class LogisticRegressionStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, daily_candles):
-        trading_trend = self._get_trend(candles)
-        daily_trend = self._get_trend(daily_candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, daily_candles)
 
         self._delete_last_in_progress_trade()
-        if trading_trend == daily_trend and trading_trend is not None:
-            self._start_new_trade(trading_trend, candles.index[-1])
+        if longer_timeframe_trend is not None:
+            self._start_new_trade(longer_timeframe_trend, candles.index[-1])
 
     def entry_signal(self, candles, longer_timeframe_candles) -> bool:
         last_trade = self.get_trade()
