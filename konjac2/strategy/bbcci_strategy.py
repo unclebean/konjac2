@@ -24,12 +24,14 @@ class BBCCIStrategy(ABCStrategy):
 
     def entry_signal(self, candles):
         cci34 = cci(candles.high, candles.low, candles.close, 34)
+        cci144 = cci(candles.high, candles.low, candles.close, 144)
+        diff_value = abs(cci34[-1] - cci144[-1])
         last_order_status = self._can_open_new_trade()
-        if last_order_status.ready_to_procceed and last_order_status.is_long and is_crossing_down(cci34[-1], -240):
+        if last_order_status.ready_to_procceed and last_order_status.is_long and diff_value > 210:
             self._update_open_trade(TradeType.long.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.long.name}")
 
-        if last_order_status.ready_to_procceed and last_order_status.is_short and is_crossing_up(cci34[-1], 240):
+        if last_order_status.ready_to_procceed and last_order_status.is_short and diff_value > 210:
             self._update_open_trade(TradeType.short.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
