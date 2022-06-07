@@ -51,6 +51,7 @@ class LogisticRegressionStrategy(ABCStrategy):
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             if (trend != last_trade.trend and trend is not None) or is_profit or is_loss:
+                log.info(f"open position for {self.symbol} take profit {take_profit} stop loss {stop_loss}")
                 return self._update_close_trade(
                     trend,
                     close_price,
