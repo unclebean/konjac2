@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime as dt
 from konjac2.bot.telegram_bot import say_something
@@ -80,6 +81,7 @@ async def bbcci_scanner():
 
 
 async def smart_bot():
+    await asyncio.sleep(30)
     query_symbol = "SOL/USDT"
     trade_symbol = "SOL-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
@@ -110,7 +112,6 @@ async def smart_bot():
             log.error("open position error! {}".format(err))
             place_trade(trade_symbol, "buy", trade.trend)
             say_something("opened position failed!")
-
     log.info("job running done!")
 
 
