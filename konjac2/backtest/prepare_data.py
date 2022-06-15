@@ -7,7 +7,7 @@ def generate_dates(start_date="2019-05-01T21:00:00", step_hours=1, step_mins=0, 
     start = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
     forward_dates = []
     index = 0
-    while len(forward_dates) < 100:
+    while len(forward_dates) < 500:
         start = start + timedelta(hours=step_hours, minutes=step_mins)
         # if start.weekday() < 5:
         if index % counts == 0:
@@ -19,7 +19,7 @@ def generate_dates(start_date="2019-05-01T21:00:00", step_hours=1, step_mins=0, 
 
 
 def prepare_forex_backtest_data(symbol: str, timeframe: str, step_hours=1, step_mins=0):
-    dates = generate_dates(start_date="2020-12-01T00:00:00", step_hours=step_hours, step_mins=step_mins)
+    dates = generate_dates(start_date="2020-01-01T00:00:00", step_hours=step_hours, step_mins=step_mins)
     datasets = None
     for date in dates:
         try:

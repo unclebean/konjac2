@@ -122,8 +122,8 @@ def open_position(symbol, tradeType, tp=0, sl=0):
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
     quantity_price = amount * price
-    gain_rate = 0.025 if tp == 0 else tp
-    loss_rate = 0.02 if sl == 0 else sl
+    gain_rate = 0.03 if tp == 0 else tp
+    loss_rate = 0.025 if sl == 0 else sl
     if side == "buy":
         gain = (quantity_price + quantity_price * gain_rate) / amount
         loss = (quantity_price - quantity_price * loss_rate) / amount

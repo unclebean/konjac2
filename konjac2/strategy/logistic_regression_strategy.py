@@ -1,6 +1,7 @@
 import logging
 from pandas_ta.overlap import ema
 from pandas_ta.volume import obv
+from pandas_ta.momentum import stochrsi
 
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 
@@ -108,3 +109,21 @@ class LogisticRegressionStrategy(ABCStrategy):
             trend_action = TradeType.short.name
 
         return trend_action
+
+    def _get_stoch_rsi_trend(self, candles):
+        stochrsi_values = stochrsi(candles.close, length=14, rsi_length=14, k=3, d=3)
+        stochrsi_k = stochrsi_values["STOCHRSIk_14_14_3_3"]
+        stoch_trend = None
+        is_stoch_in_zone = False
+        for k_value in reversed(stochrsi_k):
+            if k_value > 80 and is_stoch_in_zone:
+                stoch_trend = TradeType.short.name
+                break
+            if k_value < 20 and is_stoch_in_zone:
+                stoch_trend = TradeType.long.name
+                break
+            if k_value > 20 and k_value < 80:
+                is_stoch_in_zone = True
+        return stoch_trend
+
+

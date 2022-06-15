@@ -1,3 +1,4 @@
+import logging
 from collections import namedtuple
 from datetime import datetime
 from abc import ABC, abstractclassmethod
@@ -9,6 +10,8 @@ from ..models.trade import Trade, TradeStatus, get_last_time_trade
 from ..models.signal import Signal, get_open_trade_signals
 
 LastTradeStatus = namedtuple("LastTradeStatus", "ready_to_procceed is_long is_short opened_position")
+
+log = logging.getLogger(__name__)
 
 
 class ABCStrategy(ABC):
@@ -100,6 +103,10 @@ class ABCStrategy(ABC):
             )
         )
         self.balance = self.balance - last_trade.quantity * position
+        gain = (last_trade.quantity * position + last_trade.quantity * position * 0.3) / last_trade.quantity
+        loss = (last_trade.quantity * position - last_trade.quantity * position * 0.25) / last_trade.quantity
+        log.info(f"{self.symbol} take profit {gain} stop loss {loss}")
+
         session.commit()
         session.close()
         return True
@@ -170,7 +177,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.025
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.03
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -193,7 +200,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.02
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.025
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
