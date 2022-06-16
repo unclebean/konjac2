@@ -178,7 +178,6 @@ async def trade_eur_usd():
     h4_data = fetch_data(query_symbol, "H4", True, counts=1000)
 
     is_exit_trade = strategy.exit_signal(data)
-    close_trade(trade_symbol)
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
