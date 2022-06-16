@@ -18,7 +18,7 @@ def make_trade(symbol: str, signal: str):
     if TradeType.long.name == signal:
         _long_trade(symbol)
     if TradeType.short.name == signal:
-        _short_trade()
+        _short_trade(symbol)
 
 
 def _long_trade(symbol: str, units=5000):
