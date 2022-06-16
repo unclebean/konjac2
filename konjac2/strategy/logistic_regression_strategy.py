@@ -4,6 +4,7 @@ from pandas_ta.volume import obv
 from pandas_ta.momentum import stochrsi
 
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
+from konjac2.indicator.squeeze_momentum import is_squeeze
 
 from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
@@ -31,7 +32,13 @@ class LogisticRegressionStrategy(ABCStrategy):
         if last_trade is not None and last_trade.status == TradeStatus.in_progress.name:
             longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, longer_timeframe_candles)
             trend, accuracy, _ = self._get_open_signal(candles)
-            if trend is not None and trend == last_trade.trend and trend == longer_timeframe_trend:
+            is_in_squeeze = is_squeeze(candles)
+            if (
+                trend is not None
+                and trend == last_trade.trend
+                and trend == longer_timeframe_trend
+                and not is_in_squeeze
+            ):
                 status = self._update_open_trade(last_trade.trend, candles.close[-1], "lr", accuracy, candles.index[-1])
                 _, take_profit = self._is_take_profit(candles)
                 _, stop_loss = self._is_stop_loss(candles)
@@ -125,5 +132,3 @@ class LogisticRegressionStrategy(ABCStrategy):
             if k_value > 20 and k_value < 80:
                 is_stoch_in_zone = True
         return stoch_trend
-
-

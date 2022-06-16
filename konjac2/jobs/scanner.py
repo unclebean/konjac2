@@ -11,6 +11,7 @@ from konjac2.indicator.hurst import hurst
 from konjac2.models import apply_session
 from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType
+from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import TrustCrypto, Instruments, Cryptos
@@ -85,8 +86,8 @@ async def smart_bot():
     query_symbol = "SOL/USDT"
     trade_symbol = "SOL-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", False, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", False, limit=1500)
+    data = fetch_data(query_symbol, "H1", True, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data)
@@ -165,4 +166,44 @@ async def short_smart_bot():
             place_trade(trade_symbol, "buy", trade.trend, tp=0.023, sl=0.013)
             say_something("opened position failed!")
 
+    log.info("job running done!")
+
+
+async def trade_eur_usd():
+    await asyncio.sleep(30)
+    query_symbol = "EUR_USD"
+    trade_symbol = "EUR_USD"
+    strategy = LogisticRegressionStrategy(symbol=query_symbol)
+    data = fetch_data(query_symbol, "H1", True, counts=1000)
+    h4_data = fetch_data(query_symbol, "H4", True, counts=1000)
+
+    is_exit_trade = strategy.exit_signal(data)
+    close_trade(trade_symbol)
+    trade = get_last_time_trade(query_symbol)
+    if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
+        try:
+            close_trade(trade_symbol)
+            log.info("closed position!")
+            say_something("closed position {}".format(query_symbol))
+        except Exception as err:
+            log.error("closed position error! {}".format(err))
+            close_trade(trade_symbol)
+
+    strategy.seek_trend(data, h4_data)
+    is_opened_trade = strategy.entry_signal(data, h4_data)
+    trade = get_last_time_trade(query_symbol)
+    if (
+        is_opened_trade
+        and trade is not None
+        and trade.status == TradeStatus.opened.name
+        and not has_opened_trades(query_symbol)
+    ):
+        try:
+            make_trade(trade_symbol, trade.trend)
+            log.info("opened position!")
+            say_something("opened position {}".format(query_symbol))
+        except Exception as err:
+            log.error("open position error! {}".format(err))
+            make_trade(trade_symbol, trade.trend)
+            say_something("opened position failed!")
     log.info("job running done!")
