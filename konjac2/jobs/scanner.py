@@ -87,7 +87,7 @@ async def smart_bot():
     trade_symbol = "SOL-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", False, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data)
@@ -116,14 +116,18 @@ async def smart_bot():
     log.info("job running done!")
 
 
-async def scan_crypto():
-    for crypto in TrustCrypto:
-        strategy = LogisticRegressionStrategy(symbol=crypto)
-        data = fetch_data(crypto, "H1", True, limit=1500)
-        h4_data = fetch_data(crypto, "H4", True, limit=1500)
-        strategy.exit_signal(data)
-        strategy.seek_trend(data, h4_data)
-        strategy.entry_signal(data, h4_data)
+async def scan_crypto(query_symbol: str):
+    h6_data = fetch_data(query_symbol, "H6", True, limit=1500)
+    daily_data = fetch_data(query_symbol, "D", True, limit=1500) 
+    threadholder, short_term_volatility = heikin_ashi_mom(h6_data, daily_data)
+    trend_action = None
+    if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
+        trend_action = TradeType.long.name
+
+    if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
+        trend_action = TradeType.short.name
+
+    return trend_action 
 
 
 async def scan_fx():
@@ -175,7 +179,7 @@ async def trade_eur_usd():
     trade_symbol = "EUR_USD"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=1000)
-    h4_data = fetch_data(query_symbol, "H4", True, counts=1000)
+    h4_data = fetch_data(query_symbol, "H4", False, counts=1000)
 
     is_exit_trade = strategy.exit_signal(data)
     trade = get_last_time_trade(query_symbol)
