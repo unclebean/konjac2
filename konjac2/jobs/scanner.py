@@ -87,7 +87,7 @@ async def smart_bot():
     trade_symbol = "SOL-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", False, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data)
@@ -179,7 +179,7 @@ async def trade_eur_usd():
     trade_symbol = "EUR_USD"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=1000)
-    h4_data = fetch_data(query_symbol, "H4", False, counts=1000)
+    h4_data = fetch_data(query_symbol, "H4", True, counts=1000)
 
     is_exit_trade = strategy.exit_signal(data)
     trade = get_last_time_trade(query_symbol)
