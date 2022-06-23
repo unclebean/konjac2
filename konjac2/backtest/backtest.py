@@ -47,7 +47,7 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2020-02-20 00:00:00":]
+    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) # .loc["2020-02-20 00:00:00":]
     h4_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
     strategy = LogisticRegressionStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):

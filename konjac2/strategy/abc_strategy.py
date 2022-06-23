@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 class ABCStrategy(ABC):
     strategy_name = "abc strategy"
-    balance = 10000
+    balance = 500
 
     def __init__(self, symbol: str):
         self.symbol = symbol
