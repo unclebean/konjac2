@@ -104,7 +104,7 @@ class ABCStrategy(ABC):
         )
         self.balance = self.balance - last_trade.quantity * position
         gain = (last_trade.quantity * position + last_trade.quantity * position * 0.3) / last_trade.quantity
-        loss = (last_trade.quantity * position - last_trade.quantity * position * 0.25) / last_trade.quantity
+        loss = (last_trade.quantity * position - last_trade.quantity * position * 0.15) / last_trade.quantity
         log.info(f"{self.symbol} take profit {gain} stop loss {loss}")
 
         session.commit()
