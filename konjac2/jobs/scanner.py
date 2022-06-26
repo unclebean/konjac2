@@ -14,6 +14,7 @@ from konjac2.indicator.utils import TradeType
 from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
+from konjac2.strategy.macd_histogram_strategy import MacdHistogramStrategy
 from . import TrustCrypto, Instruments, Cryptos
 
 
@@ -85,7 +86,7 @@ async def smart_bot():
     await asyncio.sleep(30)
     query_symbol = "SAND/USDT"
     trade_symbol = "SAND-PERP"
-    strategy = LogisticRegressionStrategy(symbol=query_symbol)
+    strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)

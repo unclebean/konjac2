@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
+from konjac2.strategy.macd_histogram_strategy import MacdHistogramStrategy
 from konjac2.strategy.vegas_strategy import VegasStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from .prepare_data import prepare_forex_backtest_data
@@ -49,7 +50,7 @@ def short_term_backtest(symbol: str):
     session.close()
     m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) # .loc["2020-02-20 00:00:00":]
     h4_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
-    strategy = LogisticRegressionStrategy(symbol=symbol)
+    strategy = MacdHistogramStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):
         if len(window.index) < 999:
             continue
