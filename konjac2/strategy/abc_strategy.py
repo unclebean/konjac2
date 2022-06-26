@@ -3,6 +3,8 @@ from collections import namedtuple
 from datetime import datetime
 from abc import ABC, abstractclassmethod
 
+from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
+
 
 from ..indicator.utils import TradeType
 from ..models import apply_session
@@ -211,3 +213,14 @@ class ABCStrategy(ABC):
             # print("loss: {} stop loss:: {}".format(loss, stop_loss))
 
             return loss >= stop_loss, stop_loss
+
+    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles):
+        threadholder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles)
+        trend_action = None
+        if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
+            trend_action = TradeType.long.name
+
+        if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
+            trend_action = TradeType.short.name
+
+        return trend_action

@@ -24,14 +24,23 @@ class MacdHistogramStrategy(ABCStrategy):
 
     def entry_signal(self, candles, h4_candles):
         last_order_status = self._can_open_new_trade()
-        if last_order_status.ready_to_procceed and last_order_status.is_long:
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+        if (
+            last_order_status.ready_to_procceed
+            and last_order_status.is_long
+            and longer_timeframe_trend == TradeType.long.name
+        ):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
             if macd_histogram[-1] < 0 and macd_histogram[-2] < macd_histogram[-1]:
                 self._update_open_trade(
                     TradeType.long.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
                 )
-        if last_order_status.ready_to_procceed and last_order_status.is_short:
+        if (
+            last_order_status.ready_to_procceed
+            and last_order_status.is_short
+            and longer_timeframe_trend == TradeType.short.name
+        ):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
             if macd_histogram[-1] > 0 and macd_histogram[-2] > macd_histogram[-1]:

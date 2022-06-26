@@ -3,7 +3,6 @@ from pandas_ta.overlap import ema
 from pandas_ta.volume import obv
 from pandas_ta.momentum import stochrsi
 
-from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 from konjac2.indicator.squeeze_momentum import is_squeeze
 
 from ..indicator.utils import TradeType
@@ -105,17 +104,6 @@ class LogisticRegressionStrategy(ABCStrategy):
         if obv_values[-1] < obv_ema200[-1] and obv_values[-2] < obv_ema200[-2] and candles.close[-1] < ema12[-1]:
             trend = TradeType.short.name
         return trend
-
-    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles):
-        threadholder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles)
-        trend_action = None
-        if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
-            trend_action = TradeType.long.name
-
-        if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
-            trend_action = TradeType.short.name
-
-        return trend_action
 
     def _get_stoch_rsi_trend(self, candles):
         stochrsi_values = stochrsi(candles.close, length=14, rsi_length=14, k=3, d=3)
