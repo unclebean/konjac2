@@ -1,7 +1,6 @@
 from pandas_ta.momentum import macd
 from pandas_ta.overlap import ichimoku
 from .abc_strategy import ABCStrategy
-from ..models.trade import TradeStatus
 from ..indicator.utils import TradeType
 
 
@@ -33,7 +32,7 @@ class MacdHistogramStrategy(ABCStrategy):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
             if macd_histogram[-1] < 0 and macd_histogram[-2] < macd_histogram[-1]:
-                self._update_open_trade(
+                return self._update_open_trade(
                     TradeType.long.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
                 )
         if (
@@ -44,9 +43,11 @@ class MacdHistogramStrategy(ABCStrategy):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
             if macd_histogram[-1] > 0 and macd_histogram[-2] > macd_histogram[-1]:
-                self._update_open_trade(
+                return self._update_open_trade(
                     TradeType.short.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
                 )
+
+        return False
 
     def exit_signal(self, candles):
         last_order_status = self._can_close_trade()
@@ -57,7 +58,7 @@ class MacdHistogramStrategy(ABCStrategy):
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             if (macd_histogram[-1] > 0 and macd_histogram[-1] < macd_histogram[-2]) or is_profit or is_loss:
-                self._update_close_trade(
+                return self._update_close_trade(
                     TradeType.short.name,
                     candles.close[-1],
                     "macd_ichimoku",
@@ -74,7 +75,7 @@ class MacdHistogramStrategy(ABCStrategy):
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             if (macd_histogram[-1] < 0 and macd_histogram[-1] > macd_histogram[-2]) or is_profit or is_loss:
-                self._update_close_trade(
+                return self._update_close_trade(
                     TradeType.long.name,
                     candles.close[-1],
                     "macd_ichimoku",
@@ -85,3 +86,4 @@ class MacdHistogramStrategy(ABCStrategy):
                     take_profit,
                     stop_loss,
                 )
+        return False

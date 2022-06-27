@@ -15,7 +15,7 @@ from konjac2.service.forex.place_order import close_trade, has_opened_trades, ma
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from konjac2.strategy.macd_histogram_strategy import MacdHistogramStrategy
-from . import TrustCrypto, Instruments, Cryptos
+from . import Instruments, Cryptos
 
 
 log = logging.getLogger(__name__)
@@ -82,10 +82,10 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def smart_bot():
+async def smart_bot(currency="SAND"):
     await asyncio.sleep(30)
-    query_symbol = "SAND/USDT"
-    trade_symbol = "SAND-PERP"
+    query_symbol = f"{currency}/USDT"
+    trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
@@ -117,61 +117,12 @@ async def smart_bot():
     log.info("job running done!")
 
 
-async def scan_crypto(query_symbol: str):
-    h6_data = fetch_data(query_symbol, "H6", True, limit=1500)
-    daily_data = fetch_data(query_symbol, "D", True, limit=1500) 
-    threadholder, short_term_volatility = heikin_ashi_mom(h6_data, daily_data)
-    trend_action = None
-    if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
-        trend_action = TradeType.long.name
-
-    if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
-        trend_action = TradeType.short.name
-
-    return trend_action 
-
-
-async def scan_fx():
-    for fx in ["EUR_USD"]:
-        strategy = LogisticRegressionStrategy(symbol=fx)
-        data = fetch_data(fx, "M30", True, limit=1500)
-        strategy.exit_signal(data)
-        strategy.seek_trend(data)
-        strategy.entry_signal(data)
-
-
-async def short_smart_bot():
-    query_symbol = "DOGE/USDT"
-    trade_symbol = "DOGE-PERP"
-    strategy = BBCCIStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "M5", True, limit=1500)
-    opened_position = opened_position_by_symbol(trade_symbol)
-
-    is_exit_trade = strategy.exit_signal(data)
-    trade = get_last_time_trade(query_symbol)
-    if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
+async def scan_crypto():
+    for currency in Cryptos:
         try:
-            place_trade(trade_symbol, "sell")
-            log.info("closed position!")
-            say_something("closed position {}".format(query_symbol))
+            await smart_bot(currency=currency)
         except Exception as err:
-            log.error("closed position error! {}".format(err))
-            place_trade(trade_symbol, "sell")
-
-    strategy.seek_trend(data)
-    is_opened_trade = strategy.entry_signal(data)
-    trade = get_last_time_trade(query_symbol)
-    if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
-        try:
-            place_trade(trade_symbol, "buy", trade.trend, tp=0.023, sl=0.013)
-            log.info("opened position!")
-            say_something("opened position {}".format(query_symbol))
-        except Exception as err:
-            log.error("open position error! {}".format(err))
-            place_trade(trade_symbol, "buy", trade.trend, tp=0.023, sl=0.013)
-            say_something("opened position failed!")
-
-    log.info("job running done!")
+            print(str(err))
 
 
 async def trade_eur_usd():
