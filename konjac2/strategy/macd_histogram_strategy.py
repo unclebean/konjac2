@@ -56,7 +56,7 @@ class MacdHistogramStrategy(ABCStrategy):
             macd_histogram = macd_data["MACDh_13_34_9"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            if macd_histogram[-1] > 0 and macd_histogram[-1] < macd_histogram[-2]:
+            if (macd_histogram[-1] > 0 and macd_histogram[-1] < macd_histogram[-2]) or is_profit or is_loss:
                 self._update_close_trade(
                     TradeType.short.name,
                     candles.close[-1],
@@ -73,7 +73,7 @@ class MacdHistogramStrategy(ABCStrategy):
             macd_histogram = macd_data["MACDh_13_34_9"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            if macd_histogram[-1] < 0 and macd_histogram[-1] > macd_histogram[-2]:
+            if (macd_histogram[-1] < 0 and macd_histogram[-1] > macd_histogram[-2]) or is_profit or is_loss:
                 self._update_close_trade(
                     TradeType.long.name,
                     candles.close[-1],

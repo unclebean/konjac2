@@ -84,8 +84,8 @@ async def bbcci_scanner():
 
 async def smart_bot():
     await asyncio.sleep(30)
-    query_symbol = "SAND/USDT"
-    trade_symbol = "SAND-PERP"
+    query_symbol = "DOGE/USDT"
+    trade_symbol = "DOGE-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
