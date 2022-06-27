@@ -118,7 +118,7 @@ async def smart_bot(currency="SAND"):
 
 
 async def scan_crypto():
-    for currency in Cryptos:
+    for currency in ["SAND", "WAVES"]:
         try:
             await smart_bot(currency=currency)
         except Exception as err:
