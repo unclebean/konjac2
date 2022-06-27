@@ -83,7 +83,6 @@ async def bbcci_scanner():
 
 
 async def smart_bot(currency="SAND"):
-    await asyncio.sleep(30)
     query_symbol = f"{currency}/USDT"
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
@@ -118,6 +117,7 @@ async def smart_bot(currency="SAND"):
 
 
 async def scan_crypto():
+    await asyncio.sleep(30)
     for currency in ["SAND", "WAVES"]:
         try:
             await smart_bot(currency=currency)
