@@ -117,7 +117,6 @@ async def smart_bot(currency="SAND"):
 
 
 async def scan_crypto():
-    await asyncio.sleep(30)
     for currency in Cryptos:
         try:
             await smart_bot(currency=currency)
@@ -126,7 +125,6 @@ async def scan_crypto():
 
 
 async def trade_eur_usd():
-    await asyncio.sleep(30)
     query_symbol = "EUR_USD"
     trade_symbol = "EUR_USD"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
@@ -162,3 +160,9 @@ async def trade_eur_usd():
             make_trade(trade_symbol, trade.trend)
             say_something("opened position failed!")
     log.info("job running done!")
+
+
+async def scanner_job():
+    await asyncio.sleep(30)
+    await scan_crypto()
+    await trade_eur_usd()
