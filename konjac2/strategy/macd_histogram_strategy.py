@@ -1,4 +1,4 @@
-from pandas_ta.momentum import macd
+from pandas_ta.momentum import macd, stochrsi
 from pandas_ta.overlap import ichimoku
 from .abc_strategy import ABCStrategy
 from ..indicator.utils import TradeType
@@ -16,9 +16,9 @@ class MacdHistogramStrategy(ABCStrategy):
         isb = ichimoku_df["ISB_26"]
         close_price = candles.close[-1]
         self._delete_last_in_progress_trade()
-        if close_price > isa[-1] and close_price > isb[-1]:
+        if close_price > isa[-26] and close_price > isb[-26]:
             self._start_new_trade(TradeType.long.name, candles.index[-1])
-        if close_price < isa[-1] and close_price < isb[-1]:
+        if close_price < isa[-26] and close_price < isb[-26]:
             self._start_new_trade(TradeType.short.name, candles.index[-1])
 
     def entry_signal(self, candles, h4_candles):
@@ -31,7 +31,10 @@ class MacdHistogramStrategy(ABCStrategy):
         ):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
-            if macd_histogram[-1] < 0 and macd_histogram[-2] < macd_histogram[-1]:
+            stoch_rsi_data = stochrsi(candles.close)
+            stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
+            stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
+            if macd_histogram[-1] < 0 and macd_histogram[-2] < macd_histogram[-1] and stock_rsi_k[-1] > stock_rsi_d[-1]:
                 return self._update_open_trade(
                     TradeType.long.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
                 )
@@ -42,7 +45,10 @@ class MacdHistogramStrategy(ABCStrategy):
         ):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
-            if macd_histogram[-1] > 0 and macd_histogram[-2] > macd_histogram[-1]:
+            stoch_rsi_data = stochrsi(candles.close)
+            stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
+            stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
+            if macd_histogram[-1] > 0 and macd_histogram[-2] > macd_histogram[-1] and stock_rsi_k[-1] < stock_rsi_d[-1]:
                 return self._update_open_trade(
                     TradeType.short.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
                 )
