@@ -49,6 +49,5 @@ Cryptos = [
     "WAVES",
     "XRP",
     "TRX",
-    "STEP"
     # "SOL",
 ]

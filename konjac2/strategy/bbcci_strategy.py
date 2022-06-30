@@ -11,7 +11,7 @@ class BBCCIStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles):
+    def seek_trend(self, candles, h4_candles):
         trends, cci144 = bb_cci_mom(candlestick=candles)
         trend = None
         if is_crossing_up(cci144[-1], 80):
@@ -22,7 +22,7 @@ class BBCCIStrategy(ABCStrategy):
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
-    def entry_signal(self, candles):
+    def entry_signal(self, candles, h4_candles):
         cci34 = cci(candles.high, candles.low, candles.close, 34)
         cci144 = cci(candles.high, candles.low, candles.close, 144)
         diff_value = abs(cci34[-1] - cci144[-1])
