@@ -179,7 +179,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.3
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.03
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -202,7 +202,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.15
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.015
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
