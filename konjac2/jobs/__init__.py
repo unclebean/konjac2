@@ -35,7 +35,7 @@ Cryptos = [
     "AXS",
     # "BTC",
     # "CRV",
-    # "CVX",
+    "CVX",
     "DOGE",
     "DOT",
     # "ETH",
