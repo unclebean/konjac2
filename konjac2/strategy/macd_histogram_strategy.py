@@ -55,7 +55,7 @@ class MacdHistogramStrategy(ABCStrategy):
 
         return False
 
-    def exit_signal(self, candles):
+    def exit_signal(self, candles, h4_candles):
         last_order_status = self._can_close_trade()
 
         if last_order_status.ready_to_procceed and last_order_status.is_long:
@@ -63,7 +63,13 @@ class MacdHistogramStrategy(ABCStrategy):
             macd_histogram = macd_data["MACDh_13_34_9"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            if (macd_histogram[-1] > 0 and macd_histogram[-1] < macd_histogram[-2]) or is_profit or is_loss:
+            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+            if (
+                (macd_histogram[-1] > 0 and macd_histogram[-1] < macd_histogram[-2])
+                or is_profit
+                or is_loss
+                or longer_timeframe_trend != TradeType.long.name
+            ):
                 return self._update_close_trade(
                     TradeType.short.name,
                     candles.close[-1],
@@ -80,7 +86,13 @@ class MacdHistogramStrategy(ABCStrategy):
             macd_histogram = macd_data["MACDh_13_34_9"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            if (macd_histogram[-1] < 0 and macd_histogram[-1] > macd_histogram[-2]) or is_profit or is_loss:
+            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+            if (
+                (macd_histogram[-1] < 0 and macd_histogram[-1] > macd_histogram[-2])
+                or is_profit
+                or is_loss
+                or longer_timeframe_trend != TradeType.short.name
+            ):
                 return self._update_close_trade(
                     TradeType.long.name,
                     candles.close[-1],

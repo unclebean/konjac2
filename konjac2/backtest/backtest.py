@@ -50,7 +50,7 @@ def short_term_backtest(symbol: str):
     session.close()
     m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) # .loc["2020-02-20 00:00:00":]
     h4_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
-    strategy = BBCCIStrategy(symbol=symbol)
+    strategy = MacdHistogramStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):
         if len(window.index) < 999:
             continue
@@ -71,7 +71,7 @@ def short_term_backtest(symbol: str):
         # print(window)
         current_day_data = h4_data.loc[:last_h4_index]
         # print(current_day_data)
-        strategy.exit_signal(window)
+        strategy.exit_signal(window, current_day_data)
         strategy.seek_trend(window, current_day_data)
         strategy.entry_signal(window, current_day_data)
         print(strategy.get_trade())

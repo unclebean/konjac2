@@ -87,10 +87,10 @@ async def smart_bot(currency="SAND"):
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", False, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
-    is_exit_trade = strategy.exit_signal(data)
+    is_exit_trade = strategy.exit_signal(data, h4_data)
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
         try:

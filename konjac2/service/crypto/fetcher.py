@@ -18,6 +18,7 @@ TIMEFRAME_CCXT_MAPPER = {
     "H6": "6h",
     "H8": "8h",
     "D": "1d",
+    "3D": "3d",
 }
 
 
