@@ -44,7 +44,7 @@ Cryptos = [
     # "MATIC",
     # "NEAR",
     # "RUNE",
-    # "SAND",
+    "SAND",
     # "STORJ",
     "WAVES",
     # "XRP",
