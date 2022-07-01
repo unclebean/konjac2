@@ -38,7 +38,7 @@ Cryptos = [
     "CVX",
     "DOGE",
     "DOT",
-    # "ETH",
+    "ETH",
     "FTM",
     "MANA",
     "MATIC",
