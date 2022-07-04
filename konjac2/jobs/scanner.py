@@ -83,7 +83,7 @@ async def bbcci_scanner():
 
 
 async def smart_bot(currency="SAND"):
-    query_symbol = f"{currency}/USDT"
+    query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
