@@ -51,4 +51,5 @@ Cryptos = [
     # "XRP",
     # "TRX",
     # "SOL",
+    "YFII"
 ]
