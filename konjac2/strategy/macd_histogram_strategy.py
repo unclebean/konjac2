@@ -1,7 +1,10 @@
+import logging
 from pandas_ta.momentum import macd, stochrsi
 from pandas_ta.overlap import ichimoku
 from .abc_strategy import ABCStrategy
 from ..indicator.utils import TradeType
+
+log = logging.getLogger(__name__)
 
 
 class MacdHistogramStrategy(ABCStrategy):
@@ -24,6 +27,9 @@ class MacdHistogramStrategy(ABCStrategy):
     def entry_signal(self, candles, h4_candles):
         last_order_status = self._can_open_new_trade()
         longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+
+        log.info(f"{self.symbol} heikin ashi trend {longer_timeframe_trend}")
+
         if (
             last_order_status.ready_to_procceed
             and last_order_status.is_long
