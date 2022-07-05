@@ -36,7 +36,7 @@ Cryptos = [
     # "BTC",
     "CEL",
     # "CRV",
-    # "CVX",
+    "CVX",
     # "DOGE",
     # "DOT",
     "ETH",
