@@ -78,6 +78,9 @@ class MacdHistogramStrategy(ABCStrategy):
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+            log.info(
+                f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
+            )
             if (
                 (macd_histogram[-1] > 0 and macd_histogram[-1] < macd_histogram[-2])
                 or is_profit
@@ -101,6 +104,9 @@ class MacdHistogramStrategy(ABCStrategy):
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+            log.info(
+                f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
+            )
             if (
                 (macd_histogram[-1] < 0 and macd_histogram[-1] > macd_histogram[-2])
                 or is_profit
