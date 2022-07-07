@@ -41,7 +41,7 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             if (
-                (macd_histogram[-1] < 0 or (macd_histogram[-2] < 0 and macd_histogram[-1] > 0))
+                (macd_histogram[-1] < 0)
                 and macd_histogram[-2] < macd_histogram[-1]
                 and stock_rsi_k[-1] > stock_rsi_d[-1]
             ):
@@ -59,7 +59,7 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             if (
-                (macd_histogram[-1] > 0 or (macd_histogram[-2] > 0 and macd_histogram[-1] < 0))
+                (macd_histogram[-1] > 0)
                 and macd_histogram[-2] > macd_histogram[-1]
                 and stock_rsi_k[-1] < stock_rsi_d[-1]
             ):
