@@ -41,6 +41,7 @@ Cryptos = [
     # "DOT",
     "ETH",
     # "FTM",
+    "LTC",
     # "MANA",
     # "MATIC",
     # "NEAR",
