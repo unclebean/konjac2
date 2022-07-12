@@ -43,6 +43,7 @@ Cryptos = [
     # "FTM",
     # "LINK",
     "LTC",
+    "PERP",
     # "MANA",
     # "MATIC",
     # "NEAR",
