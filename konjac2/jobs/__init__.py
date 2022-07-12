@@ -31,7 +31,7 @@ TrustCrypto = [
 Cryptos = [
     # "ATOM",
     # "AAVE",
-    # "AVAX",
+    "AVAX",
     # "AXS",
     # "BTC",
     "CEL",
@@ -48,7 +48,7 @@ Cryptos = [
     # "MATIC",
     # "NEAR",
     # "RUNE",
-    "SAND",
+    # "SAND",
     # "STORJ",
     "WAVES",
     # "XRP",
