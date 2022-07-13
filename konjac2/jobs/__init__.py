@@ -34,7 +34,7 @@ Cryptos = [
     "AVAX",
     # "AXS",
     # "BTC",
-    "CEL",
+    # "CEL",
     # "CRV",
     "CVX",
     # "DOGE",
