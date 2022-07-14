@@ -6,9 +6,9 @@ def heikin_ashi_mom(long_term_volatility_data, short_term_volatility_data):
     long_term_volatility = (
         long_term_volatility_data["high"] - long_term_volatility_data["low"]
     ) / long_term_volatility_data["high"]
-    average_dv = long_term_volatility.abs().rolling(7).apply(lambda d: d.sum() / 7)
+    average_dv = long_term_volatility.abs().rolling(4).apply(lambda d: d.sum() / 4)
     # volatility/3 for the threadholder
-    threadholder = average_dv / 3
+    threadholder = average_dv / 2
     # getting 6H heikin_ashi
     # close - open for volatility of heikin_ashi bar
     short_term_volatility = (
