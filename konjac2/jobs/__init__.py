@@ -48,11 +48,12 @@ Cryptos = [
     # "MATIC",
     # "NEAR",
     # "RUNE",
+    "RSR",
     # "SAND",
     # "STORJ",
     "WAVES",
     # "XRP",
     # "TRX",
     # "SOL",
-    # "YFII"
+    "YFII"
 ]
