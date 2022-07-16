@@ -31,9 +31,9 @@ class MacdHistogramStrategy(ABCStrategy):
         log.info(f"{self.symbol} heikin ashi trend {longer_timeframe_trend}")
 
         if (
-            last_order_status.ready_to_procceed
-            and last_order_status.is_long
-            and longer_timeframe_trend == TradeType.long.name
+                last_order_status.ready_to_procceed
+                and last_order_status.is_long
+                and longer_timeframe_trend == TradeType.long.name
         ):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
@@ -41,17 +41,18 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             if (
-                (macd_histogram[-1] <= 0 or (macd_histogram[-2] < 0 and macd_histogram[-1] > 0))
-                and macd_histogram[-2] <= macd_histogram[-1]
-                and stock_rsi_k[-1] > stock_rsi_d[-1]
+                    (round(macd_histogram[-1], 3) <= 0 or (
+                            round(macd_histogram[-2], 3) < 0 and round(macd_histogram[-1], 3) > 0))
+                    and round(macd_histogram[-2], 3) <= round(macd_histogram[-1], 3)
+                    and stock_rsi_k[-1] > stock_rsi_d[-1]
             ):
                 return self._update_open_trade(
                     TradeType.long.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
                 )
         if (
-            last_order_status.ready_to_procceed
-            and last_order_status.is_short
-            and longer_timeframe_trend == TradeType.short.name
+                last_order_status.ready_to_procceed
+                and last_order_status.is_short
+                and longer_timeframe_trend == TradeType.short.name
         ):
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
@@ -59,9 +60,10 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             if (
-                (macd_histogram[-1] >= 0 or (macd_histogram[-2] > 0 and macd_histogram[-1] < 0))
-                and macd_histogram[-2] >= macd_histogram[-1]
-                and stock_rsi_k[-1] < stock_rsi_d[-1]
+                    (round(macd_histogram[-1], 3) >= 0 or (
+                            round(macd_histogram[-2], 3) > 0 and round(macd_histogram[-1], 3) < 0))
+                    and round(macd_histogram[-2], 3) >= round(macd_histogram[-1], 3)
+                    and stock_rsi_k[-1] < stock_rsi_d[-1]
             ):
                 return self._update_open_trade(
                     TradeType.short.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
@@ -82,10 +84,10 @@ class MacdHistogramStrategy(ABCStrategy):
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
             if (
-                (macd_histogram[-1] >= 0 and macd_histogram[-1] < macd_histogram[-2])
-                or is_profit
-                or is_loss
-                or longer_timeframe_trend != TradeType.long.name
+                    (macd_histogram[-1] >= 0 and macd_histogram[-1] < macd_histogram[-2])
+                    or is_profit
+                    or is_loss
+                    or longer_timeframe_trend != TradeType.long.name
             ):
                 return self._update_close_trade(
                     TradeType.short.name,
@@ -108,10 +110,10 @@ class MacdHistogramStrategy(ABCStrategy):
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
             if (
-                (macd_histogram[-1] <= 0 and macd_histogram[-1] > macd_histogram[-2])
-                or is_profit
-                or is_loss
-                or longer_timeframe_trend != TradeType.short.name
+                    (macd_histogram[-1] <= 0 and macd_histogram[-1] > macd_histogram[-2])
+                    or is_profit
+                    or is_loss
+                    or longer_timeframe_trend != TradeType.short.name
             ):
                 return self._update_close_trade(
                     TradeType.long.name,
