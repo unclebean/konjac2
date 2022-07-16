@@ -35,7 +35,7 @@ class BBCCIStrategy(ABCStrategy):
             self._update_open_trade(TradeType.short.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
-    def exit_signal(self, candles):
+    def exit_signal(self, candles, h4_candles):
         cci34 = cci(candles.high, candles.low, candles.close, 34)
         last_order_status = self._can_close_trade()
         if last_order_status.ready_to_procceed and last_order_status.is_long and cci34[-1] >= 160:
