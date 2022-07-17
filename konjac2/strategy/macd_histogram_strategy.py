@@ -44,7 +44,7 @@ class MacdHistogramStrategy(ABCStrategy):
                     ((macd_histogram[-1] <= 0 or macd_histogram[-2] < 0 < macd_histogram[-1])
                      and macd_histogram[-2] <= macd_histogram[-1]
                      and stock_rsi_k[-1] > stock_rsi_d[-1])
-                    or (0 < macd_histogram[-3] > macd_histogram[-2] and macd_histogram[-2] * 2 <= macd_histogram[-1] > 0
+                    or (0 < macd_histogram[-3] > macd_histogram[-2] and macd_histogram[-2] * 2 < macd_histogram[-1] > 0
                         and stock_rsi_k[-1] > stock_rsi_d[-1]
                         and stock_rsi_k[-2] <= stock_rsi_d[-2])
             ):
@@ -65,7 +65,7 @@ class MacdHistogramStrategy(ABCStrategy):
                     ((macd_histogram[-1] >= 0 or macd_histogram[-2] > 0 > macd_histogram[-1])
                      and macd_histogram[-2] >= macd_histogram[-1]
                      and stock_rsi_k[-1] < stock_rsi_d[-1])
-                    or (0 > macd_histogram[-3] < macd_histogram[-2] and macd_histogram[-2] * 2 >= macd_histogram[-1] < 0
+                    or (0 > macd_histogram[-3] < macd_histogram[-2] and macd_histogram[-2] * 2 > macd_histogram[-1] < 0
                         and stock_rsi_k[-1] < stock_rsi_d[-1]
                         and stock_rsi_k[-2] >= stock_rsi_d[-2])
             ):
