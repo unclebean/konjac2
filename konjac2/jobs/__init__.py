@@ -51,6 +51,7 @@ Cryptos = [
     # "RUNE",
     # "RSR",
     # "SAND",
+    "SRM",
     "STORJ",
     "WAVES",
     # "XRP",
