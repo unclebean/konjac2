@@ -53,10 +53,10 @@ Cryptos = [
     # "SAND",
     # "SRM",
     "STORJ",
-    "SHIB",
+    # "SHIB",
     "WAVES",
     # "XRP",
     # "TRX",
     # "SOL",
-    # "YFII"
+    "YFII"
 ]
