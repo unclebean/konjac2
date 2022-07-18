@@ -82,12 +82,12 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def smart_bot(currency="SAND"):
+async def smart_bot(currency="SAND", use_stable=True):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", True, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", use_stable, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data, h4_data)
@@ -116,10 +116,10 @@ async def smart_bot(currency="SAND"):
     log.info("job running done!")
 
 
-async def scan_crypto():
+async def scan_crypto(use_stable=True):
     for currency in Cryptos:
         try:
-            await smart_bot(currency=currency)
+            await smart_bot(currency=currency, use_stable=use_stable)
         except Exception as err:
             print(str(err))
 
