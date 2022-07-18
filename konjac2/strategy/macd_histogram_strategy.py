@@ -47,9 +47,9 @@ class MacdHistogramStrategy(ABCStrategy):
                     or (0 < macd_histogram[-3] > macd_histogram[-2] and macd_histogram[-2] * 2 < macd_histogram[-1] > 0
                         and stock_rsi_k[-1] > stock_rsi_d[-1]
                         and stock_rsi_k[-2] <= stock_rsi_d[-2])
-                    or ((macd_histogram[-3] < 0 < macd_histogram[-2] * 2 < macd_histogram[-1]
-                         or 0 < macd_histogram[-3] * 2 < macd_histogram[-2] < macd_histogram[-1])
-                        and stock_rsi_k[-1] > stock_rsi_d[-1])
+                    # or ((macd_histogram[-3] < 0 < macd_histogram[-2] * 2 < macd_histogram[-1]
+                    #      or 0 < macd_histogram[-3] * 2 < macd_histogram[-2] < macd_histogram[-1])
+                    #     and stock_rsi_k[-1] > stock_rsi_d[-1])
             ):
                 return self._update_open_trade(
                     TradeType.long.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
@@ -71,9 +71,9 @@ class MacdHistogramStrategy(ABCStrategy):
                     or (0 > macd_histogram[-3] < macd_histogram[-2] and macd_histogram[-2] * 2 > macd_histogram[-1] < 0
                         and stock_rsi_k[-1] < stock_rsi_d[-1]
                         and stock_rsi_k[-2] >= stock_rsi_d[-2])
-                    or ((macd_histogram[-3] > 0 > macd_histogram[-2] * 2 > macd_histogram[-1]
-                         or 0 > macd_histogram[-3] * 2 > macd_histogram[-2] > macd_histogram[-1])
-                        and stock_rsi_k[-1] < stock_rsi_d[-1])
+                    # or ((macd_histogram[-3] > 0 > macd_histogram[-2] * 2 > macd_histogram[-1]
+                    #      or 0 > macd_histogram[-3] * 2 > macd_histogram[-2] > macd_histogram[-1])
+                    #     and stock_rsi_k[-1] < stock_rsi_d[-1])
             ):
                 return self._update_open_trade(
                     TradeType.short.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
