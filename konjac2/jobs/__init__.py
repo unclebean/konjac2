@@ -31,7 +31,7 @@ TrustCrypto = [
 Cryptos = [
     # "ATOM",
     # "AAVE",
-    "ALGO",
+    # "ALGO",
     "AVAX",
     # "AXS",
     # "BTC",
