@@ -86,7 +86,7 @@ async def smart_bot(currency="SAND", use_stable=True):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", use_stable, limit=1500)
+    data = fetch_data(query_symbol, "H1", True, limit=1500)
     h4_data = fetch_data(query_symbol, "H4", use_stable, limit=1500)
     opened_position = opened_position_by_symbol(trade_symbol)
 
