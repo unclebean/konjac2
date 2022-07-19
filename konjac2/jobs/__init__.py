@@ -46,6 +46,7 @@ Cryptos = [
     "LTC",
     # "ONE",
     "PERP",
+    "GALA",
     # "MANA",
     # "MATIC",
     # "NEAR",
