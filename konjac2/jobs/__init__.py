@@ -52,7 +52,7 @@ Cryptos = [
     # "NEAR",
     # "RUNE",
     # "RSR",
-    # "SAND",
+    "SAND",
     # "SRM",
     "STORJ",
     # "SHIB",
