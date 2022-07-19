@@ -33,7 +33,7 @@ Cryptos = [
     # "AAVE",
     # "ALGO",
     "AVAX",
-    # "AXS",
+    "AXS",
     # "BTC",
     # "CEL",
     # "CRV",
