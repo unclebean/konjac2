@@ -22,7 +22,7 @@ class MacdHistogramStrategy(ABCStrategy):
         is_sqz = is_squeeze(candles)
         longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
         self._delete_last_in_progress_trade()
-        if not is_sqz:
+        if not is_sqz and longer_timeframe_trend is not None:
             self._start_new_trade(longer_timeframe_trend, candles.index[-1])
             return
         if close_price > isa[-26] and close_price > isb[-26]:
