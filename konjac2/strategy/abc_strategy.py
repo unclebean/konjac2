@@ -5,7 +5,6 @@ from abc import ABC, abstractclassmethod
 
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 
-
 from ..indicator.utils import TradeType
 from ..models import apply_session
 from ..models.trade import Trade, TradeStatus, get_last_time_trade
@@ -41,9 +40,9 @@ class ABCStrategy(ABC):
     def _can_open_new_trade(self) -> LastTradeStatus:
         last_trade = get_last_time_trade(self.symbol)
         ready_to_new_trade = (
-            last_trade is not None
-            and last_trade.status != TradeStatus.closed.name
-            and last_trade.status != TradeStatus.opened.name
+                last_trade is not None
+                and last_trade.status != TradeStatus.closed.name
+                and last_trade.status != TradeStatus.opened.name
         )
         is_long = ready_to_new_trade and last_trade.trend == TradeType.long.name
         is_short = ready_to_new_trade and last_trade.trend == TradeType.short.name
@@ -114,16 +113,16 @@ class ABCStrategy(ABC):
         return True
 
     def _update_close_trade(
-        self,
-        tradeType,
-        position,
-        indicator,
-        indicator_value=0,
-        exit_date=datetime.now(),
-        is_profit=False,
-        is_loss=False,
-        take_profit=0,
-        stop_loss=0,
+            self,
+            tradeType,
+            position,
+            indicator,
+            indicator_value=0,
+            exit_date=datetime.now(),
+            is_profit=False,
+            is_loss=False,
+            take_profit=0,
+            stop_loss=0,
     ):
         last_trade = get_last_time_trade(self.symbol)
         session = apply_session()
@@ -137,10 +136,10 @@ class ABCStrategy(ABC):
         last_trade.closed_position = position
 
         result = (
-            last_trade.opened_position - position
-            if last_trade.trend == TradeType.short.name
-            else position - last_trade.opened_position
-        ) * last_trade.quantity
+                     last_trade.opened_position - position
+                     if last_trade.trend == TradeType.short.name
+                     else position - last_trade.opened_position
+                 ) * last_trade.quantity
 
         if is_profit:
             result = take_profit
@@ -148,7 +147,7 @@ class ABCStrategy(ABC):
             result = -stop_loss
 
         fee = (last_trade.opened_position * (0.061110 / 100) * last_trade.quantity) + (
-            last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
+                last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
         )
         self.balance += last_trade.opened_position * last_trade.quantity + result - fee
         # print("balance is {}".format(self.balance))
@@ -214,8 +213,9 @@ class ABCStrategy(ABC):
 
             return loss >= stop_loss, stop_loss
 
-    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles):
-        threadholder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles)
+    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=3, holder_dev=2):
+        threadholder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles, rolling=rolling,
+                                                              holder_dev=holder_dev)
         trend_action = None
         if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
             trend_action = TradeType.long.name

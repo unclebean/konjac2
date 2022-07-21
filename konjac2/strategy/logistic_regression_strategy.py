@@ -20,7 +20,7 @@ class LogisticRegressionStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, daily_candles):
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, daily_candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, daily_candles, rolling=7, holder_dev=3)
 
         self._delete_last_in_progress_trade()
         if longer_timeframe_trend is not None:
@@ -29,14 +29,15 @@ class LogisticRegressionStrategy(ABCStrategy):
     def entry_signal(self, candles, longer_timeframe_candles) -> bool:
         last_trade = self.get_trade()
         if last_trade is not None and last_trade.status == TradeStatus.in_progress.name:
-            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, longer_timeframe_candles)
+            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, longer_timeframe_candles, rolling=7,
+                                                                           holder_dev=3)
             trend, accuracy, _ = self._get_open_signal(candles)
             is_in_squeeze = is_squeeze(candles)
             if (
-                trend is not None
-                and trend == last_trade.trend
-                and trend == longer_timeframe_trend
-                and not is_in_squeeze
+                    trend is not None
+                    and trend == last_trade.trend
+                    and trend == longer_timeframe_trend
+                    and not is_in_squeeze
             ):
                 status = self._update_open_trade(last_trade.trend, candles.close[-1], "lr", accuracy, candles.index[-1])
                 _, take_profit = self._is_take_profit(candles)
@@ -47,9 +48,9 @@ class LogisticRegressionStrategy(ABCStrategy):
     def exit_signal(self, candles) -> bool:
         last_trade = self.get_trade()
         if (
-            last_trade is not None
-            and last_trade.status == TradeStatus.opened.name
-            and last_trade.entry_date != candles.index[-1]
+                last_trade is not None
+                and last_trade.status == TradeStatus.opened.name
+                and last_trade.entry_date != candles.index[-1]
         ):
             close_price = candles.close[-1]
             trend, accuracy, _ = self._get_signal(candles)
