@@ -2,6 +2,7 @@ import logging
 from pandas_ta.momentum import macd, stochrsi
 from pandas_ta.overlap import ichimoku
 from .abc_strategy import ABCStrategy
+from ..indicator.squeeze_momentum import is_squeeze
 from ..indicator.utils import TradeType
 
 log = logging.getLogger(__name__)
@@ -21,8 +22,16 @@ class MacdHistogramStrategy(ABCStrategy):
         self._delete_last_in_progress_trade()
         if close_price > isa[-26] and close_price > isb[-26]:
             self._start_new_trade(TradeType.long.name, candles.index[-1])
+            return
         if close_price < isa[-26] and close_price < isb[-26]:
             self._start_new_trade(TradeType.short.name, candles.index[-1])
+            return
+
+        is_sqz = is_squeeze(candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+        self._delete_last_in_progress_trade()
+        if not is_sqz:
+            self._start_new_trade(longer_timeframe_trend, candles.index[-1])
 
     def entry_signal(self, candles, h4_candles):
         last_order_status = self._can_open_new_trade()
