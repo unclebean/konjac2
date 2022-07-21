@@ -25,6 +25,7 @@ class MacdHistogramStrategy(ABCStrategy):
 
         if not is_sqz and longer_timeframe_trend is not None:
             self._start_new_trade(longer_timeframe_trend, candles.index[-1])
+            log.info(f"{self.symbol} in progress with no squeeze!")
             return
         if close_price > isa[-26] and close_price > isb[-26]:
             self._start_new_trade(TradeType.long.name, candles.index[-1])
