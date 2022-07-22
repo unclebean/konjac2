@@ -55,6 +55,7 @@ Cryptos = [
     # "RSR",
     # "SAND",
     # "SRM",
+    "SNX",
     "STORJ",
     # "SHIB",
     "WAVES",
