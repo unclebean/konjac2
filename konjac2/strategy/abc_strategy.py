@@ -65,7 +65,7 @@ class ABCStrategy(ABC):
             session.commit()
             session.close()
 
-    def _start_new_trade(self, trend: str, create_date=datetime.now()):
+    def _start_new_trade(self, trend: str, create_date=datetime.now(), open_type="", h4_date=None):
         last_trade = get_last_time_trade(self.symbol)
         if last_trade is None or last_trade is not None and last_trade.status == TradeStatus.closed.name:
             session = apply_session()
@@ -76,6 +76,8 @@ class ABCStrategy(ABC):
                     trend=trend,
                     status=TradeStatus.in_progress.name,
                     create_date=create_date,
+                    open_type=open_type,
+                    h4_date=h4_date,
                 )
             )
             session.commit()

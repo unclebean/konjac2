@@ -33,6 +33,8 @@ class Trade(Base):
     create_date = Column(DateTime)
     quantity = Column(Float, nullable=True)
     signals = relationship("Signal")
+    open_type = Column(String, nullable=True)
+    h4_date = Column(DateTime, nullable=True)
 
     Index('symbol', 'strategy', 'create_date')
 
