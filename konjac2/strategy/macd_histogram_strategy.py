@@ -41,7 +41,7 @@ class MacdHistogramStrategy(ABCStrategy):
         longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
 
         log.info(f"{self.symbol} heikin ashi trend {longer_timeframe_trend}")
-        is_sqz = is_squeeze(candles)
+        # is_sqz = is_squeeze(candles)
 
         if (
                 last_order_status.ready_to_procceed
@@ -60,7 +60,7 @@ class MacdHistogramStrategy(ABCStrategy):
                     or (0 < macd_histogram[-3] > macd_histogram[-2] and macd_histogram[-2] * 2 < macd_histogram[-1] > 0
                         and stock_rsi_k[-1] > stock_rsi_d[-1]
                         and stock_rsi_k[-2] <= stock_rsi_d[-2])
-                    or (not is_sqz and macd_histogram[-1] > macd_histogram[-2] and stock_rsi_k[-1] > stock_rsi_d[-1])
+                    # or (not is_sqz and macd_histogram[-1] > macd_histogram[-2] and stock_rsi_k[-1] > stock_rsi_d[-1])
             ):
                 return self._update_open_trade(
                     TradeType.long.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
@@ -82,7 +82,7 @@ class MacdHistogramStrategy(ABCStrategy):
                     or (0 > macd_histogram[-3] < macd_histogram[-2] and macd_histogram[-2] * 2 > macd_histogram[-1] < 0
                         and stock_rsi_k[-1] < stock_rsi_d[-1]
                         and stock_rsi_k[-2] >= stock_rsi_d[-2])
-                    or (not is_sqz and macd_histogram[-1] < macd_histogram[-2] and stock_rsi_k[-1] < stock_rsi_d[-1])
+                    # or (not is_sqz and macd_histogram[-1] < macd_histogram[-2] and stock_rsi_k[-1] < stock_rsi_d[-1])
             ):
                 return self._update_open_trade(
                     TradeType.short.name, candles.close[-1], "macd_ichimoku", macd_histogram[-1], candles.index[-1]
