@@ -100,6 +100,9 @@ class MacdHistogramStrategy(ABCStrategy):
         if last_order_status.ready_to_procceed and last_order_status.is_long:
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
+            stoch_rsi_data = stochrsi(candles.close)
+            stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
+            stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
@@ -107,7 +110,7 @@ class MacdHistogramStrategy(ABCStrategy):
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
             if (
-                    (macd_histogram[-1] >= 0 and macd_histogram[-1] < macd_histogram[-2])
+                    (macd_histogram[-1] >= 0 and macd_histogram[-1] < macd_histogram[-2] and stock_rsi_k[-1] < stock_rsi_d[-1])
                     or is_profit
                     or is_loss
                     or longer_timeframe_trend != TradeType.long.name
@@ -126,6 +129,9 @@ class MacdHistogramStrategy(ABCStrategy):
         if last_order_status.ready_to_procceed and last_order_status.is_short:
             macd_data = macd(candles.close, 13, 34)
             macd_histogram = macd_data["MACDh_13_34_9"]
+            stoch_rsi_data = stochrsi(candles.close)
+            stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
+            stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
             longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
@@ -133,7 +139,7 @@ class MacdHistogramStrategy(ABCStrategy):
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
             if (
-                    (macd_histogram[-1] <= 0 and macd_histogram[-1] > macd_histogram[-2])
+                    (macd_histogram[-1] <= 0 and macd_histogram[-1] > macd_histogram[-2] and stock_rsi_k[-1] > stock_rsi_d[-1])
                     or is_profit
                     or is_loss
                     or longer_timeframe_trend != TradeType.short.name
