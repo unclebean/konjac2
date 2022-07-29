@@ -23,7 +23,7 @@ class MacdHistogramStrategy(ABCStrategy):
         longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
         self._delete_last_in_progress_trade()
 
-        if not is_sqz and longer_timeframe_trend is not None:
+        if longer_timeframe_trend is not None:
             self._start_new_trade(longer_timeframe_trend, candles.index[-1], open_type="squeeze",
                                   h4_date=h4_candles.index[-1])
             log.info(f"{self.symbol} in progress with no squeeze!")
@@ -60,8 +60,8 @@ class MacdHistogramStrategy(ABCStrategy):
                     or (0 < macd_histogram[-3] > macd_histogram[-2] and macd_histogram[-2] * 2 < macd_histogram[-1] > 0
                         and stock_rsi_k[-1] > stock_rsi_d[-1]
                         and stock_rsi_k[-2] <= stock_rsi_d[-2])
-                    or (not is_sqz
-                        and stock_rsi_k[-1] > stock_rsi_d[-1]
+                    or (
+                        stock_rsi_k[-1] > stock_rsi_d[-1]
                         and stock_rsi_k[-2] <= stock_rsi_d[-2])
             ):
                 return self._update_open_trade(

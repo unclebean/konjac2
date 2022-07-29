@@ -162,6 +162,11 @@ async def trade_eur_usd():
     log.info("job running done!")
 
 
+async def place_crypto_order(symbol: str, trend: str):
+    if symbol is not None and trend is not None:
+        place_trade(symbol, "buy", trend)
+
+
 async def scanner_job():
     await asyncio.sleep(30)
     await scan_crypto()
