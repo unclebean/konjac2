@@ -1,7 +1,7 @@
 from ..chart.heikin_ashi import heikin_ashi
 
 
-def heikin_ashi_mom(long_term_volatility_data, short_term_volatility_data, rolling=3, holder_dev=2):
+def heikin_ashi_mom(long_term_volatility_data, short_term_volatility_data, rolling=7, holder_dev=3):
     short_term_heikin_ashi = heikin_ashi(short_term_volatility_data)
     long_term_volatility = (
                                    long_term_volatility_data["high"] - long_term_volatility_data["low"]
