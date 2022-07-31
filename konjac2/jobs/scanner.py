@@ -16,7 +16,7 @@ from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from konjac2.strategy.macd_histogram_strategy import MacdHistogramStrategy
 from . import Instruments, Cryptos
-
+from ..service.utils import filter_incomplete_h1_data, filter_incomplete_h4_data
 
 log = logging.getLogger(__name__)
 
@@ -82,12 +82,15 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def smart_bot(currency="SAND", use_stable=True):
+async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", True, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", use_stable, limit=1000)
+    data = fetch_data(query_symbol, "H1", False, limit=1500)
+    h4_data = fetch_data(query_symbol, "H4", False, limit=1000)
+
+    data = filter_incomplete_h1_data(data)
+    h4_data = filter_incomplete_h4_data(h4_data)
     opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data, h4_data)
@@ -116,10 +119,10 @@ async def smart_bot(currency="SAND", use_stable=True):
     log.info("job running done!")
 
 
-async def scan_crypto(use_stable=True):
+async def scan_crypto():
     for currency in Cryptos:
         try:
-            await smart_bot(currency=currency, use_stable=use_stable)
+            await smart_bot(currency=currency)
         except Exception as err:
             print(str(err))
 
@@ -168,5 +171,6 @@ async def place_crypto_order(symbol: str, trend: str):
 
 
 async def scanner_job():
+    await asyncio.sleep(5)
     await scan_crypto()
     await trade_eur_usd()
