@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 def get_nearest_complete_h4_hour():
-    current_hour = datetime.utcnow().hour
+    current_hour = datetime.utcnow().hour - 1
     if current_hour < 4:
         return 0
     elif current_hour < 8:
