@@ -56,20 +56,32 @@ def short_term_backtest(symbol: str):
             continue
         # last_day = window.index[-1].strftime("%Y-%m-%d")
         last_index = window.index[-1]
-        if last_index.hour < 4:
+        if 4 <= last_index.hour < 8:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 00:00:00"
-        elif last_index.hour < 8:
+        elif 8 <= last_index.hour < 12:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 04:00:00"
-        elif last_index.hour < 12:
+        elif 12 <= last_index.hour < 16:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 08:00:00"
-        elif last_index.hour < 16:
+        elif 16 <= last_index.hour < 20:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 12:00:00"
-        elif last_index.hour < 20:
+        elif 20 <= last_index.hour <= 23:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 16:00:00"
         else:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 20:00:00"
+            last_h4_index = (last_index - timedelta(days=1)).strftime("%Y-%m-%d") + " 20:00:00"
         # print(window)
         current_day_data = h4_data.loc[:last_h4_index]
+        near_real_time_candle = window.loc[last_h4_index:last_index][1:]
+        if len(near_real_time_candle) > 0:
+            open_price = near_real_time_candle.open[0]
+            close_price = near_real_time_candle.close[-1]
+            high_price = near_real_time_candle.high.max()
+            low_price = near_real_time_candle.low.min()
+            volume = near_real_time_candle.volume.sum()
+            near_real_time_row = pd.DataFrame([[open_price, close_price, high_price, low_price, volume]], columns=["open", "close", "high", "low", "volume"], index=[last_index])
+            current_day_data = current_day_data.append(near_real_time_row)
+            print(window.tail())
+            print(current_day_data.tail())
+
         # print(current_day_data)
         strategy.exit_signal(window, current_day_data)
         strategy.seek_trend(window, current_day_data)
