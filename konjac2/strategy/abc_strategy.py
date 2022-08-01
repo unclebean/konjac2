@@ -1,7 +1,7 @@
 import logging
 from collections import namedtuple
 from datetime import datetime
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 
@@ -22,16 +22,16 @@ class ABCStrategy(ABC):
     def __init__(self, symbol: str):
         self.symbol = symbol
 
-    @abstractclassmethod
-    def seek_trend(self, candles):
+    @abstractmethod
+    def seek_trend(self, candles, middle_candles=None, long_candles=None):
         pass
 
-    @abstractclassmethod
-    def entry_signal(self, candles) -> bool:
+    @abstractmethod
+    def entry_signal(self, candles, middle_candles=None, long_candles=None) -> bool:
         pass
 
-    @abstractclassmethod
-    def exit_signal(self, candles) -> bool:
+    @abstractmethod
+    def exit_signal(self, candles, middle_candles=None, long_candles=None) -> bool:
         pass
 
     def get_trade(self):
@@ -186,20 +186,12 @@ class ABCStrategy(ABC):
             if last_trade.trend == TradeType.short.name:
                 profit = (last_trade.opened_position - low_price) * last_trade.quantity
 
-            """
-            print(
-                "high: {} low: {} position: {} quantity: {} result: {} take profit: {}".format(
-                    high_price, low_price, last_trade.opened_position, last_trade.quantity, profit, take_profit
-                )
-            )
-            """
-
             return profit >= take_profit, take_profit
+        return False, 0
 
     def _is_stop_loss(self, candles):
         last_trade = self.get_trade()
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
-            # close_price = candles.close[-1]
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
@@ -209,20 +201,17 @@ class ABCStrategy(ABC):
             if last_trade.trend == TradeType.short.name:
                 loss = (high_price - last_trade.opened_position) * last_trade.quantity
 
-            # print(last_trade)
-            # print(last_trade.opened_position, close_price, low_price, high_price, last_trade.quantity)
-            # print("loss: {} stop loss:: {}".format(loss, stop_loss))
-
             return loss >= stop_loss, stop_loss
+        return False, 0
 
     def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=7, holder_dev=3):
-        threadholder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles, rolling=rolling,
+        thread_holder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles, rolling=rolling,
                                                               holder_dev=holder_dev)
         trend_action = None
-        if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
+        if thread_holder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
             trend_action = TradeType.long.name
 
-        if threadholder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
+        if thread_holder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
             trend_action = TradeType.short.name
 
         return trend_action

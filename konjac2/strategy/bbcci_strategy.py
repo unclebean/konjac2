@@ -11,7 +11,7 @@ class BBCCIStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles, h4_candles):
+    def seek_trend(self, candles, middle_candles=None, long_candles=None):
         trends, cci144 = bb_cci_mom(candlestick=candles)
         trend = None
         if is_crossing_up(cci144[-1], 80):
@@ -22,7 +22,7 @@ class BBCCIStrategy(ABCStrategy):
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
-    def entry_signal(self, candles, h4_candles):
+    def entry_signal(self, candles, middle_candles=None, long_candles=None):
         cci34 = cci(candles.high, candles.low, candles.close, 34)
         cci144 = cci(candles.high, candles.low, candles.close, 144)
         diff_value = abs(cci34[-1] - cci144[-1])
@@ -35,12 +35,12 @@ class BBCCIStrategy(ABCStrategy):
             self._update_open_trade(TradeType.short.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
-    def exit_signal(self, candles, h4_candles):
+    def exit_signal(self, candles, middle_candles=None, long_candles=None):
         cci34 = cci(candles.high, candles.low, candles.close, 34)
         last_order_status = self._can_close_trade()
+        is_profit, take_profit = self._is_take_profit(candles)
+        is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed and last_order_status.is_long and cci34[-1] >= 160:
-            is_profit, take_profit = self._is_take_profit(candles)
-            is_loss, stop_loss = self._is_stop_loss(candles)
             self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -52,11 +52,8 @@ class BBCCIStrategy(ABCStrategy):
                 take_profit,
                 stop_loss,
             )
-            # say_something(f"{self.symbol} close {TradeType.long.name}")
 
         if last_order_status.ready_to_procceed and last_order_status.is_short and cci34[-1] <= -160:
-            is_profit, take_profit = self._is_take_profit(candles)
-            is_loss, stop_loss = self._is_stop_loss(candles)
             self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
@@ -68,4 +65,3 @@ class BBCCIStrategy(ABCStrategy):
                 take_profit,
                 stop_loss,
             )
-            # say_something(f"{self.symbol} close {TradeType.short.name}")
