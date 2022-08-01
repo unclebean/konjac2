@@ -83,17 +83,18 @@ async def bbcci_scanner():
 
 
 async def smart_bot(currency="SAND"):
-    query_symbol = f"{currency}-PERP"
+    query_symbol = f"{currency}/USDT"
     trade_symbol = f"{currency}-PERP"
     strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", False, limit=1500)
-    h4_data = fetch_data(query_symbol, "H4", False, limit=1000)
+    h6_data = fetch_data(query_symbol, "H6", True, counts=1000)
+    d_data = fetch_data(query_symbol, "D", True, counts=1000)
 
     data = filter_incomplete_h1_data(data)
-    h4_data = filter_incomplete_h4_data(h4_data)
+    h6_data = filter_incomplete_h4_data(h6_data)
     opened_position = opened_position_by_symbol(trade_symbol)
 
-    is_exit_trade = strategy.exit_signal(data, h4_data)
+    is_exit_trade = strategy.exit_signal(data, h6_data, d_data)
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
         try:
@@ -104,8 +105,8 @@ async def smart_bot(currency="SAND"):
             log.error("closed position error! {}".format(err))
             place_trade(trade_symbol, "sell")
 
-    strategy.seek_trend(data, h4_data)
-    is_opened_trade = strategy.entry_signal(data, h4_data)
+    strategy.seek_trend(data, h6_data, d_data)
+    is_opened_trade = strategy.entry_signal(data, h6_data, d_data)
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         try:

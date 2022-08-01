@@ -14,31 +14,30 @@ class MacdHistogramStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles, h4_candles):
+    def seek_trend(self, candles, h6_candles, d_candles):
         ichimoku_df, _ = ichimoku(candles.high, candles.low, candles.close)
         isa = ichimoku_df["ISA_9"]
         isb = ichimoku_df["ISB_26"]
         close_price = candles.close[-1]
-        is_sqz = is_squeeze(candles)
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(h6_candles, d_candles)
         self._delete_last_in_progress_trade()
 
         if longer_timeframe_trend is not None:
             self._start_new_trade(longer_timeframe_trend, candles.index[-1], open_type="squeeze",
-                                  h4_date=h4_candles.index[-1])
+                                  h4_date=h6_candles.index[-1])
             log.info(f"{self.symbol} in progress with no squeeze!")
             return
         if close_price > isa[-26] and close_price > isb[-26]:
             self._start_new_trade(TradeType.long.name, candles.index[-1], open_type="ichimoku",
-                                  h4_date=h4_candles.index[-1])
+                                  h4_date=h6_candles.index[-1])
             return
         if close_price < isa[-26] and close_price < isb[-26]:
             self._start_new_trade(TradeType.short.name, candles.index[-1], open_type="ichimoku",
-                                  h4_date=h4_candles.index[-1])
+                                  h4_date=h6_candles.index[-1])
 
-    def entry_signal(self, candles, h4_candles):
+    def entry_signal(self, candles, h6_candles, d_candles):
         last_order_status = self._can_open_new_trade()
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(h6_candles, d_candles)
 
         log.info(f"{self.symbol} heikin ashi trend {longer_timeframe_trend}")
         is_sqz = is_squeeze(candles)
@@ -93,7 +92,7 @@ class MacdHistogramStrategy(ABCStrategy):
 
         return False
 
-    def exit_signal(self, candles, h4_candles):
+    def exit_signal(self, candles, h6_candles, d_candles):
         last_order_status = self._can_close_trade()
 
         if last_order_status.ready_to_procceed and last_order_status.is_long:
@@ -104,7 +103,7 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+            longer_timeframe_trend = self._get_longer_timeframe_volatility(h6_candles, d_candles)
             log.info(
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
@@ -133,7 +132,7 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+            longer_timeframe_trend = self._get_longer_timeframe_volatility(h6_candles, d_candles)
             log.info(
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )

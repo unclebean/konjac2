@@ -215,7 +215,7 @@ class ABCStrategy(ABC):
 
             return loss >= stop_loss, stop_loss
 
-    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=6, holder_dev=2):
+    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=7, holder_dev=3):
         threadholder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles, rolling=rolling,
                                                               holder_dev=holder_dev)
         trend_action = None
