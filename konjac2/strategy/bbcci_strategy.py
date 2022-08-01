@@ -1,8 +1,12 @@
+import logging
+
 from pandas_ta.momentum import cci
 
 from .abc_strategy import ABCStrategy
 from ..indicator.utils import TradeType, is_crossing_up, is_crossing_down
 from ..indicator.bb_cci_momentum import bb_cci_mom
+
+log = logging.getLogger(__name__)
 
 
 class BBCCIStrategy(ABCStrategy):
@@ -18,6 +22,7 @@ class BBCCIStrategy(ABCStrategy):
             trend = TradeType.long.name
         if is_crossing_down(cci144[-1], -80):
             trend = TradeType.short.name
+        log.info(f"BBCCI trend {trend} at {candles.index[-1]}")
         if trend is not None and trends[-3] and trends[-2] and trends[-1]:
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
