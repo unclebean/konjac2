@@ -82,12 +82,12 @@ async def bbcci_scanner():
 
 
 async def smart_bot(currency="SAND"):
-    query_symbol = f"{currency}/USDT"
+    query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
     strategy = BBCCIStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "M15", True, limit=1500)
-    h6_data = fetch_data(query_symbol, "H6", True, counts=1000)
-    d_data = fetch_data(query_symbol, "D", True, counts=1000)
+    h6_data = fetch_data(query_symbol, "H4", True, counts=100)
+    d_data = fetch_data(query_symbol, "D", True, counts=100)
 
     h6_data = filter_incomplete_h4_data(h6_data)
     opened_position = opened_position_by_symbol(trade_symbol)
