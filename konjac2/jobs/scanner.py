@@ -14,9 +14,8 @@ from konjac2.indicator.utils import TradeType
 from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
-from konjac2.strategy.macd_histogram_strategy import MacdHistogramStrategy
 from . import Instruments, Cryptos
-from ..service.utils import filter_incomplete_h1_data, filter_incomplete_h4_data
+from ..service.utils import filter_incomplete_h4_data
 
 log = logging.getLogger(__name__)
 
@@ -86,11 +85,10 @@ async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}/USDT"
     trade_symbol = f"{currency}-PERP"
     strategy = BBCCIStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", False, limit=1500)
+    data = fetch_data(query_symbol, "M15", True, limit=1500)
     h6_data = fetch_data(query_symbol, "H6", True, counts=1000)
     d_data = fetch_data(query_symbol, "D", True, counts=1000)
 
-    data = filter_incomplete_h1_data(data)
     h6_data = filter_incomplete_h4_data(h6_data)
     opened_position = opened_position_by_symbol(trade_symbol)
 
@@ -172,6 +170,6 @@ async def place_crypto_order(symbol: str, trend: str):
 
 
 async def scanner_job():
-    await asyncio.sleep(5)
+    await asyncio.sleep(30)
     await scan_crypto()
     await trade_eur_usd()
