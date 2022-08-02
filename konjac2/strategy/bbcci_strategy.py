@@ -45,7 +45,8 @@ class BBCCIStrategy(ABCStrategy):
         last_order_status = self._can_close_trade()
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
-        if last_order_status.ready_to_procceed and last_order_status.is_long and cci34[-1] >= 160:
+        if last_order_status.ready_to_procceed and last_order_status.is_long \
+                and (cci34[-1] >= 160 or is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -58,7 +59,8 @@ class BBCCIStrategy(ABCStrategy):
                 stop_loss,
             )
 
-        if last_order_status.ready_to_procceed and last_order_status.is_short and cci34[-1] <= -160:
+        if last_order_status.ready_to_procceed and last_order_status.is_short \
+                and (cci34[-1] <= -160 or is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
