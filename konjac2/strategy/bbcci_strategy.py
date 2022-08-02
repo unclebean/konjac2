@@ -23,7 +23,7 @@ class BBCCIStrategy(ABCStrategy):
         if is_crossing_down(cci144[-1], -80):
             trend = TradeType.short.name
         log.info(f"{self.symbol} BBCCI trend {trend} at {candles.index[-1]}")
-        if trend is not None and trends[-5] and trends[-4] and trends[-3] and trends[-2] and trends[-1]:
+        if trend is not None and trends[-4] and trends[-3] and trends[-2] and trends[-1]:
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
