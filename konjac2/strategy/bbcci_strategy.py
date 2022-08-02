@@ -23,7 +23,7 @@ class BBCCIStrategy(ABCStrategy):
         if is_crossing_down(cci144[-1], -80):
             trend = TradeType.short.name
         log.info(f"{self.symbol} BBCCI trend {trend} at {candles.index[-1]}")
-        if trend is not None and trends[-3] and trends[-2] and trends[-1]:
+        if trend is not None and trends[-5] and trends[-4] and trends[-3] and trends[-2] and trends[-1]:
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
@@ -32,11 +32,11 @@ class BBCCIStrategy(ABCStrategy):
         cci144 = cci(candles.high, candles.low, candles.close, 144)
         diff_value = abs(cci34[-1] - cci144[-1])
         last_order_status = self._can_open_new_trade()
-        if last_order_status.ready_to_procceed and last_order_status.is_long and diff_value > 210:
+        if last_order_status.ready_to_procceed and last_order_status.is_long and diff_value > 210 and cci144[-1] > 0:
             return self._update_open_trade(TradeType.long.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.long.name}")
 
-        if last_order_status.ready_to_procceed and last_order_status.is_short and diff_value > 210:
+        if last_order_status.ready_to_procceed and last_order_status.is_short and diff_value > 210 and cci144[-1] < 0:
             return self._update_open_trade(TradeType.short.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
