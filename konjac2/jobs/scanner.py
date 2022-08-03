@@ -15,6 +15,7 @@ from konjac2.service.forex.place_order import close_trade, has_opened_trades, ma
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Instruments, Cryptos
+from ..indicator.moving_average import moving_average
 from ..service.utils import filter_incomplete_h4_data
 
 log = logging.getLogger(__name__)
@@ -166,7 +167,9 @@ async def trade_eur_usd():
 
 async def place_crypto_order(symbol: str, trend: str):
     if symbol is not None and trend is not None:
-        place_trade(symbol, "buy", trend)
+        data = fetch_data(symbol, "H1", True, counts=100)
+        ma = moving_average(data.close)
+        place_trade(symbol, "buy", trend, loss_position=ma[-2])
 
 
 async def scanner_job():

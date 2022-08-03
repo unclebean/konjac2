@@ -51,10 +51,20 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
   const chartWrapper = useRef(null);
   const [chartWidth, updateChartWidth] = useState(800);
   const [trace, updateTrace] = useState(traceConfig);
+  const [histTrace, updateHistTrace] = useState({
+    type: "bar",
+    yaxis: "y2",
+    name: "HIST",
+  });
   const [macdTrace, updateMacdTrace] = useState({
     type: "scatter",
     yaxis: "y2",
     name: "MACD",
+  });
+  const [signalTrace, updateSignalTrace] = useState({
+    type: "scatter",
+    yaxis: "y2",
+    name: "SIGNAL",
   });
 
   const [senkouATrace, updateSenkouATrace] = useState({
@@ -99,7 +109,9 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
     }
     updateTrace({...trace, ...marketData});
 
+    updateHistTrace({...histTrace, x: marketData.x, y: macd.hist});
     updateMacdTrace({...macdTrace, x: marketData.x, y: macd.macd});
+    updateSignalTrace({...signalTrace, x: marketData.x, y: macd.signal});
 
     updateSenkouATrace({
       ...senkouATrace,
@@ -135,7 +147,9 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
           tenkanTrace,
           kijunTrace,
           // chikouTrace,
+          histTrace,
           macdTrace,
+          signalTrace,
         ]}
         layout={{...layout, width: chartWidth}}
         config={{displaylogo: false, responsive: true}}

@@ -9,7 +9,7 @@ class VegasStrategy(ABCStrategy):
     def __init__(self, symbol):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles):
+    def seek_trend(self, candles, middle_candles=None, long_candles=None):
         ema144 = ema(candles.close, 144)[-1]
         ema169 = ema(candles.close, 169)[-1]
         ema576 = ema(candles.close, 576)[-1]
@@ -24,7 +24,7 @@ class VegasStrategy(ABCStrategy):
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
-    def entry_signal(self, candles):
+    def entry_signal(self, candles, middle_candles=None, long_candles=None):
         ema12 = ema(candles.close, 12)[-1]
         ema144 = ema(candles.close, 144)
         ema676 = ema(candles.close, 676)
@@ -48,7 +48,7 @@ class VegasStrategy(ABCStrategy):
         ):
             self._update_open_trade(TradeType.short.name, candles.close[-1], "vegas", ema12, candles.index[-1])
 
-    def exit_signal(self, candles):
+    def exit_signal(self, candles, middle_candles=None, long_candles=None):
         last_order_status = self._can_close_trade()
         if last_order_status.ready_to_procceed:
             last_trade = self.get_trade()

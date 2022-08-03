@@ -13,7 +13,7 @@ class EmaStochRsiStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles, h4_candles):
+    def seek_trend(self, candles, middle_candles=None, long_candles=None):
         ema_8 = ema(candles.close, 8)
         ema_14 = ema(candles.close, 14)
         ema_50 = ema(candles.close, 50)
@@ -24,9 +24,9 @@ class EmaStochRsiStrategy(ABCStrategy):
         if ema_8[-1] > close_price and ema_14[-1] > close_price and ema_50[-1] > close_price:
             self._start_new_trade(TradeType.short.name, candles.index[-1])
 
-    def entry_signal(self, candles, h4_candles):
+    def entry_signal(self, candles, middle_candles=None, long_candles=None):
         last_order_status = self._can_open_new_trade()
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, middle_candles)
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
@@ -60,7 +60,7 @@ class EmaStochRsiStrategy(ABCStrategy):
 
         return False
 
-    def exit_signal(self, candles, h4_candles):
+    def exit_signal(self, candles, middle_candles=None, long_candles=None):
         last_order_status = self._can_close_trade()
         stoch_rsi_data = stochrsi(candles.close)
         stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
@@ -69,7 +69,7 @@ class EmaStochRsiStrategy(ABCStrategy):
         ema_14 = ema(candles.close, 14)
         ema_50 = ema(candles.close, 50)
         close_price = candles.close[-1]
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, h4_candles)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, middle_candles)
 
         if last_order_status.ready_to_procceed and last_order_status.is_long:
             is_profit, take_profit = self._is_take_profit(candles)

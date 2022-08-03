@@ -107,14 +107,14 @@ def sell_spot(symbol, account=""):
     exchanage.create_market_sell_order(symbol, amount)
 
 
-def place_trade(symbol, side, tradeType="", tp=0, sl=0):
+def place_trade(symbol, side, tradeType="", tp=0, sl=0, loss_position=None):
     if side == "buy":
-        open_position(symbol, tradeType, tp, sl)
+        open_position(symbol, tradeType, tp, sl, loss_position)
     else:
         close_position(symbol)
 
 
-def open_position(symbol, tradeType, tp=0, sl=0):
+def open_position(symbol, tradeType, tp=0, sl=0, loss_position=None):
     exchange = get_context()
     balance = get_ftx_balance()
     log.info("open position for {} current balance {}".format(symbol, balance))
@@ -129,13 +129,15 @@ def open_position(symbol, tradeType, tp=0, sl=0):
     if side == "buy":
         gain = (quantity_price + quantity_price * gain_rate) / amount
         loss = (quantity_price - quantity_price * loss_rate) / amount
+        loss_price = loss_position if loss_position is not None else loss
         exchange.create_order(symbol, "takeProfit", "sell", amount, None, params={"triggerPrice": gain})
-        exchange.create_order(symbol, "stop", "sell", amount, None, params={"triggerPrice": loss})
+        exchange.create_order(symbol, "stop", "sell", amount, None, params={"triggerPrice": loss_price})
     else:
         gain = (quantity_price - quantity_price * gain_rate) / amount
         loss = (quantity_price + quantity_price * loss_rate) / amount
+        loss_price = loss_position if loss_position is not None else loss
         exchange.create_order(symbol, "takeProfit", "buy", amount, None, params={"triggerPrice": gain})
-        exchange.create_order(symbol, "stop", "buy", amount, None, params={"triggerPrice": loss})
+        exchange.create_order(symbol, "stop", "buy", amount, None, params={"triggerPrice": loss_price})
 
 
 def close_position(symbol):
