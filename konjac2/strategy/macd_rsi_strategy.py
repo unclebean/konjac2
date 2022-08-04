@@ -14,7 +14,7 @@ class MacdRsiStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles, middle_candles=None, long_candles=None):
+    def seek_trend(self, candles, day_candles=None):
         trigger, m_normal, _ = n_macd(candles.close)
         if trigger[-1] < 0 and trigger[-2] > m_normal[-2] and trigger[-1] < m_normal[-1]:
             self._delete_last_in_progress_trade()
@@ -24,7 +24,7 @@ class MacdRsiStrategy(ABCStrategy):
             self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.short.name, candles.index[-1])
 
-    def entry_signal(self, candles, middle_candles=None, long_middle=None):
+    def entry_signal(self, candles, day_candles=None):
         last_order_status = self._can_open_new_trade()
         rsi_data = rsi(candles.close, timeperiod=21)
         rsi_sma_data = sma(rsi_data, 55)
@@ -42,7 +42,7 @@ class MacdRsiStrategy(ABCStrategy):
                 and ma_data[-1] > candles.close[-1]:
             return self._update_open_trade(TradeType.short.name, candles.close[-1], "macd_rsi", ma_data[-1], candles.index[-1])
 
-    def exit_signal(self, candles, middle_candles=None, long_candles=None):
+    def exit_signal(self, candles, day_candles=None):
         last_order_status = self._can_close_trade()
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)

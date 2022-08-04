@@ -9,7 +9,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles, middle_candles=None, long_candles=None):
+    def seek_trend(self, candles, day_candles=None):
         dema144 = dema(candles.close)[-1]
         dema169 = dema(candles.close)[-1]
         close_price = candles.close[-1]
@@ -22,7 +22,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
-    def entry_signal(self, candles, middle_candles=None, long_candles=None):
+    def entry_signal(self, candles, day_candles=None):
         super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3.0"]
         last_order_status = self._can_open_new_trade()
         close_price = candles.close[-1]
@@ -45,7 +45,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
                 TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
             )
 
-    def exit_signal(self, candles, middle_candles=None, long_candles=None):
+    def exit_signal(self, candles, day_candles=None):
         super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3.0"]
         last_order_status = self._can_close_trade()
         close_price = candles.close[-1]

@@ -16,7 +16,7 @@ app.include_router(TrendRouter)
 app.include_router(ChartRouter)
 
 
-@app.on_event("startup")
+# @app.on_event("startup")
 async def startup_event():
     file_path = os.environ.get("konjac_log", "./logs/konjac_api.log")
     logger = logging.getLogger()
@@ -27,12 +27,12 @@ async def startup_event():
     logger.setLevel(logging.INFO)
 
 
-@app.on_event("startup")
+# @app.on_event("startup")
 async def start_bot():
     startup_bot()
 
 
-@app.on_event("startup")
+# @app.on_event("startup")
 async def start_job():
     if settings.run_cron_job:
         scheduler = AsyncIOScheduler()

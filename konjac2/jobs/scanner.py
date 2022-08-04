@@ -87,13 +87,11 @@ async def smart_bot(currency="SAND"):
     trade_symbol = f"{currency}-PERP"
     strategy = BBCCIStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "M15", True, limit=1500)
-    h6_data = fetch_data(query_symbol, "H4", True, counts=100)
     d_data = fetch_data(query_symbol, "D", True, counts=100)
 
-    h6_data = filter_incomplete_h4_data(h6_data)
     opened_position = opened_position_by_symbol(trade_symbol)
 
-    is_exit_trade = strategy.exit_signal(data, h6_data, d_data)
+    is_exit_trade = strategy.exit_signal(data, d_data)
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
         try:
@@ -104,8 +102,8 @@ async def smart_bot(currency="SAND"):
             log.error("closed position error! {}".format(err))
             place_trade(trade_symbol, "sell")
 
-    strategy.seek_trend(data, h6_data, d_data)
-    is_opened_trade = strategy.entry_signal(data, h6_data, d_data)
+    strategy.seek_trend(data, d_data)
+    is_opened_trade = strategy.entry_signal(data, d_data)
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         try:
@@ -132,9 +130,9 @@ async def trade_eur_usd():
     trade_symbol = "EUR_USD"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=1000)
-    h4_data = fetch_data(query_symbol, "H4", True, counts=1000)
+    d_data = fetch_data(query_symbol, "D", True, counts=1000)
 
-    is_exit_trade = strategy.exit_signal(data)
+    is_exit_trade = strategy.exit_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
@@ -145,8 +143,8 @@ async def trade_eur_usd():
             log.error("closed position error! {}".format(err))
             close_trade(trade_symbol)
 
-    strategy.seek_trend(data, h4_data)
-    is_opened_trade = strategy.entry_signal(data, h4_data)
+    strategy.seek_trend(data, day_candles=d_data)
+    is_opened_trade = strategy.entry_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
     if (
         is_opened_trade
@@ -175,5 +173,5 @@ async def place_crypto_order(symbol: str, trend: str):
 
 async def scanner_job():
     await asyncio.sleep(30)
-    await scan_crypto()
+    # await scan_crypto()
     await trade_eur_usd()

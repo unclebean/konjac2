@@ -12,6 +12,7 @@ from .prepare_data import prepare_forex_backtest_data
 from ..indicator.heikin_ashi_momentum import heikin_ashi_mom
 from ..models import apply_session
 from ..models.trade import Trade
+from ..strategy.macd_rsi_strategy import MacdRsiStrategy
 
 logging.basicConfig()
 logging.getLogger("sqlalchemy").setLevel(logging.ERROR)
@@ -48,44 +49,22 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) # .loc["2020-02-20 00:00:00":]
-    h4_data = pd.read_csv(f"{symbol}_6_0.csv", index_col="date", parse_dates=True)
+    h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) # .loc["2020-02-20 00:00:00":]
     d_data = pd.read_csv(f"{symbol}_24_0.csv", index_col="date", parse_dates=True)
-    strategy = BBCCIStrategy(symbol=symbol)
-    for window in m5_data.rolling(window=999):
-        if len(window.index) < 999:
+    strategy = LogisticRegressionStrategy(symbol=symbol)
+    for window in h1_data.rolling(window=930):
+        if len(window.index) < 930:
             continue
         # last_day = window.index[-1].strftime("%Y-%m-%d")
         last_index = window.index[-1]
-
-        if 6 <= last_index.hour < 12:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 00:00:00"
-        elif 12 <= last_index.hour < 18:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 06:00:00"
-        elif 18 <= last_index.hour <= 23:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 12:00:00"
-        else:
-            last_h4_index = (last_index - timedelta(days=1)).strftime("%Y-%m-%d") + " 18:00:00"
-        # print(window)
-        current_day_data = h4_data.loc[:last_h4_index]
-        # near_real_time_candle = window.loc[last_h4_index:last_index][6:]
-        #
-        # if len(near_real_time_candle) > 0:
-        #     open_price = near_real_time_candle.open[0]
-        #     close_price = near_real_time_candle.close[-1]
-        #     high_price = near_real_time_candle.high.max()
-        #     low_price = near_real_time_candle.low.min()
-        #     volume = near_real_time_candle.volume.sum()
-        #     near_real_time_row = pd.DataFrame([[open_price, close_price, high_price, low_price, volume]], columns=["open", "close", "high", "low", "volume"], index=[last_index])
-        #     current_day_data = current_day_data.append(near_real_time_row)
 
         day_index = (last_index - timedelta(days=1)).strftime("%Y-%m-%d") + " 00:00:00"
         d_candles = d_data.loc[:day_index]
 
         # print(current_day_data)
-        strategy.exit_signal(window, current_day_data, d_candles)
-        strategy.seek_trend(window, current_day_data, d_candles)
-        strategy.entry_signal(window, current_day_data, d_candles)
+        strategy.exit_signal(window, d_candles)
+        strategy.seek_trend(window, d_candles)
+        strategy.entry_signal(window, d_candles)
         print(strategy.get_trade())
     session = apply_session()
     total_result = session.query(

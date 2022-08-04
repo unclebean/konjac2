@@ -23,15 +23,15 @@ class ABCStrategy(ABC):
         self.symbol = symbol
 
     @abstractmethod
-    def seek_trend(self, candles, middle_candles=None, long_candles=None):
+    def seek_trend(self, candles, day_candles=None):
         pass
 
     @abstractmethod
-    def entry_signal(self, candles, middle_candles=None, long_candles=None) -> bool:
+    def entry_signal(self, candles, day_candles=None) -> bool:
         pass
 
     @abstractmethod
-    def exit_signal(self, candles, middle_candles=None, long_candles=None) -> bool:
+    def exit_signal(self, candles, day_candles=None) -> bool:
         pass
 
     def get_trade(self):
@@ -180,7 +180,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.025
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.035
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -189,11 +189,22 @@ class ABCStrategy(ABC):
             return profit >= take_profit, take_profit
         return False, 0
 
-    def _is_stop_loss(self, candles):
+    def _is_stop_loss(self, candles, stop_position=None):
         last_trade = self.get_trade()
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
             low_price = candles.low[-1]
             high_price = candles.high[-1]
+
+            if stop_position is not None \
+                    and last_trade.trend == TradeType.long.name \
+                    and stop_position >= low_price:
+                stop_loss = last_trade.opened_position * last_trade.quantity - stop_position * last_trade.quantity
+                return True, stop_loss
+            if stop_position is not None \
+                    and last_trade.trend == TradeType.short.name \
+                    and stop_position <= high_price:
+                stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
+                return True, stop_loss
 
             stop_loss = last_trade.opened_position * last_trade.quantity * 0.015
 

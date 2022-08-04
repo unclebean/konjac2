@@ -1,5 +1,4 @@
 from pandas_ta import cci
-from pandas_ta.momentum import rsi
 
 from .abc_strategy import ABCStrategy
 from ..chart.heikin_ashi import heikin_ashi
@@ -13,7 +12,7 @@ class CERSIStrategy(ABCStrategy):
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
 
-    def seek_trend(self, candles, middle_candles=None, long_candles=None):
+    def seek_trend(self, candles, day_candles=None):
         heikin_ashi_candles = heikin_ashi(candles)
         signals = chandelier_exit(heikin_ashi_candles)
 
@@ -24,7 +23,7 @@ class CERSIStrategy(ABCStrategy):
             self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.short.name, candles.index[-1])
 
-    def entry_signal(self, candles, middle_candles=None, long_candles=None):
+    def entry_signal(self, candles, day_candles=None):
         cci34 = cci(candles.high, candles.low, candles.close, 34)
         cci144 = cci(candles.high, candles.low, candles.close, 144)
         last_order_status = self._can_open_new_trade()
@@ -43,7 +42,7 @@ class CERSIStrategy(ABCStrategy):
                                     candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
-    def exit_signal(self, candles, middle_candles=None, long_candles=None):
+    def exit_signal(self, candles, day_candles=None):
         heikin_ashi_candles = heikin_ashi(candles)
         signals = chandelier_exit(heikin_ashi_candles)
         cci34 = cci(candles.high, candles.low, candles.close, 34)
