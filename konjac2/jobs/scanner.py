@@ -166,10 +166,11 @@ async def trade_eur_usd():
 
 
 async def place_crypto_order(symbol: str, trend: str):
-    if symbol is not None and trend is not None:
+    if symbol is not None and trend is not None and not has_opened_trades(symbol):
         data = fetch_data(symbol, "H1", True, counts=100)
         ma = moving_average(data.close)
-        place_trade(symbol, "buy", trend, loss_position=ma[-2])
+        stop_position = ma[-1] - ma[-1] * 0.002 if trend == TradeType.long.name else ma[-1] + ma[-1] * 0.002
+        place_trade(symbol, "buy", trend, loss_position=stop_position)
 
 
 async def scanner_job():
