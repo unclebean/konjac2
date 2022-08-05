@@ -216,11 +216,12 @@ class ABCStrategy(ABC):
         return False, 0
 
     def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles):
-        short_trend, _, _ = predict_xgb_next_ticker(longer_timeframe_candles.copy(deep=True), predict_step=0)
-        if short_trend is None:
+        daily_trend, _, _ = predict_xgb_next_ticker(longer_timeframe_candles.copy(deep=True), predict_step=0)
+        log.info(f"daily trend is {daily_trend}")
+        if daily_trend is None:
             return None
-        if short_trend[0] > 0.5:
+        if daily_trend[0] > 0.5:
             return TradeType.long.name
-        elif short_trend[0] < 0.5:
+        elif daily_trend[0] < 0.5:
             return TradeType.short.name
         return None
