@@ -20,7 +20,7 @@ class LogisticRegressionStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, day_candles=None):
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles, rolling=7, holder_dev=3)
+        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
 
         self._delete_last_in_progress_trade()
         if longer_timeframe_trend is not None:
@@ -29,8 +29,7 @@ class LogisticRegressionStrategy(ABCStrategy):
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_trade = self.get_trade()
         if last_trade is not None and last_trade.status == TradeStatus.in_progress.name:
-            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles, rolling=7,
-                                                                           holder_dev=3)
+            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
             trend, accuracy, _ = self._get_open_signal(candles)
             is_in_squeeze = is_squeeze(candles)
             if (

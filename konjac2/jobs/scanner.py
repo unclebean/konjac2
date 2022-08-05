@@ -85,9 +85,9 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
-    strategy = BBCCIStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "M15", True, limit=1500)
-    d_data = fetch_data(query_symbol, "D", True, counts=100)
+    strategy = LogisticRegressionStrategy(symbol=query_symbol)
+    data = fetch_data(query_symbol, "H1", True, limit=1500)
+    d_data = fetch_data(query_symbol, "D", False, counts=1500)
 
     opened_position = opened_position_by_symbol(trade_symbol)
 
@@ -168,10 +168,10 @@ async def place_crypto_order(symbol: str, trend: str):
         data = fetch_data(symbol, "H1", True, counts=100)
         ma = moving_average(data.close)
         stop_position = ma[-1] - ma[-1] * 0.002 if trend == TradeType.long.name else ma[-1] + ma[-1] * 0.002
-        place_trade(symbol, "buy", trend, loss_position=stop_position)
+        place_trade(symbol, "buy", trend)
 
 
 async def scanner_job():
     await asyncio.sleep(30)
-    # await scan_crypto()
+    await scan_crypto()
     await trade_eur_usd()

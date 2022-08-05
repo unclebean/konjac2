@@ -3,7 +3,7 @@ from collections import namedtuple
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
+from ..indicator.logistic_regression import predict_xgb_next_ticker
 
 from ..indicator.utils import TradeType
 from ..models import apply_session
@@ -180,7 +180,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.035
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.045
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -206,7 +206,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.015
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.025
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -215,14 +215,12 @@ class ABCStrategy(ABC):
             return loss >= stop_loss, stop_loss
         return False, 0
 
-    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=7, holder_dev=3):
-        thread_holder, short_term_volatility = heikin_ashi_mom(candles, longer_timeframe_candles, rolling=rolling,
-                                                              holder_dev=holder_dev)
-        trend_action = None
-        if thread_holder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] > 0:
-            trend_action = TradeType.long.name
-
-        if thread_holder[-1] <= abs(short_term_volatility[-1]) and short_term_volatility[-1] < 0:
-            trend_action = TradeType.short.name
-
-        return trend_action
+    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles):
+        short_trend, _, _ = predict_xgb_next_ticker(longer_timeframe_candles.copy(deep=True), predict_step=0)
+        if short_trend is None:
+            return None
+        if short_trend[0] < 0.5:
+            return TradeType.long.name
+        elif short_trend[0] > 0.5:
+            return TradeType.short.name
+        return None
