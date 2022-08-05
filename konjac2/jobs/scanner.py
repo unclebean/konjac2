@@ -83,7 +83,7 @@ async def bbcci_scanner():
 
 
 async def smart_bot(currency="SAND"):
-    query_symbol = f"{currency}-PERP"
+    query_symbol = f"{currency}/USDT"
     trade_symbol = f"{currency}-PERP"
     strategy = LogisticRegressionStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "M30", True, limit=1500)
