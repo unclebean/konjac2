@@ -219,8 +219,8 @@ class ABCStrategy(ABC):
         short_trend, _, _ = predict_xgb_next_ticker(longer_timeframe_candles.copy(deep=True), predict_step=0)
         if short_trend is None:
             return None
-        if short_trend[0] < 0.5:
+        if short_trend[0] > 0.5:
             return TradeType.long.name
-        elif short_trend[0] > 0.5:
+        elif short_trend[0] < 0.5:
             return TradeType.short.name
         return None
