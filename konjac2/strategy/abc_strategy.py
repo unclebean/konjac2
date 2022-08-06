@@ -3,6 +3,7 @@ from collections import namedtuple
 from datetime import datetime
 from abc import ABC, abstractmethod
 
+from ..indicator.heikin_ashi_momentum import heikin_ashi_mom
 from ..indicator.logistic_regression import predict_xgb_next_ticker
 
 from ..indicator.utils import TradeType
@@ -216,16 +217,19 @@ class ABCStrategy(ABC):
             return loss >= stop_loss, stop_loss
         return False, 0
 
-    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles):
-        daily_trend, _, _ = predict_xgb_next_ticker(longer_timeframe_candles.copy(deep=True), predict_step=0)
-        log.info(f"daily trend is {daily_trend}")
-        if daily_trend is None:
-            return None
-        if daily_trend[0] > 0.5:
-            return TradeType.long.name
-        elif daily_trend[0] < 0.5:
-            return TradeType.short.name
-        return None
+    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=42, holder_dev=20):
+        thread_holder, short_term_volatility = heikin_ashi_mom(longer_timeframe_candles, candles, rolling=rolling,
+                                                               holder_dev=holder_dev)
+        trend_action = None
+        if thread_holder[-1] <= abs(short_term_volatility[-1]) \
+                and 0 < short_term_volatility[-1]:
+            trend_action = TradeType.long.name
+
+        if thread_holder[-1] <= abs(short_term_volatility[-1]) \
+                and 0 > short_term_volatility[-1]:
+            trend_action = TradeType.short.name
+
+        return trend_action
 
     def _get_ris_vwap_rend(self, candles):
         r_vwap = RSI_VWAP(candles, group_by="week")
