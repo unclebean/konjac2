@@ -29,7 +29,7 @@ TrustCrypto = [
 ]
 
 Cryptos = [
-    # "ATOM",
+    "ATOM",
     # "AAVE",
     # "ALGO",
     # "AVAX",
@@ -40,7 +40,7 @@ Cryptos = [
     # "CRV",
     # "CVX",
     # "DOGE",
-    # "DOT",
+    "DOT",
     "ETH",
     # "FTM",
     # "LINK",
