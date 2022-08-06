@@ -17,6 +17,7 @@ from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStra
 from . import Instruments, Cryptos
 from ..indicator.moving_average import moving_average
 from ..service.utils import filter_incomplete_h4_data
+from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 
 log = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}/USDT"
     trade_symbol = f"{currency}-PERP"
-    strategy = LogisticRegressionStrategy(symbol=query_symbol)
+    strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "M30", True, limit=1500)
     d_data = fetch_data(query_symbol, "D", False, counts=1500)
 

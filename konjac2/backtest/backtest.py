@@ -13,6 +13,7 @@ from ..indicator.heikin_ashi_momentum import heikin_ashi_mom
 from ..models import apply_session
 from ..models.trade import Trade
 from ..strategy.macd_rsi_strategy import MacdRsiStrategy
+from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 
 logging.basicConfig()
 logging.getLogger("sqlalchemy").setLevel(logging.ERROR)
@@ -49,9 +50,9 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2020-02-20 00:00:00":]
+    h1_data = pd.read_csv(f"{symbol}_0_30.csv", index_col="date", parse_dates=True).loc["2020-02-20 00:00:00":]
     d_data = pd.read_csv(f"{symbol}_24_0.csv", index_col="date", parse_dates=True)
-    strategy = LogisticRegressionStrategy(symbol=symbol)
+    strategy = MacdHistogramStrategy(symbol=symbol)
     for window in h1_data.rolling(window=930):
         if len(window.index) < 930:
             continue

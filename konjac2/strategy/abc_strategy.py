@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from ..indicator.logistic_regression import predict_xgb_next_ticker
 
 from ..indicator.utils import TradeType
+from ..indicator.vwap import RSI_VWAP
 from ..models import apply_session
 from ..models.trade import Trade, TradeStatus, get_last_time_trade
 from ..models.signal import Signal, get_open_trade_signals
@@ -180,7 +181,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.045
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.035
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -206,7 +207,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.025
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.035
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -224,4 +225,13 @@ class ABCStrategy(ABC):
             return TradeType.long.name
         elif daily_trend[0] < 0.5:
             return TradeType.short.name
+        return None
+
+    def _get_ris_vwap_rend(self, candles):
+        r_vwap = RSI_VWAP(candles, group_by="week")
+        if r_vwap[-3] < 5 and r_vwap[-2] < 5 and r_vwap[-1] < 5:
+            return TradeType.short.name
+        if r_vwap[-3] > 95 and r_vwap[-2] > 95 and r_vwap[-1] > 95:
+            return TradeType.long.name
+
         return None

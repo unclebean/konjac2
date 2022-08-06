@@ -19,7 +19,7 @@ class MacdHistogramStrategy(ABCStrategy):
         isa = ichimoku_df["ISA_9"]
         isb = ichimoku_df["ISB_26"]
         close_price = candles.close[-1]
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
+        longer_timeframe_trend = self._get_ris_vwap_rend(candles)
         self._delete_last_in_progress_trade()
 
         if longer_timeframe_trend is not None:
@@ -37,7 +37,7 @@ class MacdHistogramStrategy(ABCStrategy):
 
     def entry_signal(self, candles, day_candles=None):
         last_order_status = self._can_open_new_trade()
-        longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
+        longer_timeframe_trend = self._get_ris_vwap_rend(candles)
 
         log.info(f"{self.symbol} heikin ashi trend {longer_timeframe_trend}")
         is_sqz = is_squeeze(candles)
@@ -103,7 +103,7 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
+            longer_timeframe_trend = self._get_ris_vwap_rend(candles)
             log.info(
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
@@ -132,7 +132,7 @@ class MacdHistogramStrategy(ABCStrategy):
             stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
             is_profit, take_profit = self._is_take_profit(candles)
             is_loss, stop_loss = self._is_stop_loss(candles)
-            longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
+            longer_timeframe_trend = self._get_ris_vwap_rend(candles)
             log.info(
                 f"{self.symbol} is_profit {is_profit} take_profit {take_profit} is_loss {is_loss} stop_loss {stop_loss} trend {longer_timeframe_trend}"
             )
