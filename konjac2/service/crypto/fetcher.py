@@ -119,7 +119,7 @@ def open_position(symbol, tradeType, tp=0, sl=0, loss_position=None):
     balance = get_ftx_balance()
     log.info("open position for {} current balance {}".format(symbol, balance))
     price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
-    amount = balance / price * 3
+    amount = balance / price
     side = "buy" if tradeType == "long" else "sell"
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
