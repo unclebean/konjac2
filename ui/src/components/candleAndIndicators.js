@@ -101,7 +101,7 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
   });
 
   useEffect(() => {
-    const {marketData, macd, ichimoku} = candlesAndIndicators;
+    const {marketData, macd, ichimoku, threadholder, volatility} = candlesAndIndicators;
     const wrapperWidth = chartWrapper.current.offsetWidth;
     updateChartWidth(wrapperWidth);
     if (!marketData) {
@@ -110,8 +110,8 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
     updateTrace({...trace, ...marketData});
 
     updateHistTrace({...histTrace, x: marketData.x, y: macd.hist});
-    updateMacdTrace({...macdTrace, x: marketData.x, y: macd.macd});
-    updateSignalTrace({...signalTrace, x: marketData.x, y: macd.signal});
+    updateMacdTrace({...macdTrace, x: marketData.x, y: threadholder});
+    updateSignalTrace({...signalTrace, x: marketData.x, y: volatility});
 
     updateSenkouATrace({
       ...senkouATrace,
@@ -142,12 +142,12 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
       <Plot
         data={[
           trace,
-          senkouATrace,
-          senkouBTrace,
-          tenkanTrace,
-          kijunTrace,
+          // senkouATrace,
+          // senkouBTrace,
+          // tenkanTrace,
+          // kijunTrace,
           // chikouTrace,
-          histTrace,
+          // histTrace,
           macdTrace,
           signalTrace,
         ]}

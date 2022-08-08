@@ -25,8 +25,8 @@ TIMEFRAME_CCXT_MAPPER = {
 def crypto_fetcher(symbol, timeframe, complete=True, **kwargs):
     since = kwargs.get("since", None)
     limit = kwargs.get("limit", None)
-    exchange = get_binance_context()
-    # exchange = get_context()
+    # exchange = get_binance_context()
+    exchange = get_context()
     return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
 
 
@@ -124,8 +124,8 @@ def open_position(symbol, tradeType, tp=0, sl=0, loss_position=None):
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
     quantity_price = amount * price
-    gain_rate = 0.035 if tp == 0 else tp
-    loss_rate = 0.035 if sl == 0 else sl
+    gain_rate = 0.125 if tp == 0 else tp
+    loss_rate = 0.085 if sl == 0 else sl
     if side == "buy":
         gain = (quantity_price + quantity_price * gain_rate) / amount
         loss = (quantity_price - quantity_price * loss_rate) / amount

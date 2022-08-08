@@ -182,7 +182,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.035
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.125
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -208,7 +208,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.035
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.085
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -217,7 +217,7 @@ class ABCStrategy(ABC):
             return loss >= stop_loss, stop_loss
         return False, 0
 
-    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=42, holder_dev=20):
+    def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=42, holder_dev=21):
         thread_holder, short_term_volatility = heikin_ashi_mom(longer_timeframe_candles, candles, rolling=rolling,
                                                                holder_dev=holder_dev)
         trend_action = None
@@ -233,9 +233,9 @@ class ABCStrategy(ABC):
 
     def _get_ris_vwap_rend(self, candles):
         r_vwap = RSI_VWAP(candles, group_by="week")
-        if r_vwap[-3] < 5 and r_vwap[-2] < 5 and r_vwap[-1] < 5:
+        if r_vwap[-3] < 19 and r_vwap[-2] < 19 and r_vwap[-1] < 19:
             return TradeType.short.name
-        if r_vwap[-3] > 95 and r_vwap[-2] > 95 and r_vwap[-1] > 95:
+        if r_vwap[-3] > 80 and r_vwap[-2] > 80 and r_vwap[-1] > 80:
             return TradeType.long.name
 
         return None

@@ -11,8 +11,60 @@ export const AllForexPairs = [
     label: "ETH-PERP",
   },
   {
+    key: "AVAX-PERP",
+    label: "AVAX-PERP",
+  },
+  {
+    key: "DOGE-PERP",
+    label: "DOGE-PERP",
+  },
+  {
+    key: "AAVE-PERP",
+    label: "AAVE-PERP",
+  },
+  {
+    key: "ADA-PERP",
+    label: "ADA-PERP",
+  },
+  {
+    key: "MANA-PERP",
+    label: "MANA-PERP",
+  },
+  {
+    key: "STORJ-PERP",
+    label: "STORJ-PERP",
+  },
+  {
+    key: "WAVES-PERP",
+    label: "WAVES-PERP",
+  },
+  {
+    key: "DOT-PERP",
+    label: "DOT-PERP",
+  },
+  {
     key: "CEL-PERP",
     label: "CEL-PERP",
+  },
+  {
+    key: "ATOM-PERP",
+    label: "ATOM-PERP",
+  },
+  {
+    key: "AXS-PERP",
+    label: "AXS-PERP",
+  },
+  {
+    key: "CVX-PERP",
+    label: "CVX-PERP",
+  },
+  {
+    key: "FTM-PERP",
+    label: "FTM-PERP",
+  },
+  {
+    key: "LTC-PERP",
+    label: "LTC-PERP",
   }
 ];
 

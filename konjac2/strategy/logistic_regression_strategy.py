@@ -51,6 +51,7 @@ class LogisticRegressionStrategy(ABCStrategy):
                 and last_trade.status == TradeStatus.opened.name
                 and last_trade.entry_date != candles.index[-1]
         ):
+            # longer_timeframe_trend = self._get_longer_timeframe_volatility(candles, day_candles)
             close_price = candles.close[-1]
             trend, accuracy, _ = self._get_signal(candles)
             # order_running_hours = (candles.index[-1] - last_trade.entry_date).seconds / 3600
@@ -63,7 +64,7 @@ class LogisticRegressionStrategy(ABCStrategy):
                     trend,
                     close_price,
                     "lr",
-                    accuracy,
+                    0,
                     candles.index[-1],
                     is_profit,
                     is_loss,
@@ -72,8 +73,9 @@ class LogisticRegressionStrategy(ABCStrategy):
                 )
 
     def _get_open_signal(self, candles):
-        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True))
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0)
         most_important_feature = max(features, key=lambda f: f["Importance"])
+        print(f"{trend} {accuracy}")
         if trend is None:
             return None, 0, 0
         if trend[0] > 0.5:
