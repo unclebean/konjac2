@@ -129,12 +129,12 @@ async def scan_crypto():
             print(str(err))
 
 
-async def trade_eur_usd():
-    query_symbol = "EUR_USD"
-    trade_symbol = "EUR_USD"
-    strategy = LogisticRegressionStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", True, counts=1000)
-    d_data = fetch_data(query_symbol, "D", True, counts=1000)
+async def trade_forex(symbol="EUR_USD"):
+    query_symbol = symbol
+    trade_symbol = symbol
+    strategy = IchimokuWillR(symbol=query_symbol)
+    data = fetch_data(query_symbol, "H1", True, counts=500)
+    d_data = fetch_data(query_symbol, "H4", True, counts=500)
 
     is_exit_trade = strategy.exit_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
@@ -167,6 +167,14 @@ async def trade_eur_usd():
     log.info("job running done!")
 
 
+async def scan_forex():
+    for instrument in Instruments:
+        try:
+            await trade_forex(instrument)
+        except Exception as err:
+            print(str(err))
+
+
 async def place_crypto_order(symbol: str, trend: str):
     if symbol is not None and trend is not None and not has_opened_trades(symbol):
         data = fetch_data(symbol, "H1", True, counts=100)
@@ -178,4 +186,4 @@ async def place_crypto_order(symbol: str, trend: str):
 async def scanner_job():
     await asyncio.sleep(30)
     await scan_crypto()
-    await trade_eur_usd()
+    await scan_forex()
