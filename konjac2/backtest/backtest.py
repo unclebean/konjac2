@@ -14,9 +14,12 @@ from ..models import apply_session
 from ..models.trade import Trade
 from ..strategy.bb_stoch_strategy import BBStochStrategy
 from ..strategy.cci_histogram_strategy import CCIHistogramStrategy
+from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_rsi_strategy import MacdRsiStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.n_macd_volatility_strategy import NMacdVolatilityStrategy
+from ..strategy.strategy_five import StrategyFive
+from ..strategy.strategy_one import StrategyOne
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
 
 logging.basicConfig()
@@ -54,9 +57,9 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2021-03-20 00:00:00":]
-    d_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True)
-    strategy = VwapRsiStrategy(symbol=symbol)
+    h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) #.loc["2021-03-20 00:00:00":]
+    d_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
+    strategy = IchimokuWillR(symbol=symbol)
     for window in h1_data.rolling(window=999):
         if len(window.index) < 999:
             continue

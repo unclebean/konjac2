@@ -17,6 +17,7 @@ from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStra
 from . import Instruments, Cryptos
 from ..indicator.moving_average import moving_average
 from ..service.utils import filter_incomplete_h4_data
+from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
@@ -88,7 +89,7 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
-    strategy = VwapRsiStrategy(symbol=query_symbol)
+    strategy = IchimokuWillR(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
