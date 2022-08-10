@@ -113,7 +113,7 @@ def test(symbol: str):
     return m5_data.loc["2021-11-20 00:00:00":]
 
 
-def fx_hort_term_backtest(symbol: str):
+def fx_short_term_backtest(symbol: str):
     session = apply_session()
     trades = session.query(Trade)
     trades.delete(synchronize_session=False)
@@ -121,26 +121,24 @@ def fx_hort_term_backtest(symbol: str):
     session.close()
     m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True).loc["2020-01-20 00:00:00":]
     h4_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
-    strategy = LogisticRegressionStrategy(symbol=symbol)
+    strategy = IchimokuWillR(symbol=symbol)
     for window in m5_data.rolling(window=999):
         if len(window.index) < 999:
             continue
         # last_day = window.index[-1].strftime("%Y-%m-%d")
         last_index = window.index[-1]
-        if last_index.hour < 1:
-            last_h4_index = (last_index - timedelta(days=1)).strftime("%Y-%m-%d") + " 21:00:00"
-        elif last_index.hour < 5:
+        if 5 <= last_index.hour < 9:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 01:00:00"
-        elif last_index.hour < 9:
+        elif 9 <= last_index.hour < 13:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 05:00:00"
-        elif last_index.hour < 13:
+        elif 13 <= last_index.hour < 17:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 09:00:00"
-        elif last_index.hour < 17:
+        elif 17 <= last_index.hour < 21:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 13:00:00"
-        elif last_index.hour < 21:
+        elif 21 <= last_index.hour <= 23:
             last_h4_index = last_index.strftime("%Y-%m-%d") + " 17:00:00"
         else:
-            last_h4_index = last_index.strftime("%Y-%m-%d") + " 21:00:00"
+            last_h4_index = (last_index - timedelta(days=1)).strftime("%Y-%m-%d") + " 21:00:00"
 
         print(f">>>>>> H1: {last_index} H4: {last_h4_index}")
 
