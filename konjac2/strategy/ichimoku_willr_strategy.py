@@ -8,12 +8,12 @@ class IchimokuWillR(ABCStrategy):
     strategy_name = "ichimoku willR"
 
     def seek_trend(self, candles, day_candles=None):
-        is_buy, is_short = self._get_signals(candles, day_candles)
+        is_long, is_short = self._get_signals(candles, day_candles)
         trend = self._get_ris_vwap_rend(candles)
-        if is_buy and trend is TradeType.long.name:
+        if is_long and trend is TradeType.long.name:
             self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.long.name, candles.index[-1], h4_date=day_candles.index[-1])
-        if is_short:
+        if is_short and trend is TradeType.short.name:
             self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.short.name, candles.index[-1], h4_date=day_candles.index[-1])
 
