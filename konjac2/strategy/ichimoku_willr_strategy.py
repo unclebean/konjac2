@@ -28,6 +28,14 @@ class IchimokuWillR(ABCStrategy):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
+        if (
+                last_order_status.ready_to_procceed
+                and last_order_status.is_short
+                and willr_[-2] >= -20 > willr_[-1]
+        ):
+            return self._update_open_trade(
+                TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
+            )
 
     def exit_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_close_trade()
@@ -39,6 +47,21 @@ class IchimokuWillR(ABCStrategy):
                 and willr_[-1] >= -30:
             return self._update_close_trade(
                 TradeType.short.name,
+                candles.close[-1],
+                self.strategy_name,
+                candles.close[-1],
+                candles.index[-1],
+                is_profit,
+                is_loss,
+                take_profit,
+                stop_loss,
+            )
+
+        if last_order_status.ready_to_procceed \
+                and last_order_status.is_short \
+                and willr_[-1] <= -70:
+            return self._update_close_trade(
+                TradeType.long.name,
                 candles.close[-1],
                 self.strategy_name,
                 candles.close[-1],
