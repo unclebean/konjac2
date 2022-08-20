@@ -129,6 +129,12 @@ async def scan_crypto():
             print(str(err))
 
 
+async def close_all_crypto():
+    for currency in Cryptos:
+        trade_symbol = f"{currency}-PERP"
+        place_trade(trade_symbol, "sell")
+
+
 async def trade_forex(symbol="EUR_USD"):
     query_symbol = symbol
     trade_symbol = symbol
