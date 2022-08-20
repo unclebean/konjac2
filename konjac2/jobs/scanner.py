@@ -132,7 +132,9 @@ async def scan_crypto():
 async def close_all_crypto():
     for currency in Cryptos:
         trade_symbol = f"{currency}-PERP"
-        place_trade(trade_symbol, "sell")
+        opened_position = opened_position_by_symbol(trade_symbol)
+        if opened_position:
+            place_trade(trade_symbol, "sell")
 
 
 async def trade_forex(symbol="EUR_USD"):
