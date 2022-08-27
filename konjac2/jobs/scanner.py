@@ -21,6 +21,7 @@ from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
+from ..strategy.vwap_rsi_willr_strategy import VwapRsiWillR
 
 log = logging.getLogger(__name__)
 
@@ -89,8 +90,8 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
-    strategy = IchimokuWillR(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", True, limit=1500)
+    strategy = VwapRsiWillR(symbol=query_symbol)
+    data = fetch_data(query_symbol, "M30", True, limit=1500)
     d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
     opened_position = opened_position_by_symbol(trade_symbol)
