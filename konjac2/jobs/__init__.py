@@ -13,7 +13,6 @@ Instruments = [
     "NZD_CAD",
     "USD_CAD",
     "USD_JPY",
-    "WTICO_USD",
 ]
 
 TrustCrypto = [
