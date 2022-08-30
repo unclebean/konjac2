@@ -2,7 +2,6 @@ Instruments = [
     "AUD_CAD",
     "AUD_JPY",
     "AUD_USD",
-    "CAD_JPY",
     "EUR_AUD",
     "EUR_CAD",
     "EUR_GBP",
@@ -10,12 +9,9 @@ Instruments = [
     "EUR_USD",
     "GBP_AUD",
     "GBP_CAD",
-    "GBP_JPY",
     "GBP_USD",
     "NZD_CAD",
-    "NZD_JPY",
     "USD_CAD",
-    "USD_JPY",
     "WTICO_USD",
 ]
 

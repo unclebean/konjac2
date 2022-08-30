@@ -4,16 +4,14 @@ from konjac2.service.forex.context import get_account, get_context
 
 log = logging.getLogger(__name__)
 
-
 STOP_LOSS = "0.005"
+JPY_STOP_LOSS = "0.5"
 TAKE_PROFIT = "0.008"
 
 
 def make_trade(symbol: str, signal: str):
     log.info(
-        "symbol %s strategy signal %s trend %s",
-        symbol,
-        signal,
+        f"symbol {symbol} strategy signal {signal}",
     )
     if TradeType.long.name == signal:
         _long_trade(symbol)
@@ -28,7 +26,7 @@ def _long_trade(symbol: str, units=5000):
             "type": "MARKET",
             "instrument": symbol,
             "units": units,
-            "stopLossOnFill": {"distance": STOP_LOSS},
+            "stopLossOnFill": {"distance": _get_stop_loss(symbol)},
         }
     )
     log.info("create long trade %s status %d", symbol, response.status)
@@ -42,7 +40,7 @@ def _short_trade(symbol: str, units=5000):
             "type": "MARKET",
             "instrument": symbol,
             "units": -units,
-            "stopLossOnFill": {"distance": STOP_LOSS},
+            "stopLossOnFill": {"distance": _get_stop_loss(symbol)},
         }
     )
     log.info("create short trade %s status %d", symbol, response.status)
@@ -69,3 +67,9 @@ def close_trade(symbol: str):
             log.info("closed trade %s, order %s", symbol, trade.id)
             response = get_context().trade.close(get_account(), trade.id)
             log.info("close trade status %d", response.status)
+
+
+def _get_stop_loss(symbol: str):
+    if "JPY" in symbol:
+        return JPY_STOP_LOSS
+    return STOP_LOSS
