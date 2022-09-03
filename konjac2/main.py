@@ -8,7 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from konjac2.bot.telegram_bot import startup_bot
 from konjac2.routers.daily_trend import router as TrendRouter
 from konjac2.routers.chart import router as ChartRouter
-from konjac2.jobs.scanner import scanner_job
+from konjac2.jobs.scanner import scanner_job, scanner_h1_job
 from konjac2.config import settings
 
 app = FastAPI()
@@ -36,6 +36,7 @@ async def start_bot():
 async def start_job():
     if settings.run_cron_job:
         scheduler = AsyncIOScheduler()
+        scheduler.add_job(scanner_h1_job, CronTrigger.from_crontab("0 * * * *"))
         scheduler.add_job(scanner_job, CronTrigger.from_crontab("*/5 * * * *"))
         # scheduler.add_job(short_smart_bot, CronTrigger.from_crontab("*/5 * * * *"))
         scheduler.start()

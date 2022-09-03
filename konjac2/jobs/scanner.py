@@ -160,10 +160,10 @@ async def trade_forex(symbol="EUR_USD"):
     is_opened_trade = strategy.entry_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
     if (
-        is_opened_trade
-        and trade is not None
-        and trade.status == TradeStatus.opened.name
-        and not has_opened_trades(query_symbol)
+            is_opened_trade
+            and trade is not None
+            and trade.status == TradeStatus.opened.name
+            and not has_opened_trades(query_symbol)
     ):
         try:
             make_trade(trade_symbol, trade.trend)
@@ -195,4 +195,8 @@ async def place_crypto_order(symbol: str, trend: str):
 async def scanner_job():
     await asyncio.sleep(30)
     await scan_crypto()
-    # await scan_forex()
+
+
+async def scanner_h1_job():
+    await asyncio.sleep(30)
+    await scan_forex()
