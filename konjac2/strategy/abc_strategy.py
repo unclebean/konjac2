@@ -4,7 +4,6 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 
 from ..indicator.heikin_ashi_momentum import heikin_ashi_mom
-from ..indicator.logistic_regression import predict_xgb_next_ticker
 
 from ..indicator.utils import TradeType
 from ..indicator.vwap import RSI_VWAP

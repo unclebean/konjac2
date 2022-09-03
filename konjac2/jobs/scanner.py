@@ -10,7 +10,7 @@ from konjac2.indicator.squeeze_momentum import squeeze
 from konjac2.indicator.hurst import hurst
 from konjac2.models import apply_session
 from konjac2.models.trend import TradingTrend
-from konjac2.indicator.utils import TradeType
+from konjac2.indicator.utils import TradeType, resample_to_interval
 from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
@@ -92,7 +92,8 @@ async def smart_bot(currency="SAND"):
     trade_symbol = f"{currency}-PERP"
     strategy = BBCCIStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "M5", True, limit=1500)
-    d_data = fetch_data(query_symbol, "H4", True, counts=1500)
+    d_data = resample_to_interval(data, 60)
+    # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
     opened_position = opened_position_by_symbol(trade_symbol)
 
