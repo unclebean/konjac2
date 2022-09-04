@@ -31,25 +31,25 @@ class BBCCIStrategy(ABCStrategy):
             self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None):
-        cci34 = cci(candles.high, candles.low, candles.close, 34)
-        cci144 = cci(candles.high, candles.low, candles.close, 144)
-        diff_value = abs(cci34[-1] - cci144[-1])
+        cci144, cci34, diff_value = self._get_cci_diff(candles)
         last_order_status = self._can_open_new_trade()
         if last_order_status.ready_to_procceed and last_order_status.is_long and diff_value > 210 and cci144[-1] > 0:
-            return self._update_open_trade(TradeType.long.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
+            return self._update_open_trade(TradeType.long.name, candles.close[-1], "cci34_240", cci34[-1],
+                                           candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.long.name}")
 
         if last_order_status.ready_to_procceed and last_order_status.is_short and diff_value > 210 and cci144[-1] < 0:
-            return self._update_open_trade(TradeType.short.name, candles.close[-1], "cci34_240", cci34[-1], candles.index[-1])
+            return self._update_open_trade(TradeType.short.name, candles.close[-1], "cci34_240", cci34[-1],
+                                           candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
     def exit_signal(self, candles, day_candles=None):
-        cci34 = cci(candles.high, candles.low, candles.close, 34)
+        cci144, cci34, diff_value = self._get_cci_diff(candles)
         last_order_status = self._can_close_trade()
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed and last_order_status.is_long \
-                and (cci34[-1] >= 160 or is_loss or is_profit):
+                and ((cci34[-1] >= 160 and diff_value < 210) or is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -63,7 +63,7 @@ class BBCCIStrategy(ABCStrategy):
             )
 
         if last_order_status.ready_to_procceed and last_order_status.is_short \
-                and (cci34[-1] <= -160 or is_loss or is_profit):
+                and ((cci34[-1] <= -160 and diff_value < 210) or is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
@@ -75,3 +75,9 @@ class BBCCIStrategy(ABCStrategy):
                 take_profit,
                 stop_loss,
             )
+
+    def _get_cci_diff(self, candles):
+        cci34 = cci(candles.high, candles.low, candles.close, 34)
+        cci144 = cci(candles.high, candles.low, candles.close, 144)
+        diff_value = abs(cci34[-1] - cci144[-1])
+        return cci144, cci34, diff_value
