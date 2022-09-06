@@ -69,6 +69,14 @@ def close_trade(symbol: str):
             log.info("close trade status %d", response.status)
 
 
+def is_opened_maximum_positions() -> bool:
+    try:
+        return len(_get_opened_trades()) > 3
+    except Exception as err:
+        log.error(str(err))
+        return False
+
+
 def _get_stop_loss(symbol: str):
     if "JPY" in symbol:
         return JPY_STOP_LOSS

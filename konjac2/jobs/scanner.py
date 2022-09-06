@@ -11,7 +11,7 @@ from konjac2.indicator.hurst import hurst
 from konjac2.models import apply_session
 from konjac2.models.trend import TradingTrend
 from konjac2.indicator.utils import TradeType, resample_to_interval
-from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
+from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade, is_opened_maximum_positions
 from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Instruments, Cryptos
@@ -180,6 +180,8 @@ async def trade_forex(symbol="EUR_USD"):
 async def scan_forex():
     for instrument in Instruments:
         try:
+            if is_opened_maximum_positions():
+                break
             await trade_forex(instrument)
         except Exception as err:
             print(str(err))
