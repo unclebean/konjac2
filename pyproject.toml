@@ -26,6 +26,7 @@ SQLAlchemy = "^1.4.32"
 APScheduler = "^3.6.3"
 scikit-learn = "^1.0.2"
 xgboost = "^1.6.0"
+pykalman = "^0.9.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
