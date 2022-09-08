@@ -202,4 +202,4 @@ async def scanner_job():
 
 async def scanner_h1_job():
     await asyncio.sleep(30)
-    await scan_forex()
+    # await scan_forex()
