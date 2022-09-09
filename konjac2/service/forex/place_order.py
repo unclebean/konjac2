@@ -72,8 +72,8 @@ def close_trade(symbol: str):
 def is_opened_maximum_positions() -> bool:
     try:
         opened_trades = _get_opened_trades()
-        log.info(f"opened positions {opened_trades}")
-        return len(opened_trades) > 3
+        log.info(f"opened positions {len(opened_trades)}")
+        return len(opened_trades) > 2
     except Exception as err:
         log.error(str(err))
         return False
