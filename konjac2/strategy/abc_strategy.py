@@ -232,9 +232,9 @@ class ABCStrategy(ABC):
 
     def _get_ris_vwap_rend(self, candles):
         r_vwap = RSI_VWAP(candles, group_by="week")
-        if r_vwap[-3] < 5 and r_vwap[-2] < 5 and r_vwap[-1] < 5:
+        if r_vwap[-3] < 15 and r_vwap[-2] < 15 and r_vwap[-1] < 15:
             return TradeType.short.name
-        if r_vwap[-3] > 95 and r_vwap[-2] > 95 and r_vwap[-1] > 95:
+        if r_vwap[-3] > 85 and r_vwap[-2] > 85 and r_vwap[-1] > 85:
             return TradeType.long.name
 
         return None
