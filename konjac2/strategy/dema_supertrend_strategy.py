@@ -1,4 +1,4 @@
-from pandas_ta.overlap import supertrend, dema
+from pandas_ta.overlap import dema
 from .abc_strategy import ABCStrategy
 from ..indicator.squeeze_momentum import is_squeeze
 from ..indicator.utils import TradeType
@@ -24,7 +24,6 @@ class DemaSuperTrendStrategy(ABCStrategy):
             self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None):
-        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3"]
         last_order_status = self._can_open_new_trade()
         is_in_squeeze = is_squeeze(candles)
         if (
@@ -33,7 +32,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and not is_in_squeeze
         ):
             self._update_open_trade(
-                TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+                TradeType.long.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
         if (
             last_order_status.ready_to_procceed
@@ -41,11 +40,10 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and not is_in_squeeze
         ):
             self._update_open_trade(
-                TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+                TradeType.short.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
 
     def exit_signal(self, candles, day_candles=None):
-        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)['SUPERT_34_3']
         last_order_status = self._can_close_trade()
         is_in_squeeze = is_squeeze(candles)
         if (
@@ -54,7 +52,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and is_in_squeeze
         ):
             self._update_close_trade(
-                TradeType.short.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+                TradeType.short.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
         if (
             last_order_status.ready_to_procceed
@@ -62,5 +60,5 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and is_in_squeeze
         ):
             self._update_close_trade(
-                TradeType.long.name, candles.close[-1], "super_trend", super_trend[-1], candles.index[-1]
+                TradeType.long.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
