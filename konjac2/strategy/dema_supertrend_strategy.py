@@ -31,7 +31,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and last_order_status.is_long
             and not is_in_squeeze
         ):
-            self._update_open_trade(
+            return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
         if (
@@ -39,7 +39,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and last_order_status.is_short
             and not is_in_squeeze
         ):
-            self._update_open_trade(
+            return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
 
@@ -51,7 +51,7 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and last_order_status.is_long
             and is_in_squeeze
         ):
-            self._update_close_trade(
+            return self._update_close_trade(
                 TradeType.short.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
         if (
@@ -59,6 +59,6 @@ class DemaSuperTrendStrategy(ABCStrategy):
             and last_order_status.is_short
             and is_in_squeeze
         ):
-            self._update_close_trade(
+            return self._update_close_trade(
                 TradeType.long.name, candles.close[-1], "super_trend", 0, candles.index[-1]
             )
