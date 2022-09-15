@@ -42,7 +42,7 @@ Cryptos = [
     "STORJ",
     # "SHIB",
     "WAVES",
-    # "XRP",
+    "XRP",
     # "TRX",
     "THETA",
     "SOL",
