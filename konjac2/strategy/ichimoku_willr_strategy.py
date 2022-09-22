@@ -22,7 +22,7 @@ class IchimokuWillR(ABCStrategy):
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
-                and willr_[-2] <= -80 < willr_[-1] < -50
+                and willr_[-2] <= -80 < willr_[-1] < -30
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -30,7 +30,7 @@ class IchimokuWillR(ABCStrategy):
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
-                and willr_[-2] >= -20 > willr_[-1] > -50
+                and willr_[-2] >= -20 > willr_[-1] > -70
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
