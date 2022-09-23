@@ -100,8 +100,14 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
     name: "Chikou Span",
   });
 
+  const [rsiVwapTrace, updateRsiVwapTrace] = useState({
+    type: "scatter",
+    yaxis: "y2",
+    name: "RSI VWAP",
+  });
+
   useEffect(() => {
-    const {marketData, macd, ichimoku, threadholder, volatility} = candlesAndIndicators;
+    const {marketData, macd, ichimoku, threadholder, volatility, rsi_vwap} = candlesAndIndicators;
     const wrapperWidth = chartWrapper.current.offsetWidth;
     updateChartWidth(wrapperWidth);
     if (!marketData) {
@@ -126,6 +132,7 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
     });
     updateTenkanTrace({...tenkanTrace, x: marketData.x, y: ichimoku.tenkan});
     updateKijunTrace({...kijunTrace, x: marketData.x, y: ichimoku.kijun});
+    updateRsiVwapTrace({...rsiVwapTrace, x: marketData.x, y: rsi_vwap});
     // updateChikouTrace({
     //   ...chikouTrace,
     //   x: marketData.x,
@@ -142,14 +149,13 @@ export const CandleAndIndicators = ({candlesAndIndicators, strategy}) => {
       <Plot
         data={[
           trace,
-          // senkouATrace,
-          // senkouBTrace,
-          // tenkanTrace,
-          // kijunTrace,
+          senkouATrace,
+          senkouBTrace,
+          tenkanTrace,
+          kijunTrace,
           // chikouTrace,
           // histTrace,
-          macdTrace,
-          signalTrace,
+          rsiVwapTrace,
         ]}
         layout={{...layout, width: chartWidth}}
         config={{displaylogo: false, responsive: true}}

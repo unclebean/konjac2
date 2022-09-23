@@ -65,6 +65,10 @@ export const AllForexPairs = [
   {
     key: "LTC-PERP",
     label: "LTC-PERP",
+  },
+  {
+    key: "USD_CAD",
+    label: "USD_CAD",
   }
 ];
 
