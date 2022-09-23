@@ -43,7 +43,7 @@ class IchimokuWillR(ABCStrategy):
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (willr_[-1] >= -30 or is_profit or is_loss):
+                and (willr_[-1] >= -20 or is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -58,7 +58,7 @@ class IchimokuWillR(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (willr_[-1] <= -70 or is_profit or is_loss):
+                and (willr_[-1] <= -80 or is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
