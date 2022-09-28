@@ -6,6 +6,7 @@ Instruments = [
     "EUR_CAD",
     "EUR_GBP",
     "EUR_JPY",
+    "EUR_NZD",
     "EUR_USD",
     "GBP_AUD",
     "GBP_CAD",
