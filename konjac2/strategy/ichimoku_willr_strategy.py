@@ -1,5 +1,6 @@
 from pandas_ta import ichimoku, willr
 
+from konjac2.indicator.senkou_span import senkou_span_a_b
 from konjac2.indicator.utils import TradeType
 from konjac2.strategy.abc_strategy import ABCStrategy
 
@@ -84,8 +85,11 @@ class IchimokuWillR(ABCStrategy):
         return is_long, is_short
 
     def _get_ichimoku(self, candles):
+        '''
         ichimoku_, _ = ichimoku(candles.high, candles.low, candles.close)
         isa = ichimoku_["ISA_9"]
         isb = ichimoku_["ISB_26"]
+        '''
+        isa, isb = senkou_span_a_b(candles.high, candles.low)
 
         return isa, isb
