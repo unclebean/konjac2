@@ -149,9 +149,10 @@ class ABCStrategy(ABC):
         if is_loss:
             result = -stop_loss
 
-        fee = (last_trade.opened_position * (0.061110 / 100) * last_trade.quantity) + (
-                last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
-        )
+        # fee = (last_trade.opened_position * (0.061110 / 100) * last_trade.quantity) + (
+        #         last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
+        # )
+        fee = 0
         self.balance += last_trade.opened_position * last_trade.quantity + result - fee
         # print("balance is {}".format(self.balance))
         last_trade.result = result - fee
@@ -181,7 +182,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.02
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.0055
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -207,7 +208,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.02
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.001
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
