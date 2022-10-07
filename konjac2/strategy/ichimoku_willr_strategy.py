@@ -74,13 +74,13 @@ class IchimokuWillR(ABCStrategy):
 
     def _get_signals(self, candles, day_candles):
         short_close_price = candles.close[-1]
-        long_close_price = day_candles.close[-1]
+        # long_close_price = day_candles.close[-1]
         short_isa, short_isb = self._get_ichimoku(candles)
         long_isa, long_isb = self._get_ichimoku(day_candles)
-        is_long = short_close_price > short_isa[-26] and short_close_price > short_isb[-26] \
-               and long_close_price > long_isa[-26] and long_close_price > long_isb[-26]
-        is_short = short_close_price < short_isa[-26] and short_close_price < short_isb[-26] \
-               and long_close_price < long_isa[-26] and long_close_price < long_isb[-26]
+        is_long = short_close_price > short_isa[-26] and short_close_price > short_isb[-26]
+               # and long_close_price > long_isa[-26] and long_close_price > long_isb[-26]
+        is_short = short_close_price < short_isa[-26] and short_close_price < short_isb[-26]
+               # and long_close_price < long_isa[-26] and long_close_price < long_isb[-26]
 
         return is_long, is_short
 
