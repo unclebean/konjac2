@@ -200,8 +200,8 @@ async def place_crypto_order(symbol: str, trend: str):
 
 async def scanner_job():
     pass
-    await asyncio.sleep(30)
-    await scan_crypto()
+    # await asyncio.sleep(30)
+    # await scan_crypto()
 
 
 async def scanner_h1_job():
