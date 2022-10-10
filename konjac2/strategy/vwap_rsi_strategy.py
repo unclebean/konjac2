@@ -15,9 +15,13 @@ class VwapRsiStrategy(ABCStrategy):
 
     def seek_trend(self, candles, day_candles=None):
         r_vwap = RSI_VWAP(candles, group_by="day")
-        if r_vwap[-1] > 19 >= r_vwap[-2]:
+        if 50 > r_vwap[-1] > 19 >= r_vwap[-2]:
+            print(r_vwap[-1])
             self._start_new_trade(TradeType.long.name, candles.index[-1], open_type="vwap rsi",
                                   h4_date=day_candles.index[-1], trend_position=candles.close[-1])
+        # if r_vwap[-1] < 80 <= r_vwap[-2]:
+        #     self._start_new_trade(TradeType.short.name, candles.index[-1], open_type="vwap rsi",
+        #                           h4_date=day_candles.index[-1], trend_position=candles.close[-1])
 
     def entry_signal(self, candles, day_candles=None):
         last_order_status = self._can_open_new_trade()
