@@ -66,7 +66,7 @@ class ABCStrategy(ABC):
             session.commit()
             session.close()
 
-    def _start_new_trade(self, trend: str, create_date=datetime.now(), open_type="", h4_date=None):
+    def _start_new_trade(self, trend: str, create_date=datetime.now(), open_type="", h4_date=None, trend_position=0):
         last_trade = get_last_time_trade(self.symbol)
         if last_trade is None or last_trade is not None and last_trade.status == TradeStatus.closed.name:
             session = apply_session()
@@ -79,6 +79,7 @@ class ABCStrategy(ABC):
                     create_date=create_date,
                     open_type=open_type,
                     h4_date=h4_date,
+                    opened_position=trend_position
                 )
             )
             session.commit()
@@ -181,7 +182,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.05
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.03
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
