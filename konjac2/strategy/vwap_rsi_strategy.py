@@ -12,14 +12,12 @@ class VwapRsiStrategy(ABCStrategy):
 
     def __init__(self, symbol: str):
         ABCStrategy.__init__(self, symbol)
-        self.trend_price = None
 
     def seek_trend(self, candles, day_candles=None):
         r_vwap = RSI_VWAP(candles, group_by="day")
         if r_vwap[-1] > 19 >= r_vwap[-2]:
-            self.trend_price = candles.high[-1]
             self._start_new_trade(TradeType.long.name, candles.index[-1], open_type="vwap rsi",
-                                  h4_date=day_candles.index[-1])
+                                  h4_date=day_candles.index[-1], trend_position=candles.close[-1])
 
     def entry_signal(self, candles, day_candles=None):
         last_order_status = self._can_open_new_trade()
@@ -27,7 +25,7 @@ class VwapRsiStrategy(ABCStrategy):
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
-                and candles.close[-1] > self.trend_price
+                and candles.close[-1] > last_order_status.opened_position
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], "vwap rsi", 0, candles.index[-1]
@@ -35,7 +33,7 @@ class VwapRsiStrategy(ABCStrategy):
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
-                and candles.close[-1] < self.trend_price
+                and candles.close[-1] < last_order_status.opened_position
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], "vwap rsi", 0, candles.index[-1]
