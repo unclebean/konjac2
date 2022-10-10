@@ -37,7 +37,7 @@ async def start_job():
     if settings.run_cron_job:
         scheduler = AsyncIOScheduler()
         scheduler.add_job(scanner_h1_job, CronTrigger.from_crontab("0 * * * *"))
-        scheduler.add_job(scanner_job, CronTrigger.from_crontab("*/5 * * * *"))
+        scheduler.add_job(scanner_job, CronTrigger.from_crontab("*/15 * * * *"))
         # scheduler.add_job(short_smart_bot, CronTrigger.from_crontab("*/5 * * * *"))
         scheduler.start()
         print("***** loaded cron jobs *****")

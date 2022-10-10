@@ -92,8 +92,8 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
-    strategy = EmaMaRsiStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "M5", True, limit=1500)
+    strategy = VwapRsiStrategy(symbol=query_symbol)
+    data = fetch_data(query_symbol, "M15", True, limit=1500)
     d_data = resample_to_interval(data, 240)
     # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
@@ -200,8 +200,8 @@ async def place_crypto_order(symbol: str, trend: str):
 
 async def scanner_job():
     pass
-    # await asyncio.sleep(30)
-    # await scan_crypto()
+    await asyncio.sleep(30)
+    await scan_crypto()
 
 
 async def scanner_h1_job():
