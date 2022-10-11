@@ -6,6 +6,8 @@ from pandas_ta.overlap import ichimoku
 
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 from konjac2.indicator.normalized_macd import n_macd
+from konjac2.indicator.senkou_span import senkou_span_a_b
+from konjac2.indicator.vwap import RSI_VWAP
 from konjac2.service.fetcher import fetch_data
 
 log = logging.getLogger(__name__)
@@ -27,12 +29,16 @@ def prepare_candles_and_ta(data, hasEndDate=None, h1_data=None, h4_data=None):
     macd_signal, macd_macd, macd_histogram = n_macd(data.close, 13, 21)
 
     ichimoku_df, _ = ichimoku(data.high, data.low, data.close)
-    senkou_a = ichimoku_df["ISA_9"]
-    senkou_b = ichimoku_df["ISB_26"]
+    senkou_a, senkou_b = senkou_span_a_b(data.high, data.low)
+    print(senkou_a.tail())
+    print(senkou_b.tail())
+    # senkou_a = ichimoku_df["ISA_9"]
+    # senkou_b = ichimoku_df["ISB_26"]
     tenkan_sen = ichimoku_df["ITS_9"]
     kijun_sen = ichimoku_df["IKS_26"]
     chikou_span = ichimoku_df["ICS_26"]
     threadholder, short_term_volatility = heikin_ashi_mom(h4_data, h1_data, rolling=42, holder_dev=21)
+    rsi_vwap = RSI_VWAP(data, group_by="week")
 
     resp = {
         "marketData": {
@@ -55,6 +61,7 @@ def prepare_candles_and_ta(data, hasEndDate=None, h1_data=None, h4_data=None):
             # "chikou": chikou_span[start_index:].tolist(),
         },
         "threadholder": threadholder[start_index:].tolist(),
-        "volatility": short_term_volatility[start_index:].tolist()
+        "volatility": short_term_volatility[start_index:].tolist(),
+        "rsi_vwap": rsi_vwap[start_index:].tolist(),
     }
     return resp

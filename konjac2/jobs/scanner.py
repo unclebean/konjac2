@@ -19,6 +19,7 @@ from ..indicator.moving_average import moving_average
 from ..service.utils import filter_incomplete_h4_data
 from ..strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
 from ..strategy.ema_ma_rsi_strategy import EmaMaRsiStrategy
+from ..strategy.ichimoku_will_v2_strategy import IchimokuWillRV2
 from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
@@ -92,9 +93,9 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
-    strategy = VwapRsiStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "M15", True, limit=1500)
-    d_data = resample_to_interval(data, 240)
+    strategy = IchimokuWillRV2(symbol=query_symbol)
+    data = fetch_data(query_symbol, "H1", True, limit=1500)
+    d_data = resample_to_interval(data, 360)
     # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
     opened_position = opened_position_by_symbol(trade_symbol)
@@ -200,11 +201,11 @@ async def place_crypto_order(symbol: str, trend: str):
 
 async def scanner_job():
     pass
-    await asyncio.sleep(30)
-    await scan_crypto()
+    # await asyncio.sleep(30)
+    # await scan_crypto()
 
 
 async def scanner_h1_job():
     await asyncio.sleep(30)
     await scan_forex()
-    # await scan_crypto()
+    await scan_crypto()
