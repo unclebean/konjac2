@@ -4,8 +4,8 @@ from konjac2.service.forex.context import get_account, get_context
 
 log = logging.getLogger(__name__)
 
-STOP_LOSS = "0.005"
-JPY_STOP_LOSS = "0.5"
+STOP_LOSS = "0.004"
+JPY_STOP_LOSS = "0.4"
 TAKE_PROFIT = "0.008"
 
 
@@ -19,7 +19,7 @@ def make_trade(symbol: str, signal: str):
         _short_trade(symbol)
 
 
-def _long_trade(symbol: str, units=15000):
+def _long_trade(symbol: str, units=25000):
     response = get_context().order.market(
         get_account(),
         **{
@@ -33,7 +33,7 @@ def _long_trade(symbol: str, units=15000):
     return response.status
 
 
-def _short_trade(symbol: str, units=15000):
+def _short_trade(symbol: str, units=25000):
     response = get_context().order.market(
         get_account(),
         **{
