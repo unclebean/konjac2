@@ -9,6 +9,7 @@ from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler
 from .vwap import VWAP
+from ..chart.heikin_ashi import heikin_ashi
 
 scaler = MinMaxScaler()
 period = 34
@@ -104,7 +105,7 @@ def _get_params():
 def prepare_indicators_data(candlestick, delta_hours=0):
     result = np.where(candlestick["close"].shift(-1) > candlestick["close"], 1, 0)[1:]
     # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    indicators = new_params(candlestick)
+    indicators = sol_params(candlestick) # new_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
@@ -117,18 +118,21 @@ def prepare_indicators_data(candlestick, delta_hours=0):
     return result, merged_indicators[1:]
 
 
-def sol_params(candlestick, delta_hours=0):
-    close_price = candlestick.close
+def sol_params(candlestick):
+    heikin_ashi_data = heikin_ashi(candlestick)
 
-    obv_values = obv(candlestick.close, candlestick.volume)
+    close_price = heikin_ashi_data.close
+    obv_values = obv(close_price, heikin_ashi_data.volume)
     obv_ema200 = ema(obv_values, 200)
-
-    ema144 = ema(candlestick.close, 144)
 
     return pd.DataFrame(
         {
             "obv_ema": obv_values - obv_ema200,
-            "close_ema144": close_price - ema144,
+            "close_shift1": close_price - close_price.shift(1),
+            "close_shift2": close_price - close_price.shift(2),
+            "close_shift3": close_price - close_price.shift(3),
+            "close_shift4": close_price - close_price.shift(4),
+            "close_shift5": close_price - close_price.shift(5),
         },
         index=candlestick.index,
     )
