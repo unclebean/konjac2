@@ -127,12 +127,11 @@ def sol_params(candlestick):
 
     return pd.DataFrame(
         {
-            "obv_ema": obv_values - obv_ema200,
             "close_shift1": close_price - close_price.shift(1),
-            "close_shift2": close_price - close_price.shift(2),
-            "close_shift3": close_price - close_price.shift(3),
-            "close_shift4": close_price - close_price.shift(4),
-            "close_shift5": close_price - close_price.shift(5),
+            "close_shift2": close_price.shift(1) - close_price.shift(2),
+            "close_shift3": close_price.shift(2) - close_price.shift(3),
+            "close_shift4": close_price.shift(3) - close_price.shift(4),
+            "close_shift5": close_price.shift(4) - close_price.shift(5),
         },
         index=candlestick.index,
     )

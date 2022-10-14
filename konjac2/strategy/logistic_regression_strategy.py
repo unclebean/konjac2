@@ -15,8 +15,9 @@ class LogisticRegressionStrategy(ABCStrategy):
 
     def seek_trend(self, candles, day_candles=None):
         trend, accuracy, _ = self._get_open_signal(candles)
+        vwap_trend = self._get_ris_vwap_rend(candles)
         self._delete_last_in_progress_trade()
-        if trend is not None:
+        if trend is not None and vwap_trend == trend:
             self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None) -> bool:
@@ -65,12 +66,12 @@ class LogisticRegressionStrategy(ABCStrategy):
             )
 
     def _get_open_signal(self, candles):
-        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0)
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=1)
         most_important_feature = max(features, key=lambda f: f["Importance"])
         if trend is None:
             return None, 0, 0
-        if trend[0] < 0.5:
+        if trend[0] > 0.5:
             return TradeType.long.name, trend[0], most_important_feature["Feature"]
-        elif trend[0] > 0.5:
+        elif trend[0] < 0.5:
             return TradeType.short.name, trend[0], most_important_feature["Feature"]
         return None, 0, 0
