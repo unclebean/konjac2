@@ -188,7 +188,6 @@ async def retrieve_fx_position_state(symbol):
     if has_opened_trades(symbol):
         data = fetch_data(symbol, "H1", False, counts=500)
         willr_ = willr(data.high, data.low, data.close)
-        print(willr_[-1])
         say_something("{} is {}".format(symbol, willr_[-1]))
 
 
