@@ -188,7 +188,8 @@ async def retrieve_fx_position_state(symbol):
     if has_opened_trades(symbol):
         data = fetch_data(symbol, "H1", False, counts=500)
         willr_ = willr(data.high, data.low, data.close)
-        say_something("{} is {}".format(symbol, willr_[-1]))
+        if willr_[-1] > -30 or willr_[-1] < -70:
+            say_something("{} should consider close {}".format(symbol, willr_[-1]))
 
 
 async def scan_forex():
