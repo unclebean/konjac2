@@ -1,6 +1,9 @@
 import asyncio
 import logging
 from datetime import datetime as dt
+
+from pandas_ta import willr
+
 from konjac2.bot.telegram_bot import say_something
 from konjac2.models.trade import TradeStatus, get_last_time_trade
 from konjac2.service.crypto.fetcher import opened_position_by_symbol, place_trade
@@ -181,6 +184,14 @@ async def trade_forex(symbol="EUR_USD"):
     log.info("job running done!")
 
 
+async def retrieve_fx_position_state(symbol):
+    if has_opened_trades(symbol):
+        data = fetch_data(symbol, "H1", False, counts=500)
+        willr_ = willr(data.high, data.low, data.close)
+        print(willr_[-1])
+        say_something("{} is {}".format(symbol, willr_[-1]))
+
+
 async def scan_forex():
     for instrument in Instruments:
         try:
@@ -200,9 +211,8 @@ async def place_crypto_order(symbol: str, trend: str):
 
 
 async def scanner_job():
-    pass
-    # await asyncio.sleep(30)
-    # await scan_crypto()
+    for instrument in Instruments:
+        await retrieve_fx_position_state(instrument)
 
 
 async def scanner_h1_job():
