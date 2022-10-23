@@ -19,11 +19,9 @@ class BBCCIStrategy(ABCStrategy):
     def seek_trend(self, candles, day_candles=None):
         trends, cci144 = bb_cci_mom(candlestick=candles)
         trend = None
-        ema_34 = ema(day_candles.close, 21)
-        close_price = day_candles.close[-1]
-        if is_crossing_up(cci144[-1], 80) and close_price > ema_34[-1]:
+        if is_crossing_up(cci144[-1], 80):
             trend = TradeType.long.name
-        if is_crossing_down(cci144[-1], -80) and close_price < ema_34[-1]:
+        if is_crossing_down(cci144[-1], -80):
             trend = TradeType.short.name
         log.info(f"{self.symbol} BBCCI trend {trend} at {candles.index[-1]}")
         if trend is not None and trends[-4] and trends[-3] and trends[-2] and trends[-1]:
