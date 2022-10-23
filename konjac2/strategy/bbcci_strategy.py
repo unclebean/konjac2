@@ -1,6 +1,5 @@
 import logging
 
-from pandas_ta import ema
 from pandas_ta.momentum import cci
 
 from .abc_strategy import ABCStrategy
