@@ -41,6 +41,6 @@ Cryptos = [
     # "STORJ",
     # "SHIB",
     "XRP",
-    "THETA",
+    # "THETA",
     "SOL",
 ]
