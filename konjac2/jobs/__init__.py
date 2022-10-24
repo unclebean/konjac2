@@ -42,5 +42,6 @@ Cryptos = [
     # "SHIB",
     "XRP",
     # "THETA",
+    "SAND",
     "SOL",
 ]
