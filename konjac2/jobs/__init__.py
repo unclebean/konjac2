@@ -28,6 +28,7 @@ TrustCrypto = [
 Cryptos = [
     "ATOM",
     "AAVE",
+    "AVAX"
     "AXS",
     "ADA",
     "DOGE",
@@ -36,12 +37,8 @@ Cryptos = [
     "LINK",
     "LTC",
     "PERP",
-    # "SRM",
-    # "SNX",
-    # "STORJ",
-    # "SHIB",
     "XRP",
-    # "THETA",
+    "UNI",
     "SAND",
     "SOL",
 ]
