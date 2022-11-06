@@ -3,6 +3,7 @@ from pandas_ta.momentum import macd, stochrsi
 from pandas_ta.overlap import ichimoku
 
 from .abc_strategy import ABCStrategy
+from ..indicator.logistic_regression import predict_xgb_next_ticker
 from ..indicator.utils import TradeType
 
 log = logging.getLogger(__name__)
@@ -15,18 +16,12 @@ class MacdHistogramStrategy(ABCStrategy):
         ABCStrategy.__init__(self, symbol)
 
     def seek_trend(self, candles, day_candles=None):
-        ichimoku_df, _ = ichimoku(candles.high, candles.low, candles.close)
-        isa = ichimoku_df["ISA_9"]
-        isb = ichimoku_df["ISB_26"]
-        close_price = candles.close[-1]
+        trend, accuracy, _ = self._get_open_signal(candles)
         self._delete_last_in_progress_trade()
-        if close_price > isa[-26] and close_price > isb[-26]:
-            self._start_new_trade(TradeType.long.name, candles.index[-1], open_type="ichimoku",
+        if trend is not None:
+            self._start_new_trade(trend, candles.index[-1], open_type="ichimoku",
                                   h4_date=day_candles.index[-1])
             return
-        if close_price < isa[-26] and close_price < isb[-26]:
-            self._start_new_trade(TradeType.short.name, candles.index[-1], open_type="ichimoku",
-                                  h4_date=day_candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None):
         last_order_status = self._can_open_new_trade()
@@ -72,6 +67,7 @@ class MacdHistogramStrategy(ABCStrategy):
 
     def exit_signal(self, candles, day_candles=None):
         last_order_status = self._can_close_trade()
+        trend, _, _ = self._get_open_signal(candles)
 
         if last_order_status.ready_to_procceed and last_order_status.is_long:
             macd_histogram, stock_rsi_d, stock_rsi_k = self._get_signals(candles)
@@ -81,6 +77,7 @@ class MacdHistogramStrategy(ABCStrategy):
                     (macd_histogram[-1] >= 0 and macd_histogram[-1] < macd_histogram[-2] and stock_rsi_k[-1] < stock_rsi_d[-1])
                     or is_profit
                     or is_loss
+                    or trend is not TradeType.long.name
             ):
                 return self._update_close_trade(
                     TradeType.short.name,
@@ -101,6 +98,7 @@ class MacdHistogramStrategy(ABCStrategy):
                     (macd_histogram[-1] <= 0 and macd_histogram[-1] > macd_histogram[-2] and stock_rsi_k[-1] > stock_rsi_d[-1])
                     or is_profit
                     or is_loss
+                    or trend is not TradeType.short.name
             ):
                 return self._update_close_trade(
                     TradeType.long.name,
@@ -123,3 +121,14 @@ class MacdHistogramStrategy(ABCStrategy):
         stock_rsi_k = stoch_rsi_data["STOCHRSIk_14_14_3_3"]
         stock_rsi_d = stoch_rsi_data["STOCHRSId_14_14_3_3"]
         return macd_histogram, stock_rsi_d, stock_rsi_k
+
+    def _get_open_signal(self, candles):
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=3)
+        most_important_feature = max(features, key=lambda f: f["Importance"])
+        if trend is None:
+            return None, 0, 0
+        if trend[0] > 0.5 and trend[1] > 0.5 and trend[2] > 0.5:
+            return TradeType.long.name, trend[0], most_important_feature["Feature"]
+        elif trend[0] < 0.5 and trend[1] < 0.5 and trend[2] < 0.5:
+            return TradeType.short.name, trend[0], most_important_feature["Feature"]
+        return None, 0, 0

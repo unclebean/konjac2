@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from pandas_ta import amat, aroon, chop, decay, decreasing, dpo, increasing, psar, qstick, ttm_trend, vhf, \
+    vortex
 from pandas_ta.overlap import ema, ichimoku
 from pandas_ta.volatility import bbands, atr
 from pandas_ta.momentum import macd, cci, rsi, stoch, mom
@@ -105,7 +107,7 @@ def _get_params():
 def prepare_indicators_data(candlestick, delta_hours=0):
     result = np.where(candlestick["close"].shift(-1) > candlestick["close"], 1, 0)[1:]
     # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    indicators = sol_params(candlestick) # new_params(candlestick)
+    indicators = trend_params(candlestick)  # new_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
@@ -135,6 +137,35 @@ def sol_params(candlestick):
         },
         index=candlestick.index,
     )
+
+
+def trend_params(candles):
+    adx_ = adx(candles.high, candles.low, candles.close)
+    amat_ = amat(candles.close)
+    aroon_ = aroon(candles.high, candles.low)
+    chop_ = chop(candles.high, candles.low, candles.close)
+    decay_ = decay(candles.close)
+    decreasing_ = decreasing(candles.close)
+    dpo_ = dpo(candles.close)
+    increasing_ = increasing(candles.close)
+    psar_ = psar(candles.high, candles.low, candles.close)
+    qstick_ = qstick(candles.open, candles.close)
+    ttm_ = ttm_trend(candles.high, candles.low, candles.close)
+    vhf_ = vhf(candles.close)
+    vortex_ = vortex(candles.high, candles.low, candles.close)
+    indicators = adx_.join(amat_) \
+        .join(aroon_) \
+        .join(chop_) \
+        .join(decay_) \
+        .join(decreasing_) \
+        .join(dpo_) \
+        .join(increasing_) \
+        .join(psar_) \
+        .join(qstick_) \
+        .join(ttm_) \
+        .join(vhf_) \
+        .join(vortex_)
+    return indicators
 
 
 def new_params(candles):
