@@ -96,7 +96,7 @@ async def bbcci_scanner():
 async def smart_bot(currency="SAND"):
     query_symbol = f"{currency}-PERP"
     trade_symbol = f"{currency}-PERP"
-    strategy = VwapRsiStrategy(symbol=query_symbol)
+    strategy = MacdHistogramStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     log.info(f"fetching data for {query_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
