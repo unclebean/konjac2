@@ -208,7 +208,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.08
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.05
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
