@@ -45,8 +45,8 @@ def LogisticRegressionModel(candles):
     return model.predict(candles.iloc[-1:, :16]), model.score(X_test, y_test)
 
 
-def predict_xgb_next_ticker(candelstick, predict_step=1, model=None, delta_hours=0):
-    data_y, data_x = prepare_indicators_data(candelstick, delta_hours)
+def predict_xgb_next_ticker(candelstick, predict_step=1, model=None, delta_hours=0, for_trend=True):
+    data_y, data_x = prepare_indicators_data(candelstick, delta_hours, for_trend=for_trend)
     if predict_step == 0:
         train_x = data_x[1:]
         train_y = data_y[1:]
@@ -104,10 +104,10 @@ def _get_params():
     return params_dict
 
 
-def prepare_indicators_data(candlestick, delta_hours=0):
+def prepare_indicators_data(candlestick, delta_hours=0, for_trend=True):
     result = np.where(candlestick["close"].shift(-1) > candlestick["close"], 1, 0)[1:]
     # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    indicators = trend_params(candlestick)  # new_params(candlestick)
+    indicators = trend_params(candlestick) if for_trend else new_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
