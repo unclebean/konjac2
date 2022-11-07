@@ -22,11 +22,12 @@ class LogisticRegressionStrategy(ABCStrategy):
 
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
-        if last_order_status.ready_to_procceed and last_order_status.is_long:
+        action, accuracy, _ = self._get_open_signal(candles, for_trend=False)
+        if last_order_status.ready_to_procceed and last_order_status.is_long and action is TradeType.long.name:
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
-        if last_order_status.ready_to_procceed and last_order_status.is_short:
+        if last_order_status.ready_to_procceed and last_order_status.is_short and action is TradeType.short.name:
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
@@ -65,8 +66,8 @@ class LogisticRegressionStrategy(ABCStrategy):
                 stop_loss,
             )
 
-    def _get_open_signal(self, candles):
-        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=1)
+    def _get_open_signal(self, candles, for_trend=True):
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=1, for_trend=for_trend)
         most_important_feature = max(features, key=lambda f: f["Importance"])
         if trend is None:
             return None, 0, 0
