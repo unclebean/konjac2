@@ -4,8 +4,8 @@ from konjac2.service.forex.context import get_account, get_context
 
 log = logging.getLogger(__name__)
 
-STOP_LOSS = "0.004"
-JPY_STOP_LOSS = "0.4"
+STOP_LOSS = "0.005"
+JPY_STOP_LOSS = "0.5"
 TAKE_PROFIT = "0.008"
 
 
@@ -27,6 +27,7 @@ def _long_trade(symbol: str, units=25000):
             "instrument": symbol,
             "units": units,
             "stopLossOnFill": {"distance": _get_stop_loss(symbol)},
+            "takeProfitOnFill": {"distance": _get_stop_loss(symbol)},
         }
     )
     log.info("create long trade %s status %d", symbol, response.status)
