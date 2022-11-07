@@ -42,6 +42,7 @@ def _short_trade(symbol: str, units=25000):
             "instrument": symbol,
             "units": -units,
             "stopLossOnFill": {"distance": _get_stop_loss(symbol)},
+            "takeProfitOnFill": {"distance": _get_stop_loss(symbol)},
         }
     )
     log.info("create short trade %s status %d", symbol, response.status)
