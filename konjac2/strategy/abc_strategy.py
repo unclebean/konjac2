@@ -3,7 +3,7 @@ from collections import namedtuple
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from ..indicator.heikin_ashi_momentum import heikin_ashi_mom
+from ..chart.heikin_ashi import heikin_ashi
 
 from ..indicator.utils import TradeType
 from ..indicator.vwap import RSI_VWAP
@@ -150,9 +150,10 @@ class ABCStrategy(ABC):
         if is_loss:
             result = -stop_loss
 
-        fee = (last_trade.opened_position * (0.061110 / 100) * last_trade.quantity) + (
-                last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
-        )
+        # fee = (last_trade.opened_position * (0.061110 / 100) * last_trade.quantity) + (
+        #         last_trade.closed_position * (0.061110 / 100) * last_trade.quantity
+        # )
+        fee = 0
         self.balance += last_trade.opened_position * last_trade.quantity + result - fee
         # print("balance is {}".format(self.balance))
         last_trade.result = result - fee
@@ -182,7 +183,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.08
+            take_profit = last_trade.opened_position * last_trade.quantity * 0.005
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -208,7 +209,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.05
+            stop_loss = last_trade.opened_position * last_trade.quantity * 0.005
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -218,18 +219,23 @@ class ABCStrategy(ABC):
         return False, 0
 
     def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=7, holder_dev=3):
-        thread_holder, short_term_volatility = heikin_ashi_mom(longer_timeframe_candles, candles, rolling=rolling,
-                                                               holder_dev=holder_dev)
-        trend_action = None
-        if thread_holder[-1] <= abs(short_term_volatility[-1]) \
-                and 0 < short_term_volatility[-1]:
-            trend_action = TradeType.long.name
+        daily_volatility = (longer_timeframe_candles["high"] - longer_timeframe_candles["low"]) / longer_timeframe_candles["high"]
+        average_dv = daily_volatility[-7:].abs().sum() / 7
+        # volatility/3 for the threadholder
+        threadholder = average_dv / 3
+        # getting 6H heikin_ashi
+        # close - open for volatility of heikin_ashi bar
+        hc = heikin_ashi(candles)
+        h6_volatility = (hc["close"] - hc["open"]) / hc["close"]
+        h6_volatility = h6_volatility.values[-1]
 
-        if thread_holder[-1] <= abs(short_term_volatility[-1]) \
-                and 0 > short_term_volatility[-1]:
-            trend_action = TradeType.short.name
+        if threadholder <= abs(h6_volatility) and h6_volatility > 0:
+            return TradeType.long.name
 
-        return trend_action
+        if threadholder <= abs(h6_volatility) and h6_volatility < 0:
+            return TradeType.short.name
+
+        return None
 
     def _get_ris_vwap_rend(self, candles):
         r_vwap = RSI_VWAP(candles, group_by="week")
