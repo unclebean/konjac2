@@ -5,7 +5,7 @@ description = ""
 authors = ["hou jian <unclebean2013@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "3.9"
 fastapi = "^0.74.1"
 ccxt = "^1.76.66"
 pandas-ta = "^0.3.14-beta.0"
@@ -27,6 +27,7 @@ APScheduler = "^3.6.3"
 scikit-learn = "^1.0.2"
 xgboost = "^1.6.0"
 pykalman = "^0.9.5"
+vectorbt = "^0.24.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
