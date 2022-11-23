@@ -19,7 +19,7 @@ def make_trade(symbol: str, signal: str):
         _short_trade(symbol)
 
 
-def _long_trade(symbol: str, units=25000):
+def _long_trade(symbol: str, units=15000):
     response = get_context().order.market(
         get_account(),
         **{
@@ -34,7 +34,7 @@ def _long_trade(symbol: str, units=25000):
     return response.status
 
 
-def _short_trade(symbol: str, units=25000):
+def _short_trade(symbol: str, units=15000):
     response = get_context().order.market(
         get_account(),
         **{
