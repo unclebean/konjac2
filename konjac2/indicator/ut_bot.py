@@ -20,7 +20,7 @@ def xATRTrailingStop_func(close, prev_close, prev_atr, nloss):
 
 
 def ut_bot(candles):
-    xATR = atr(candles.high, candles.low, candles.close, timeperiod=ATR_PERIOD)
+    xATR = atr(candles.high, candles.low, candles.close, length=ATR_PERIOD)
     nLoss = SENSITIVITY * xATR
     pd_data = pd.DataFrame({"xATR": xATR, "nLoss": nLoss, "close": candles.close})
     pd_data = pd_data.dropna()
