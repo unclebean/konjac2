@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     ftx_future_secret: str = ""
     binance_api_key: str = ""
     binance_secret: str = ""
+    gemini_api_key: str = ""
+    gemini_secret: str = ""
     telegram_token: str = ""
 
     class Config:

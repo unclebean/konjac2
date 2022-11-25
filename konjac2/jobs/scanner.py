@@ -19,6 +19,7 @@ from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Instruments, Cryptos
 from ..indicator.moving_average import moving_average
+from ..service.crypto.gemini import sell_spot, buy_spot
 from ..service.utils import filter_incomplete_h4_data
 from ..strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
 from ..strategy.ema_ma_rsi_strategy import EmaMaRsiStrategy
@@ -95,10 +96,10 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def smart_bot(currency="SAND"):
-    query_symbol = f"{currency}-PERP"
-    trade_symbol = f"{currency}-PERP"
-    strategy = LogisticRegressionStrategy(symbol=query_symbol)
+async def smart_bot(currency="ETH"):
+    query_symbol = f"{currency}/USD"
+    trade_symbol = f"{currency}/USD"
+    strategy = UTBotStrategy(symbol=query_symbol, trade_short_order=False)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     log.info(f"fetching data for {query_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
@@ -110,34 +111,30 @@ async def smart_bot(currency="SAND"):
     trade = get_last_time_trade(query_symbol)
     if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
         try:
-            place_trade(trade_symbol, "sell")
+            sell_spot(trade_symbol)
             log.info("closed position!")
             say_something("closed position {}".format(query_symbol))
         except Exception as err:
             log.error("closed position error! {}".format(err))
-            place_trade(trade_symbol, "sell")
+            sell_spot(trade_symbol)
 
     strategy.seek_trend(data, d_data)
     is_opened_trade = strategy.entry_signal(data, d_data)
     trade = get_last_time_trade(query_symbol)
     if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
         try:
-            place_trade(trade_symbol, "buy", trade.trend)
+            buy_spot(trade_symbol)
             log.info("opened position!")
             say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
-            place_trade(trade_symbol, "buy", trade.trend)
+            buy_spot(trade_symbol)
             say_something("opened position failed!")
     log.info("job running done!")
 
 
 async def scan_crypto():
-    for currency in Cryptos:
-        try:
-            await smart_bot(currency=currency)
-        except Exception as err:
-            print(str(err))
+    await smart_bot()
 
 
 async def close_all_crypto():
@@ -151,7 +148,7 @@ async def close_all_crypto():
 async def trade_forex(symbol="EUR_USD"):
     query_symbol = symbol
     trade_symbol = symbol
-    strategy = UTSuperTrendStrategy(symbol=query_symbol)
+    strategy = UTBotStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=500)
     d_data = fetch_data(query_symbol, "H4", True, counts=500)
     # d_data = resample_to_interval(data, 360)
@@ -215,7 +212,8 @@ async def place_crypto_order(symbol: str, trend: str):
 
 async def scanner_job():
     for instrument in Instruments:
-        await retrieve_fx_position_state(instrument)
+        pass
+        # await retrieve_fx_position_state(instrument)
 
 
 async def scanner_h1_job():

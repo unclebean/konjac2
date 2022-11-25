@@ -1,4 +1,13 @@
+import re
 from datetime import datetime
+
+FX_STOP_LOSS = 0.0025
+FX_JPY_STOP_LOSS = 0.25
+FX_TAKE_PROFIT = 0.005
+FX_JPY_TAKE_PROFIT = 0.5
+
+CP_STOP_LOSS = 0.08
+CP_TAKE_PROFIT = 0.08
 
 
 def get_nearest_complete_h4_hour():
@@ -27,4 +36,34 @@ def filter_incomplete_h1_data(h1_data):
 
 def filter_incomplete_h4_data(h4_data):
     return h4_data
+
+
+def is_forex_symbol(symbol: str) -> bool:
+    forex_symbol = re.search(r".*_.*", symbol)
+    return forex_symbol is not None
+
+
+def is_crypto_symbol(symbol: str) -> bool:
+    crypto_symbol = re.search(r".*[-|/].*", symbol)
+    return crypto_symbol is not None
+
+
+def get_stop_loss(symbol: str):
+    if is_forex_symbol(symbol):
+        if "JPY" in symbol:
+            return FX_JPY_STOP_LOSS
+        return FX_STOP_LOSS
+
+    if is_crypto_symbol(symbol):
+        return CP_STOP_LOSS
+
+
+def get_take_profit(symbol: str):
+    if is_forex_symbol(symbol):
+        if "JPY" in symbol:
+            return FX_JPY_TAKE_PROFIT
+        return FX_TAKE_PROFIT
+
+    if is_crypto_symbol(symbol):
+        return CP_TAKE_PROFIT
 

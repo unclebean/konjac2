@@ -213,11 +213,11 @@ def hurst(ts):
     return poly[0] * 2.0
 
 
-def get_hurst_exponent(time_series, max_lag=50):
+def get_hurst_exponent(time_series, max_lag=55):
     """Returns the Hurst Exponent of the time series"""
     lags = range(2, max_lag)
     # variances of the lagged differences
     tau = [std(subtract(time_series[lag:], time_series[:-lag])) for lag in lags]
     # calculate the slope of the log plot -> the Hurst Exponent
     reg = polyfit(log(lags), log(tau), 1)
-    return reg[0]
+    return reg[0] * 2

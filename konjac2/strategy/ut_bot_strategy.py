@@ -9,22 +9,25 @@ from konjac2.strategy.abc_strategy import ABCStrategy
 class UTBotStrategy(ABCStrategy):
     strategy_name = "ut bot"
 
+    def __init__(self, symbol: str, trade_short_order=True):
+        ABCStrategy.__init__(self, symbol, trade_short_order)
+
     def seek_trend(self, candles, day_candles=None):
         pd_data = ut_bot(candles)
-        self._delete_last_in_progress_trade()
-        is_sqz = is_squeeze(candles)
-        if pd_data['Buy'].iat[-1] and not is_sqz:
+        if pd_data['Buy'].iat[-1]:
+            self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.long.name, candles.index[-1], h4_date=day_candles.index[-1])
-        if pd_data['Sell'].iat[-1] and not is_sqz:
+        if pd_data['Sell'].iat[-1]:
+            self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.short.name, candles.index[-1], h4_date=day_candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
-        ema_200 = ema(candles.close, 200)
+        is_sqz = is_squeeze(candles)
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
-                and ema_200[-1] < candles.close[-1]
+                and not is_sqz
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -32,7 +35,7 @@ class UTBotStrategy(ABCStrategy):
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
-                and ema_200[-1] > candles.close[-1]
+                and not is_sqz
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]

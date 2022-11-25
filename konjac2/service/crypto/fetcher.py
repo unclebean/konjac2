@@ -1,8 +1,7 @@
 import logging
 import pandas as pd
 from datetime import datetime
-from .context import get_context, get_binance_context
-
+from .context import get_context, get_binance_context, get_gemini_context
 
 log = logging.getLogger(__name__)
 
@@ -25,32 +24,9 @@ TIMEFRAME_CCXT_MAPPER = {
 def crypto_fetcher(symbol, timeframe, complete=True, **kwargs):
     since = kwargs.get("since", None)
     limit = kwargs.get("limit", None)
-    # exchange = get_binance_context()
-    exchange = get_context()
+    exchange = get_gemini_context()
+    # exchange = get_context()
     return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
-
-
-def get_markets():
-    exchange = get_context()
-    return exchange.load_markets()
-
-
-def ftx_fetch_pairs():
-    exchange = get_context()
-    exchange.load_markets()
-    return exchange.symbols
-
-
-def ftx_fetcher(symbol, timerframe, complete=True, since=None):
-    exchange = get_context()
-    return _fetcher(exchange, symbol, timerframe, complete, since)
-
-
-def ftx_fetch_balance(symbol="USD"):
-    exchange = get_context()
-    balance = exchange.fetch_balance()
-    total_balance = balance.get("total", {"total": {"USD": 0}})
-    return total_balance.get(symbol, 0)
 
 
 def binance_fetch_pairs():
@@ -72,41 +48,6 @@ def _fetcher(exchange, symbol, timerframe, complete=True, since=None, limit=1500
     return dataframe
 
 
-def get_ftx_balance(account=""):
-    exchange = get_context(account=account)
-    response = exchange.fetch_balance()
-    return response["free"]["USD"]
-
-
-def get_ftx_balance_bu_currency_code(currency_code, account=""):
-    exchange = get_context(account=account)
-    response = exchange.fetch_balance()
-    return response.get(currency_code, {"free": 0.0})["free"]
-
-
-def have_ftx_free_balance(currency_code):
-    exchange = get_context()
-    response = exchange.fetch_balance()
-    balance = response.get(currency_code, {"free": 0.0})["free"]
-    return balance != 0.0
-
-
-def buy_spot(symbol, account=""):
-    exchange = get_context(account=account)
-    available_balance = get_ftx_balance(account=account)
-
-    price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
-    amount = available_balance / price
-    exchange.create_market_order(symbol, "buy", amount)
-
-
-def sell_spot(symbol, account=""):
-    exchanage = get_context(account=account)
-    currency_code = symbol.replace("/USD", "")
-    amount = get_ftx_balance_bu_currency_code(currency_code, account=account)
-    exchanage.create_market_sell_order(symbol, amount)
-
-
 def place_trade(symbol, side, tradeType="", tp=0, sl=0, loss_position=None):
     if side == "buy":
         open_position(symbol, tradeType, tp, sl, loss_position)
@@ -116,9 +57,9 @@ def place_trade(symbol, side, tradeType="", tp=0, sl=0, loss_position=None):
 
 def open_position(symbol, tradeType, tp=0, sl=0, loss_position=None):
     exchange = get_context()
-    balance = get_ftx_balance()
+    balance = get_gemini_balance()
     log.info("open position for {} current balance {}".format(symbol, balance))
-    price = ftx_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
+    price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
     amount = balance / price * 5
     side = "buy" if tradeType == "long" else "sell"
     exchange.cancel_all_orders(symbol)
