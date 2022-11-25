@@ -52,30 +52,30 @@ class UTSuperTrendStrategy(ABCStrategy):
         stop_date = last_order_status.entry_date + timedelta(hours=7)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (stop_date == candles.index[-1] or is_profit or is_loss or super_trend[-1] > close_price):
+                and (stop_date == candles.index[-1] or super_trend[-1] > close_price):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
                 self.strategy_name,
                 candles.close[-1],
                 candles.index[-1],
-                is_profit,
-                is_loss,
+                False,
+                False,
                 take_profit,
                 stop_loss,
             )
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (stop_date == candles.index[-1] or is_profit or is_loss or super_trend[-1] < close_price):
+                and (stop_date == candles.index[-1] or super_trend[-1] < close_price):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
                 self.strategy_name,
                 candles.close[-1],
                 candles.index[-1],
-                is_profit,
-                is_loss,
+                False,
+                False,
                 take_profit,
                 stop_loss,
             )

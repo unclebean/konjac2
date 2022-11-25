@@ -1,12 +1,9 @@
 import logging
 from konjac2.indicator.utils import TradeType
 from konjac2.service.forex.context import get_account, get_context
+from konjac2.service.utils import get_stop_loss, get_take_profit
 
 log = logging.getLogger(__name__)
-
-STOP_LOSS = "0.005"
-JPY_STOP_LOSS = "0.5"
-TAKE_PROFIT = "0.008"
 
 
 def make_trade(symbol: str, signal: str):
@@ -26,8 +23,8 @@ def _long_trade(symbol: str, units=15000):
             "type": "MARKET",
             "instrument": symbol,
             "units": units,
-            "stopLossOnFill": {"distance": _get_stop_loss(symbol)},
-            "takeProfitOnFill": {"distance": _get_stop_loss(symbol)},
+            "stopLossOnFill": {"distance": str(get_stop_loss(symbol))},
+            "takeProfitOnFill": {"distance": str(get_take_profit(symbol))},
         }
     )
     log.info("create long trade %s status %d", symbol, response.status)
@@ -41,8 +38,8 @@ def _short_trade(symbol: str, units=15000):
             "type": "MARKET",
             "instrument": symbol,
             "units": -units,
-            "stopLossOnFill": {"distance": _get_stop_loss(symbol)},
-            "takeProfitOnFill": {"distance": _get_stop_loss(symbol)},
+            "stopLossOnFill": {"distance": str(get_stop_loss(symbol))},
+            "takeProfitOnFill": {"distance": str(get_take_profit(symbol))},
         }
     )
     log.info("create short trade %s status %d", symbol, response.status)
@@ -79,9 +76,3 @@ def is_opened_maximum_positions() -> bool:
     except Exception as err:
         log.error(str(err))
         return False
-
-
-def _get_stop_loss(symbol: str):
-    if "JPY" in symbol:
-        return JPY_STOP_LOSS
-    return STOP_LOSS

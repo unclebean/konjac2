@@ -1,0 +1,62 @@
+# Common
+enable_fx = true
+enable_crypto = true
+
+# Forex
+[forex]
+quantity = 5000
+stop_lose = "0.005"
+take_profit = "0.005"
+jpy_stop_lose = "0.5"
+symbol_list = [
+    "AUD_CAD",
+    "AUD_JPY",
+    "AUD_USD",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_USD",
+    "NZD_CAD",
+    "USD_CAD",
+    "USD_JPY",
+]
+
+#Crypto
+stop_lose = 0.020
+take_profit = 0.020
+symbol_list = [
+    "ATOM",
+    "AAVE",
+    "ALGO",
+    "AVAX",
+    "AXS",
+    "ADA",
+    "BNB",
+    "BTC",
+    "CEL",
+    "CRV",
+    "CVX",
+    "DOGE",
+    "DOT",
+    "ETH",
+    "FTM",
+    "LINK",
+    "LTC",
+    "ONE",
+    "GALA",
+    "MANA",
+    "MATIC",
+    "NEAR",
+    "RUNE",
+    "RSR",
+    "SAND",
+    "SUSHI",
+    "THETA",
+    "XTZ",
+    "SOL",
+]
+

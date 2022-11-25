@@ -14,16 +14,28 @@ from ..indicator.utils import resample_to_interval
 from ..models import apply_session
 from ..models.trade import Trade
 from ..strategy.bb_stoch_strategy import BBStochStrategy
+from ..strategy.cci_eam_strategy import CCIEMaStrategy
 from ..strategy.cci_histogram_strategy import CCIHistogramStrategy
 from ..strategy.ce_rsi_strategy import CERSIStrategy
+from ..strategy.ema_ma_rsi_strategy import EmaMaRsiStrategy
+from ..strategy.ema_macd_strategy import EmaMacdStrategy
 from ..strategy.ema_stoch_rsi_strategy import EmaStochRsiStrategy
+from ..strategy.heikin_ashi_suppertrend_strategy import HeikinAshiSupperTrendStrategy
+from ..strategy.ichimoku_sar_strategy import IchimokuSar
+from ..strategy.ichimoku_will_v2_strategy import IchimokuWillRV2
 from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_rsi_strategy import MacdRsiStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.n_macd_volatility_strategy import NMacdVolatilityStrategy
+from ..strategy.open_high_low_strategy import OpenHighLowStrategy
+from ..strategy.rng_strategy import RNGStrategy
+from ..strategy.rsi_stoch_macd_strategy import RSIStochMacdStrategy
 from ..strategy.smoothed_ha_strategy import SmoothedHAStrategy
+from ..strategy.stoch_sar_strategy import StochSarStrategy
 from ..strategy.strategy_five import StrategyFive
 from ..strategy.strategy_one import StrategyOne
+from ..strategy.ut_bot_strategy import UTBotStrategy
+from ..strategy.ut_super_trend_strategy import UTSuperTrendStrategy
 from ..strategy.vix_strategy import VixStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
 from ..strategy.vwap_rsi_willr_strategy import VwapRsiWillR
@@ -63,13 +75,13 @@ def short_term_backtest(symbol: str):
     trades.delete(synchronize_session=False)
     session.commit()
     session.close()
-    h1_data = pd.read_csv(f"{symbol}_0_5.csv", index_col="date", parse_dates=True).loc["2019-08-01 00:00:00":]
-    strategy = BBCCIStrategy(symbol=symbol)
-    for window in h1_data.rolling(window=999):
-        if len(window.index) < 999:
+    h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True)#.loc["2021-08-01 00:00:00":]
+    strategy = UTBotStrategy(symbol=symbol)
+    for window in h1_data.rolling(window=599):
+        if len(window.index) < 599:
             continue
 
-        current_day_data = resample_to_interval(window, 60)
+        current_day_data = resample_to_interval(window, 240)
         strategy.exit_signal(window, current_day_data)
         strategy.seek_trend(window, current_day_data)
         strategy.entry_signal(window, current_day_data)
@@ -96,7 +108,7 @@ def fx_short_term_backtest(symbol: str):
     session.close()
     m5_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True) #.loc["2022-03-20 00:00:00":]
     h4_data = pd.read_csv(f"{symbol}_4_0.csv", index_col="date", parse_dates=True)
-    strategy = IchimokuWillR(symbol=symbol)
+    strategy = OpenHighLowStrategy(symbol=symbol)
     for window in m5_data.rolling(window=999):
         if len(window.index) < 999:
             continue

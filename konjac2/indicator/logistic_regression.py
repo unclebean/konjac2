@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from pandas_ta import amat, aroon, chop, decay, decreasing, dpo, increasing, psar, qstick, ttm_trend, vhf, \
-    vortex
+    vortex, ao, apo, bias, bop, brar, cfo, cg, cmo, coppock, er, fisher, inertia, kdj, kst, sma
 from pandas_ta.overlap import ema, ichimoku
 from pandas_ta.volatility import bbands, atr
 from pandas_ta.momentum import macd, cci, rsi, stoch, mom
@@ -107,7 +107,7 @@ def _get_params():
 def prepare_indicators_data(candlestick, delta_hours=0, for_trend=True):
     result = np.where(candlestick["close"].shift(-1) > candlestick["close"], 1, 0)[1:]
     # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    indicators = trend_params(candlestick) if for_trend else new_params(candlestick)
+    indicators = trend_params(candlestick) if for_trend else rsi_stoch_macd_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
@@ -138,6 +138,26 @@ def sol_params(candlestick):
         index=candlestick.index,
     )
 
+
+def momentum_params(candles):
+    ao_ = ao(candles.high, candles.low)
+    apo_ = apo(candles.close)
+    bias_ = bias(candles.close)
+    bop_ = bop(candles.open, candles.high, candles.low, candles.close)
+    brar_ = brar(candles.open, candles.high, candles.low, candles.close)
+    cci_ = cci(candles.high, candles.low, candles.close)
+    cfo_ = cfo(candles.close)
+    cg_ = cg(candles.close)
+    cmo_ = cmo(candles.close)
+    coppock_ = coppock(candles.close)
+    er_ = er(candles.close)
+    fisher_ = fisher(candles.high, candles.low)
+    inertia_ = inertia(candles.close, candles.high, candles.low)
+    kdj_ = kdj(candles.high, candles.low, candles.close)
+    kst_ = kst(candles.close)
+    indicators = pd.concat([ao_, apo_, bias_, bop_, brar_, cci_, cfo_, cg_, cmo_, coppock_, er_, fisher_, inertia_, kdj_, kst_], axis=1)
+
+    return indicators
 
 def trend_params(candles):
     adx_ = adx(candles.high, candles.low, candles.close)
@@ -226,6 +246,25 @@ def new_params(candles):
             "atr10": atr10,
             "bb3_diff": bb3_diff,
             "bb10_diff": bb10_diff,
+        },
+        index=candles.index,
+    )
+
+
+def rsi_stoch_macd_params(candles):
+    stoch_data = stoch(candles.high, candles.low, candles.close)
+    stoch_k = stoch_data["STOCHk_14_3_3"]
+    stoch_d = stoch_data["STOCHd_14_3_3"]
+    rsi_data = rsi(candles.close, length=14)
+    rsi_sma_data = sma(rsi_data, length=14)
+    macd_data = macd(candles.close)
+    macd_ = macd_data["MACD_12_26_9"]
+    macd_signal = macd_data["MACDs_12_26_9"]
+    return pd.DataFrame(
+        {
+            "stoch": stoch_k - stoch_d,
+            "rsi_sma": rsi_data - rsi_sma_data,
+            "macd": macd_ - macd_signal
         },
         index=candles.index,
     )

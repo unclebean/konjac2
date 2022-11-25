@@ -10,8 +10,9 @@ from ..indicator.vwap import RSI_VWAP
 from ..models import apply_session
 from ..models.trade import Trade, TradeStatus, get_last_time_trade
 from ..models.signal import Signal, get_open_trade_signals
+from ..service.utils import get_take_profit, get_stop_loss
 
-LastTradeStatus = namedtuple("LastTradeStatus", "ready_to_procceed is_long is_short opened_position")
+LastTradeStatus = namedtuple("LastTradeStatus", "ready_to_procceed is_long is_short opened_position, entry_date")
 
 log = logging.getLogger(__name__)
 
@@ -20,8 +21,9 @@ class ABCStrategy(ABC):
     strategy_name = "abc strategy"
     balance = 10000
 
-    def __init__(self, symbol: str):
+    def __init__(self, symbol: str, trade_short_order=True):
         self.symbol = symbol
+        self.trade_short_order = trade_short_order
 
     @abstractmethod
     def seek_trend(self, candles, day_candles=None):
@@ -48,7 +50,7 @@ class ABCStrategy(ABC):
         is_long = ready_to_new_trade and last_trade.trend == TradeType.long.name
         is_short = ready_to_new_trade and last_trade.trend == TradeType.short.name
         opened_position = last_trade.opened_position if ready_to_new_trade else 0
-        return LastTradeStatus(ready_to_new_trade, is_long, is_short, opened_position)
+        return LastTradeStatus(ready_to_new_trade, is_long, is_short, opened_position, None)
 
     def _can_close_trade(self) -> LastTradeStatus:
         last_trade = get_last_time_trade(self.symbol)
@@ -56,7 +58,8 @@ class ABCStrategy(ABC):
         is_long = ready_to_close and last_trade.trend == TradeType.long.name
         is_short = ready_to_close and last_trade.trend == TradeType.short.name
         opened_position = last_trade.opened_position if ready_to_close else 0
-        return LastTradeStatus(ready_to_close, is_long, is_short, opened_position)
+        entry_date = last_trade.entry_date if ready_to_close else datetime.today()
+        return LastTradeStatus(ready_to_close, is_long, is_short, opened_position, entry_date)
 
     def _delete_last_in_progress_trade(self):
         last_trade = get_last_time_trade(self.symbol)
@@ -183,7 +186,7 @@ class ABCStrategy(ABC):
             low_price = candles.low[-1]
             high_price = candles.high[-1]
 
-            take_profit = last_trade.opened_position * last_trade.quantity * 0.005
+            take_profit = last_trade.opened_position * last_trade.quantity * get_take_profit(self.symbol)
 
             profit = (high_price - last_trade.opened_position) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -209,7 +212,7 @@ class ABCStrategy(ABC):
                 stop_loss = stop_position * last_trade.quantity - last_trade.opened_position * last_trade.quantity
                 return True, stop_loss
 
-            stop_loss = last_trade.opened_position * last_trade.quantity * 0.005
+            stop_loss = last_trade.opened_position * last_trade.quantity * get_stop_loss(self.symbol)
 
             loss = (last_trade.opened_position - low_price) * last_trade.quantity
             if last_trade.trend == TradeType.short.name:
@@ -237,7 +240,7 @@ class ABCStrategy(ABC):
 
         return None
 
-    def _get_ris_vwap_rend(self, candles):
+    def _get_ris_vwap_trend(self, candles):
         r_vwap = RSI_VWAP(candles, group_by="week")
         if r_vwap[-3] < 5 and r_vwap[-2] < 5 and r_vwap[-1] < 5:
             return TradeType.short.name

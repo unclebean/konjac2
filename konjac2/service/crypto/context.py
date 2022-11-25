@@ -29,7 +29,6 @@ def get_context(account=""):
 
 
 def get_binance_context():
-
     exchange = ccxt.binance(
         {
             "apiKey": settings.binance_api_key,
@@ -37,4 +36,13 @@ def get_binance_context():
             "options": {"defaultMarket": "futures"},
         },
     )
+    return exchange
+
+
+def get_gemini_context():
+    exchange = ccxt.gemini({
+        "apiKey": settings.gemini_api_key,
+        "secret": settings.gemini_secret
+    })
+
     return exchange

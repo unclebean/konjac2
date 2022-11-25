@@ -17,7 +17,7 @@ class NMacdVolatilityStrategy(ABCStrategy):
 
     def seek_trend(self, candles, day_candles=None):
         _, short_term_volatility = heikin_ashi_mom(day_candles, candles, rolling=42, holder_dev=21)
-        trend = self._get_ris_vwap_rend(candles)
+        trend = self._get_ris_vwap_trend(candles)
         self._delete_last_in_progress_trade()
         ema_volatility = ema(short_term_volatility, 34)
         if trend is not None:
