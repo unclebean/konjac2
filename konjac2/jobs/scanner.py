@@ -27,6 +27,7 @@ from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
+from ..strategy.ut_super_trend_strategy import UTSuperTrendStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
 from ..strategy.vwap_rsi_willr_strategy import VwapRsiWillR
 
@@ -150,7 +151,7 @@ async def close_all_crypto():
 async def trade_forex(symbol="EUR_USD"):
     query_symbol = symbol
     trade_symbol = symbol
-    strategy = UTBotStrategy(symbol=query_symbol)
+    strategy = UTSuperTrendStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=500)
     d_data = fetch_data(query_symbol, "H4", True, counts=500)
     # d_data = resample_to_interval(data, 360)
