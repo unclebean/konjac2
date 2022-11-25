@@ -17,7 +17,7 @@ class UTBotStrategy(ABCStrategy):
         if pd_data['Buy'].iat[-1]:
             self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.long.name, candles.index[-1], h4_date=day_candles.index[-1])
-        if pd_data['Sell'].iat[-1]:
+        if pd_data['Sell'].iat[-1] and self.trade_short_order:
             self._delete_last_in_progress_trade()
             self._start_new_trade(TradeType.short.name, candles.index[-1], h4_date=day_candles.index[-1])
 
