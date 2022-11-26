@@ -96,7 +96,7 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def smart_bot(currency="XTZ"):
+async def smart_bot(currency="ETH"):
     query_symbol = f"{currency}/USD"
     trade_symbol = f"{currency}/USD"
     strategy = UTBotStrategy(symbol=query_symbol, trade_short_order=False)
