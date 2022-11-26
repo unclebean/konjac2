@@ -6,7 +6,7 @@ from pandas_ta import willr
 
 from konjac2.bot.telegram_bot import say_something
 from konjac2.models.trade import TradeStatus, get_last_time_trade
-from konjac2.service.crypto.fetcher import opened_position_by_symbol, place_trade
+from konjac2.service.crypto.fetcher import place_trade
 from konjac2.service.fetcher import fetch_data
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 from konjac2.indicator.squeeze_momentum import squeeze
@@ -19,7 +19,7 @@ from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Instruments, Cryptos
 from ..indicator.moving_average import moving_average
-from ..service.crypto.gemini import sell_spot, buy_spot
+from ..service.crypto.gemini import sell_spot, buy_spot, opened_position_by_symbol
 from ..service.utils import filter_incomplete_h4_data
 from ..strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
 from ..strategy.ema_ma_rsi_strategy import EmaMaRsiStrategy
@@ -96,7 +96,7 @@ async def bbcci_scanner():
         strategy.exit_signal(m5_data)
 
 
-async def smart_bot(currency="ETH"):
+async def smart_bot(currency="XTZ"):
     query_symbol = f"{currency}/USD"
     trade_symbol = f"{currency}/USD"
     strategy = UTBotStrategy(symbol=query_symbol, trade_short_order=False)
@@ -105,11 +105,11 @@ async def smart_bot(currency="ETH"):
     d_data = resample_to_interval(data, 360)
     # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
-    opened_position = opened_position_by_symbol(trade_symbol)
+    # opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data, d_data)
     trade = get_last_time_trade(query_symbol)
-    if is_exit_trade and opened_position is not None and trade is not None and trade.status == TradeStatus.closed.name:
+    if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
             sell_spot(trade_symbol)
             log.info("closed position!")
@@ -121,7 +121,7 @@ async def smart_bot(currency="ETH"):
     strategy.seek_trend(data, d_data)
     is_opened_trade = strategy.entry_signal(data, d_data)
     trade = get_last_time_trade(query_symbol)
-    if is_opened_trade and opened_position is None and trade is not None and trade.status == TradeStatus.opened.name:
+    if is_opened_trade and trade is not None and trade.status == TradeStatus.opened.name:
         try:
             buy_spot(trade_symbol)
             log.info("opened position!")
