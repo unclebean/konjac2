@@ -92,14 +92,3 @@ def close_position(symbol):
         exchange.create_market_buy_order(symbol, float(symbol_position["openSize"]))
     exchange.cancel_all_orders(symbol)
 
-
-def opened_positions():
-    exchange = get_context()
-    positions = exchange.fetch_positions()
-    return list(p for p in positions if p["info"]["size"] != "0.0")
-
-
-def opened_position_by_symbol(symbol):
-    positions = opened_positions()
-    position = next((p for p in positions if p["info"]["future"] == symbol), None)
-    return position

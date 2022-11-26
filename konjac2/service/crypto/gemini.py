@@ -34,3 +34,15 @@ def sell_spot(symbol):
     price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
     amount = get_gemini_balance_bu_currency_code(currency_code)
     exchange.create_limit_sell_order(symbol, amount, price)
+
+
+def opened_positions():
+    exchange = get_gemini_context()
+    positions = exchange.fetch_positions()
+    return list(p for p in positions if p["info"]["size"] != "0.0")
+
+
+def opened_position_by_symbol(symbol):
+    positions = opened_positions()
+    position = next((p for p in positions if p["info"]["future"] == symbol), None)
+    return position
