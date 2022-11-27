@@ -1,7 +1,7 @@
 import logging
 from konjac2.indicator.utils import TradeType
 from konjac2.service.forex.context import get_account, get_context
-from konjac2.service.utils import get_stop_loss, get_take_profit
+from konjac2.service.utils import get_fx_take_profit_rate, get_fx_stop_loss_rate
 
 log = logging.getLogger(__name__)
 
@@ -23,8 +23,8 @@ def _long_trade(symbol: str, units=15000):
             "type": "MARKET",
             "instrument": symbol,
             "units": units,
-            "stopLossOnFill": {"distance": str(get_stop_loss(symbol))},
-            "takeProfitOnFill": {"distance": str(get_take_profit(symbol))},
+            "stopLossOnFill": {"distance": str(get_fx_stop_loss_rate(symbol))},
+            "takeProfitOnFill": {"distance": str(get_fx_take_profit_rate(symbol))},
         }
     )
     log.info("create long trade %s status %d", symbol, response.status)
@@ -38,8 +38,8 @@ def _short_trade(symbol: str, units=15000):
             "type": "MARKET",
             "instrument": symbol,
             "units": -units,
-            "stopLossOnFill": {"distance": str(get_stop_loss(symbol))},
-            "takeProfitOnFill": {"distance": str(get_take_profit(symbol))},
+            "stopLossOnFill": {"distance": str(get_fx_stop_loss_rate(symbol))},
+            "takeProfitOnFill": {"distance": str(get_fx_take_profit_rate(symbol))},
         }
     )
     log.info("create short trade %s status %d", symbol, response.status)
