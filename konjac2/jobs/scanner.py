@@ -21,6 +21,7 @@ from . import Instruments, Cryptos
 from ..indicator.moving_average import moving_average
 from ..service.crypto.gemini import sell_spot, buy_spot, opened_position_by_symbol
 from ..service.utils import filter_incomplete_h4_data
+from ..strategy.cci_ema_strategy import CCIEMAStrategy
 from ..strategy.dema_supertrend_strategy import DemaSuperTrendStrategy
 from ..strategy.ema_ma_rsi_strategy import EmaMaRsiStrategy
 from ..strategy.ichimoku_will_v2_strategy import IchimokuWillRV2
@@ -148,10 +149,9 @@ async def close_all_crypto():
 async def trade_forex(symbol="EUR_USD"):
     query_symbol = symbol
     trade_symbol = symbol
-    strategy = UTBotStrategy(symbol=query_symbol)
+    strategy = CCIEMAStrategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=500)
     d_data = fetch_data(query_symbol, "H4", True, counts=500)
-    # d_data = resample_to_interval(data, 360)
 
     is_exit_trade = strategy.exit_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
