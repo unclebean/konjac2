@@ -1,8 +1,9 @@
 import re
 from datetime import datetime
 
-FX_STOP_LOSS = 0.0025
-FX_JPY_STOP_LOSS = 0.25
+
+FX_STOP_LOSS = 0.004
+FX_JPY_STOP_LOSS = 0.4
 FX_TAKE_PROFIT = 0.005
 FX_JPY_TAKE_PROFIT = 0.5
 
@@ -48,22 +49,56 @@ def is_crypto_symbol(symbol: str) -> bool:
     return crypto_symbol is not None
 
 
-def get_stop_loss(symbol: str):
+def get_fx_stop_loss_rate(symbol: str):
+    loss = FX_STOP_LOSS
+    if "JPY" in symbol:
+        loss = FX_JPY_STOP_LOSS
+    return loss
+
+
+def get_fx_take_profit_rate(symbol: str):
+    profit = FX_TAKE_PROFIT
+    if "JPY" in symbol:
+        profit = FX_JPY_TAKE_PROFIT
+    return profit
+
+
+def _fx_stop_loss(symbol: str, quantity: float) -> float:
+    loss = FX_STOP_LOSS
+    if "JPY" in symbol:
+        loss = FX_JPY_STOP_LOSS
+
+    return quantity * loss
+
+
+def _crypto_stop_loss(order_position: float, quantity: float) -> float:
+    return order_position * quantity * CP_STOP_LOSS
+
+
+def get_stop_loss(symbol: str, order_position: float, quantity: float) -> float:
     if is_forex_symbol(symbol):
-        if "JPY" in symbol:
-            return FX_JPY_STOP_LOSS
-        return FX_STOP_LOSS
+        return _fx_stop_loss(symbol, quantity)
 
     if is_crypto_symbol(symbol):
-        return CP_STOP_LOSS
+        return _crypto_stop_loss(order_position, quantity)
 
 
-def get_take_profit(symbol: str):
+def _fx_take_profit(symbol: str, quantity: float) -> float:
+    profit = FX_TAKE_PROFIT
+    if "JPY" in symbol:
+        profit = FX_JPY_TAKE_PROFIT
+
+    return profit * quantity
+
+
+def _crypto_take_profit(order_position: float, quantity: float) -> float:
+    return order_position * quantity * CP_TAKE_PROFIT
+
+
+def get_take_profit(symbol: str, order_position: float, quantity: float) -> float:
     if is_forex_symbol(symbol):
-        if "JPY" in symbol:
-            return FX_JPY_TAKE_PROFIT
-        return FX_TAKE_PROFIT
+        return _fx_take_profit(symbol, quantity)
 
     if is_crypto_symbol(symbol):
-        return CP_TAKE_PROFIT
+        return _crypto_take_profit(order_position, quantity)
 

@@ -14,7 +14,7 @@ from ..indicator.utils import resample_to_interval
 from ..models import apply_session
 from ..models.trade import Trade
 from ..strategy.bb_stoch_strategy import BBStochStrategy
-from ..strategy.cci_eam_strategy import CCIEMaStrategy
+from ..strategy.cci_ema_strategy import CCIEMAStrategy
 from ..strategy.cci_histogram_strategy import CCIHistogramStrategy
 from ..strategy.ce_rsi_strategy import CERSIStrategy
 from ..strategy.ema_ma_rsi_strategy import EmaMaRsiStrategy
@@ -26,6 +26,7 @@ from ..strategy.ichimoku_will_v2_strategy import IchimokuWillRV2
 from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_rsi_strategy import MacdRsiStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
+from ..strategy.macd_strategy import MacdStrategy
 from ..strategy.n_macd_volatility_strategy import NMacdVolatilityStrategy
 from ..strategy.open_high_low_strategy import OpenHighLowStrategy
 from ..strategy.rng_strategy import RNGStrategy
@@ -76,7 +77,7 @@ def short_term_backtest(symbol: str):
     session.commit()
     session.close()
     h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True)#.loc["2021-08-01 00:00:00":]
-    strategy = UTBotStrategy(symbol=symbol)
+    strategy = IchimokuWillR(symbol=symbol, trade_short_order=False)
     for window in h1_data.rolling(window=599):
         if len(window.index) < 599:
             continue
