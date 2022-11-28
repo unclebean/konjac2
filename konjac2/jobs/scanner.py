@@ -143,7 +143,7 @@ async def scan_forex():
         except Exception as err:
             print(str(err))
 
-    await trade_forex(strategy=LogisticRegressionStrategy)
+    await trade_forex(trading_strategy=LogisticRegressionStrategy)
 
 
 async def place_crypto_order(symbol: str, trend: str):
