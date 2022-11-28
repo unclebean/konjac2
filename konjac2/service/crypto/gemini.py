@@ -1,5 +1,10 @@
+import logging
+
 from konjac2.service.crypto.context import get_gemini_context
 from konjac2.service.crypto.fetcher import _fetcher
+from konjac2.service.utils import CP_TAKE_PROFIT, CP_STOP_LOSS
+
+log = logging.getLogger(__name__)
 
 
 def gemini_fetcher(symbol, timerframe, complete=True, since=None):
@@ -26,6 +31,11 @@ def buy_spot(symbol):
     price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
     amount = available_balance / price * 0.9
     exchange.create_limit_buy_order(symbol, amount, price)
+    profit = price + price * CP_TAKE_PROFIT
+    loss = price - price * CP_STOP_LOSS
+    exchange.create_limit_sell_order(symbol, amount, profit)
+    exchange.create_limit_sell_order(symbol, amount, loss)
+    log.info(f"open spot position for profit {profit} & loss {loss}")
 
 
 def sell_spot(symbol):
