@@ -77,12 +77,12 @@ def short_term_backtest(symbol: str):
     session.commit()
     session.close()
     h1_data = pd.read_csv(f"{symbol}_1_0.csv", index_col="date", parse_dates=True)#.loc["2021-08-01 00:00:00":]
-    strategy = IchimokuWillR(symbol=symbol, trade_short_order=False)
-    for window in h1_data.rolling(window=599):
-        if len(window.index) < 599:
+    strategy = MacdStrategy(symbol=symbol, trade_short_order=False)
+    for window in h1_data.rolling(window=500):
+        if len(window.index) < 500:
             continue
 
-        current_day_data = resample_to_interval(window, 240)
+        current_day_data = resample_to_interval(window, 60)
         strategy.exit_signal(window, current_day_data)
         strategy.seek_trend(window, current_day_data)
         strategy.entry_signal(window, current_day_data)

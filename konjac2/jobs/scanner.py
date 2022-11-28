@@ -29,6 +29,7 @@ from ..strategy.ichimoku_will_v2_strategy import IchimokuWillRV2
 from ..strategy.ichimoku_willr_strategy import IchimokuWillR
 from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
+from ..strategy.macd_strategy import MacdStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
 from ..strategy.ut_super_trend_strategy import UTSuperTrendStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
@@ -40,7 +41,7 @@ log = logging.getLogger(__name__)
 async def smart_bot(currency="ETH"):
     query_symbol = f"{currency}/USD"
     trade_symbol = f"{currency}/USD"
-    strategy = UTBotStrategy(symbol=query_symbol, trade_short_order=False)
+    strategy = MacdStrategy(symbol=query_symbol, trade_short_order=False)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     log.info(f"fetching data for {query_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
@@ -86,10 +87,10 @@ async def close_all_crypto():
             place_trade(trade_symbol, "sell")
 
 
-async def trade_forex(symbol="EUR_USD", strategy: type[ABCStrategy] = CCIEMAStrategy):
+async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy):
     query_symbol = symbol
     trade_symbol = symbol
-    strategy = strategy(symbol=query_symbol)
+    strategy = trading_strategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=5000)
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
     d_data = resample_to_interval(data, 360)
