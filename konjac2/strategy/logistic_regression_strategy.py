@@ -1,7 +1,5 @@
 import logging
 
-from pandas_ta import stoch
-
 from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
 from .abc_strategy import ABCStrategy
@@ -19,10 +17,12 @@ class LogisticRegressionStrategy(ABCStrategy):
         if candles.index[-1].hour != 8:
             return
         action, accuracy, _ = self._get_open_signal(day_candles, for_trend=True)
-        if action is not None:
+        if action is TradeType.long.name and day_candles.close[-1] > day_candles.open[-1]:
             self._delete_last_in_progress_trade()
             self._start_new_trade(action, candles.index[-1], h4_date=day_candles.index[-1])
-
+        if action is TradeType.short.name and day_candles.close[-1] < day_candles.open[-1]:
+            self._delete_last_in_progress_trade()
+            self._start_new_trade(action, candles.index[-1], h4_date=day_candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
@@ -41,7 +41,7 @@ class LogisticRegressionStrategy(ABCStrategy):
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (candles.index[-1].hour == 23 or is_profit or is_loss):
+                and (is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
@@ -56,7 +56,7 @@ class LogisticRegressionStrategy(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (candles.index[-1].hour == 23 or is_profit or is_loss):
+                and (is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -70,7 +70,8 @@ class LogisticRegressionStrategy(ABCStrategy):
             )
 
     def _get_open_signal(self, candles, for_trend=True):
-        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0, for_trend=for_trend)
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0,
+                                                            for_trend=for_trend)
         most_important_feature = max(features, key=lambda f: f["Importance"])
         print(accuracy)
         if trend is None:
