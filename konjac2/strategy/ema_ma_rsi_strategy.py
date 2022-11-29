@@ -47,7 +47,7 @@ class EmaMaRsiStrategy(ABCStrategy):
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit):
+                and (is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -55,14 +55,14 @@ class EmaMaRsiStrategy(ABCStrategy):
                 candles.close[-1],
                 candles.index[-1],
                 is_profit,
-                False,
+                is_loss,
                 take_profit,
                 stop_loss,
             )
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit):
+                and (is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
@@ -70,7 +70,7 @@ class EmaMaRsiStrategy(ABCStrategy):
                 candles.close[-1],
                 candles.index[-1],
                 is_profit,
-                False,
+                is_loss,
                 take_profit,
                 stop_loss,
             )
