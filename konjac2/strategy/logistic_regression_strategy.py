@@ -73,7 +73,6 @@ class LogisticRegressionStrategy(ABCStrategy):
         trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0,
                                                             for_trend=for_trend)
         most_important_feature = max(features, key=lambda f: f["Importance"])
-        print(accuracy)
         if trend is None:
             return None, 0, 0
         if trend[-1] > 0.5:
