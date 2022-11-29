@@ -16,7 +16,7 @@ class HeikinAshiSupperTrendStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, day_candles=None):
-        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3.0"]
+        super_trend = supertrend(candles.high, candles.low, candles.close, length=34, multiplier=3)["SUPERT_34_3"]
         close_price = candles.close[-1]
         self._delete_last_in_progress_trade()
         if super_trend[-1] < close_price:
