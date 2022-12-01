@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 async def smart_bot(currency="ETH"):
     query_symbol = f"{currency}/USD"
     trade_symbol = f"{currency}/USD"
-    strategy = MacdStrategy(symbol=query_symbol, trade_short_order=False)
+    strategy = UTBotStrategy(symbol=query_symbol, trade_short_order=False)
     data = fetch_data(query_symbol, "H1", True, limit=1500)
     log.info(f"fetching data for {query_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
@@ -97,6 +97,9 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
 
     is_exit_trade = strategy.exit_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
+    if trade is not None and not has_opened_trades(query_symbol):
+        strategy.close_order_by_exchange(data)
+
     if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
             close_trade(trade_symbol)
