@@ -37,6 +37,36 @@ class ABCStrategy(ABC):
     def exit_signal(self, candles, day_candles=None) -> bool:
         pass
 
+    def close_order_by_exchange(self, candles):
+        last_order_status = self._can_close_trade()
+        is_profit, take_profit = self._is_take_profit(candles)
+        is_loss, stop_loss = self._is_stop_loss(candles)
+        if last_order_status.ready_to_procceed and last_order_status.is_long:
+            return self._update_close_trade(
+                TradeType.short.name,
+                candles.close[-1],
+                "exchange",
+                0,
+                candles.index[-1],
+                is_profit,
+                is_loss,
+                take_profit,
+                stop_loss,
+            )
+
+        if last_order_status.ready_to_procceed and last_order_status.is_short:
+            return self._update_close_trade(
+                TradeType.long.name,
+                candles.close[-1],
+                "exchange",
+                0,
+                candles.index[-1],
+                is_profit,
+                is_loss,
+                take_profit,
+                stop_loss,
+            )
+
     def get_trade(self):
         return get_last_time_trade(self.symbol)
 
