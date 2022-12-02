@@ -33,7 +33,7 @@ def buy_spot(symbol):
     exchange.create_limit_buy_order(symbol, amount, price)
     profit = price + price * CP_TAKE_PROFIT
     loss = price - price * CP_STOP_LOSS
-    exchange.create_limit_sell_order(symbol, amount, profit)
+    # exchange.create_limit_sell_order(symbol, amount, profit)
     exchange.create_limit_sell_order(symbol, amount, loss)
     log.info(f"open spot position for profit {profit} & loss {loss}")
 
