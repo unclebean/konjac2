@@ -6,6 +6,8 @@ FX_STOP_LOSS = 0.004
 FX_JPY_STOP_LOSS = 0.4
 FX_TAKE_PROFIT = 0.007
 FX_JPY_TAKE_PROFIT = 0.7
+FX_WTICO_TAKE_PROFIT = 0.7
+FX_WTICO_STOP_LOSS = 0.4
 
 CP_STOP_LOSS = 0.05
 CP_TAKE_PROFIT = 0.08
@@ -53,6 +55,8 @@ def get_fx_stop_loss_rate(symbol: str):
     loss = FX_STOP_LOSS
     if "JPY" in symbol:
         loss = FX_JPY_STOP_LOSS
+    if "WTICO" in symbol:
+        loss = FX_WTICO_STOP_LOSS
     return loss
 
 
@@ -60,15 +64,13 @@ def get_fx_take_profit_rate(symbol: str):
     profit = FX_TAKE_PROFIT
     if "JPY" in symbol:
         profit = FX_JPY_TAKE_PROFIT
+    if "WTICO" in symbol:
+        profit = FX_WTICO_TAKE_PROFIT
     return profit
 
 
 def _fx_stop_loss(symbol: str, quantity: float) -> float:
-    loss = FX_STOP_LOSS
-    if "JPY" in symbol:
-        loss = FX_JPY_STOP_LOSS
-
-    return quantity * loss
+    return quantity * get_fx_stop_loss_rate(symbol)
 
 
 def _crypto_stop_loss(order_position: float, quantity: float) -> float:
@@ -84,11 +86,7 @@ def get_stop_loss(symbol: str, order_position: float, quantity: float) -> float:
 
 
 def _fx_take_profit(symbol: str, quantity: float) -> float:
-    profit = FX_TAKE_PROFIT
-    if "JPY" in symbol:
-        profit = FX_JPY_TAKE_PROFIT
-
-    return profit * quantity
+    return get_fx_take_profit_rate(symbol) * quantity
 
 
 def _crypto_take_profit(order_position: float, quantity: float) -> float:

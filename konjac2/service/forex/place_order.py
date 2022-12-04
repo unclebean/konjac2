@@ -6,17 +6,17 @@ from konjac2.service.utils import get_fx_take_profit_rate, get_fx_stop_loss_rate
 log = logging.getLogger(__name__)
 
 
-def make_trade(symbol: str, signal: str):
+def make_trade(symbol: str, signal: str, quantity=15000):
     log.info(
         f"symbol {symbol} strategy signal {signal}",
     )
     if TradeType.long.name == signal:
-        _long_trade(symbol)
+        _long_trade(symbol, units=quantity)
     if TradeType.short.name == signal:
-        _short_trade(symbol)
+        _short_trade(symbol, units=quantity)
 
 
-def _long_trade(symbol: str, units=15000):
+def _long_trade(symbol: str, units):
     response = get_context().order.market(
         get_account(),
         **{
@@ -31,7 +31,7 @@ def _long_trade(symbol: str, units=15000):
     return response.status
 
 
-def _short_trade(symbol: str, units=15000):
+def _short_trade(symbol: str, units):
     response = get_context().order.market(
         get_account(),
         **{

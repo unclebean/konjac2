@@ -16,8 +16,6 @@ class LogisticRegressionCCIStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, day_candles=None):
-        if candles.index[-1].hour != 8:
-            return
         action, accuracy, _ = self._get_open_signal(day_candles, for_trend=True)
         if action is TradeType.long.name and day_candles.close[-1] > day_candles.open[-1]:
             self._delete_last_in_progress_trade()
