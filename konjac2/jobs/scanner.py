@@ -6,7 +6,6 @@ from pandas_ta import willr
 
 from konjac2.bot.telegram_bot import say_something
 from konjac2.models.trade import TradeStatus, get_last_time_trade
-from konjac2.service.crypto.fetcher import place_trade
 from konjac2.service.fetcher import fetch_data
 from konjac2.indicator.heikin_ashi_momentum import heikin_ashi_mom
 from konjac2.indicator.squeeze_momentum import squeeze
@@ -19,6 +18,7 @@ from konjac2.strategy.bbcci_strategy import BBCCIStrategy
 from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Instruments, Cryptos
 from ..indicator.moving_average import moving_average
+from ..service.crypto.binance import place_trade
 from ..service.crypto.gemini import sell_spot, buy_spot, opened_position_by_symbol
 from ..service.utils import filter_incomplete_h4_data
 from ..strategy.abc_strategy import ABCStrategy
