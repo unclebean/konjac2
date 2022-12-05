@@ -87,7 +87,7 @@ async def close_all_crypto():
             place_trade(trade_symbol, "sell")
 
 
-async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy):
+async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000):
     query_symbol = symbol
     trade_symbol = symbol
     strategy = trading_strategy(symbol=query_symbol)
@@ -119,12 +119,12 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
             and not has_opened_trades(query_symbol)
     ):
         try:
-            make_trade(trade_symbol, trade.trend)
+            make_trade(trade_symbol, trade.trend, quantity=quantity)
             log.info("opened position!")
             say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
-            make_trade(trade_symbol, trade.trend)
+            make_trade(trade_symbol, trade.trend, quantity=quantity)
             say_something("opened position failed!")
     log.info("job running done!")
 
@@ -147,6 +147,7 @@ async def scan_forex():
             print(str(err))
 
     await trade_forex(trading_strategy=LogisticRegressionStrategy)
+    await trade_forex(symbol="WTICO_USD", quantity=80)
 
 
 async def place_crypto_order(symbol: str, trend: str):
