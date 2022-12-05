@@ -147,7 +147,7 @@ async def scan_forex():
             print(str(err))
 
     await trade_forex(trading_strategy=LogisticRegressionStrategy)
-    await trade_forex(symbol="WTICO_USD", quantity=80)
+    await trade_forex(symbol="WTICO_USD", trading_strategy=UTBotStrategy, quantity=80)
 
 
 async def place_crypto_order(symbol: str, trend: str):
