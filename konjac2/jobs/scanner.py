@@ -31,7 +31,6 @@ from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.macd_strategy import MacdStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
-from ..strategy.ut_super_trend_strategy import UTSuperTrendStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
 from ..strategy.vwap_rsi_willr_strategy import VwapRsiWillR
 
