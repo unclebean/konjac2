@@ -31,7 +31,6 @@ from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.macd_rsi_vwap_strategy import MacdRsiVwapStrategy
 from ..strategy.macd_strategy import MacdStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
-from ..strategy.ut_super_trend_strategy import UTSuperTrendStrategy
 from ..strategy.vwap_rsi_strategy import VwapRsiStrategy
 from ..strategy.vwap_rsi_willr_strategy import VwapRsiWillR
 
@@ -140,8 +139,8 @@ async def retrieve_fx_position_state(symbol):
 async def scan_forex():
     for instrument in Instruments:
         try:
-            if is_opened_maximum_positions():
-                break
+            # if is_opened_maximum_positions():
+            #     break
             await trade_forex(instrument)
         except Exception as err:
             print(str(err))
