@@ -139,8 +139,8 @@ async def retrieve_fx_position_state(symbol):
 async def scan_forex():
     for instrument in Instruments:
         try:
-            if is_opened_maximum_positions():
-                break
+            # if is_opened_maximum_positions():
+            #     break
             await trade_forex(instrument)
         except Exception as err:
             print(str(err))
