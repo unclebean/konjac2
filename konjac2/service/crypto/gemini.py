@@ -31,13 +31,6 @@ def buy_spot(symbol):
     price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
     amount = available_balance / price * 0.9
     exchange.create_limit_buy_order(symbol, amount, price)
-    profit = price + price * CP_TAKE_PROFIT
-    loss = price - price * CP_STOP_LOSS
-    currency_code = symbol.replace("/USD", "")
-    order_amount = get_gemini_balance_bu_currency_code(currency_code)
-    exchange.create_limit_sell_order(symbol, order_amount, profit)
-    exchange.create_limit_sell_order(symbol, order_amount, loss)
-    log.info(f"open spot position for profit {profit} & loss {loss}")
 
 
 def sell_spot(symbol):
