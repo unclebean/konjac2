@@ -33,7 +33,7 @@ def get_binance_context():
         {
             "apiKey": settings.binance_api_key,
             "secret": settings.binance_secret,
-            "options": {"defaultMarket": "futures"},
+            "options": {"defaultType": "future"},
         },
     )
     return exchange
