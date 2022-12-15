@@ -49,7 +49,8 @@ class UTBotStrategy(ABCStrategy):
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit or is_loss or pd_data['Sell'].iat[-1] or ema_200[-1] > candles.close[-1]):
+                and (is_profit or is_loss or pd_data['Sell'].iat[-1]
+                     or (ema_200[-1] > candles.close[-1])):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -64,7 +65,8 @@ class UTBotStrategy(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit or is_loss or pd_data['Buy'].iat[-1] or ema_200[-1] < candles.close[-1]):
+                and (is_profit or is_loss or pd_data['Buy'].iat[-1]
+                     or (ema_200[-1] < candles.close[-1])):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
