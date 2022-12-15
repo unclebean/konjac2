@@ -20,45 +20,45 @@ log = logging.getLogger(__name__)
 
 
 async def smart_bot(currency="ETH"):
-    query_symbol = f"{currency}/USD"
-    trade_symbol = f"{currency}/USD"
-    strategy = UTBotStrategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", True, limit=1500)
-    log.info(f"fetching data for {query_symbol} {data.index[-1]}")
+    spot_symbol = f"{currency}/USD"
+    future_symbol = f"{currency}/USDT"
+    strategy = UTBotStrategy(symbol=spot_symbol)
+    data = fetch_data(spot_symbol, "H1", True, limit=1500)
+    log.info(f"fetching data for {spot_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
     # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
 
     # opened_position = opened_position_by_symbol(trade_symbol)
 
     is_exit_trade = strategy.exit_signal(data, d_data)
-    trade = get_last_time_trade(query_symbol)
+    trade = get_last_time_trade(spot_symbol)
     if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
-            sell_spot(trade_symbol)
-            close_position(trade_symbol)
+            sell_spot(spot_symbol)
+            close_position(future_symbol)
             log.info("closed position!")
-            say_something("closed position {}".format(query_symbol))
+            say_something("closed position {}".format(spot_symbol))
         except Exception as err:
             log.error("closed position error! {}".format(err))
-            sell_spot(trade_symbol)
-            close_position(trade_symbol)
+            sell_spot(spot_symbol)
+            close_position(future_symbol)
 
     strategy.seek_trend(data, d_data)
     is_opened_trade = strategy.entry_signal(data, d_data)
-    trade = get_last_time_trade(query_symbol)
+    trade = get_last_time_trade(spot_symbol)
     if is_opened_trade and trade is not None and trade.status == TradeStatus.opened.name:
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         try:
             if trade_type == TradeType.long:
-                buy_spot(trade_symbol)
-            place_trade(trade_symbol, "buy", trade_type)
+                buy_spot(spot_symbol)
+            place_trade(future_symbol, "buy", trade_type)
             log.info("opened position!")
-            say_something("opened position {}".format(query_symbol))
+            say_something("opened position {}".format(spot_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
             if trade_type == TradeType.long:
-                buy_spot(trade_symbol)
-            place_trade(trade_symbol, "buy", trade_type)
+                buy_spot(spot_symbol)
+            place_trade(future_symbol, "buy", trade_type)
             say_something("opened position failed!")
     log.info("job running done!")
 
