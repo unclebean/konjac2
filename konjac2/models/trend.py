@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, Date, Time, PrimaryKeyConstraint
 from . import Base, apply_session
+from datetime import datetime
 
 
 class TradingTrend(Base):
@@ -24,3 +25,19 @@ def get_last_time_trend(symbol):
     ).first()
     session.close()
     return trend
+
+
+def new_trend(symbol, trend_name, trend):
+    session = apply_session()
+    current_date = datetime.now()
+    session.add(
+        TradingTrend(
+            symbol=symbol,
+            trend_name=trend_name,
+            trend=trend,
+            update_date=current_date.date(),
+            update_time=current_date.time(),
+        )
+    )
+    session.commit()
+    session.close()
