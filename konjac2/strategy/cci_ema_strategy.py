@@ -38,7 +38,7 @@ class CCIEMAStrategy(ABCStrategy):
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
                 and ema_30[-1] < candles.close[-1] \
-                and cci7[-2] < -100 < cci7[-1] \
+                and (cci7[-2] < -100 < cci7[-1] or cci7[-3] < -100 < cci7[-2]) \
                 and close_price[-1] > open_price[-1]:
             return self._update_open_trade(TradeType.long.name, candles.close[-1], "ema_34", 0, candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.long.name}")
@@ -46,7 +46,7 @@ class CCIEMAStrategy(ABCStrategy):
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
                 and ema_30[-1] > candles.close[-1] \
-                and cci7[-2] > 100 > cci7[-1] \
+                and (cci7[-2] > 100 > cci7[-1] or cci7[-3] > 100 > cci7[-2])\
                 and close_price[-1] < open_price[-1]:
             return self._update_open_trade(TradeType.short.name, candles.close[-1], "ema_34", 0, candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
