@@ -2,7 +2,6 @@ import logging
 
 from konjac2.service.crypto.context import get_gemini_context
 from konjac2.service.crypto.fetcher import _fetcher
-from konjac2.service.utils import CP_TAKE_PROFIT, CP_STOP_LOSS
 
 log = logging.getLogger(__name__)
 
@@ -25,20 +24,27 @@ def get_gemini_balance_bu_currency_code(currency_code):
 
 
 def buy_spot(symbol):
-    exchange = get_gemini_context()
-    available_balance = get_gemini_balance()
+    try:
+        exchange = get_gemini_context()
+        available_balance = get_gemini_balance()
 
-    price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
-    amount = available_balance / price * 0.9
-    exchange.create_limit_buy_order(symbol, amount, price)
+        price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
+        amount = available_balance / price * 0.9
+        exchange.create_limit_buy_order(symbol, amount, price)
+    except Exception as err:
+        log.info(f"buy spot trading failed {err}")
 
 
 def sell_spot(symbol):
-    exchange = get_gemini_context()
-    currency_code = symbol.replace("/USD", "")
-    price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
-    amount = get_gemini_balance_bu_currency_code(currency_code)
-    exchange.create_limit_sell_order(symbol, amount, price)
+    try:
+        exchange = get_gemini_context()
+        currency_code = symbol.replace("/USD", "")
+        price = gemini_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
+        amount = get_gemini_balance_bu_currency_code(currency_code)
+        exchange.create_limit_sell_order(symbol, amount, price)
+    except Exception as err:
+        log.info(f"sell spot trading failed {err}")
+
 
 
 def opened_positions():
