@@ -20,7 +20,7 @@ def get_gemini_balance():
 def get_gemini_balance_bu_currency_code(currency_code):
     exchange = get_gemini_context()
     response = exchange.fetch_balance()
-    return response.get(currency_code, {"free": 0.0})["free"]
+    return response.get(currency_code, {"total": 0.0})["total"]
 
 
 def buy_spot(symbol):
