@@ -126,8 +126,8 @@ async def scan_forex():
         except Exception as err:
             print(str(err))
 
-    await trade_forex(trading_strategy=LogisticRegressionStrategy)
-    await trade_forex(symbol="WTICO_USD", trading_strategy=UTBotStrategy, quantity=80)
+    # await trade_forex(trading_strategy=LogisticRegressionStrategy)
+    # await trade_forex(symbol="WTICO_USD", trading_strategy=UTBotStrategy, quantity=80)
 
 
 async def scanner_job():
