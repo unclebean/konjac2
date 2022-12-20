@@ -20,9 +20,9 @@ class CCIEMAStrategy(ABCStrategy):
         ema_10 = ema(candles.close, 10)
         ema_30 = ema(candles.close, 30)
         trend = None
-        if ema_10[-2] <= ema_30[-2] and ema_10[-1] > ema_30[-1]:
+        if ema_10[-1] > ema_30[-1]:
             trend = TradeType.long.name
-        if ema_10[-2] >= ema_30[-2] and ema_10[-1] < ema_30[-1] and self.trade_short_order:
+        if ema_10[-1] < ema_30[-1] and self.trade_short_order:
             trend = TradeType.short.name
         if trend is not None:
             self._delete_last_in_progress_trade()
