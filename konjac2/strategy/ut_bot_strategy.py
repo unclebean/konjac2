@@ -24,10 +24,12 @@ class UTBotStrategy(ABCStrategy):
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
         is_sqz = is_squeeze(candles)
+        ema_50 = ema(candles.close, 50)
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
                 and not is_sqz
+                and ema_50[-1] < candles.close[-1]
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -36,6 +38,7 @@ class UTBotStrategy(ABCStrategy):
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
                 and not is_sqz
+                and ema_50[-1] > candles.close[-1]
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -44,13 +47,11 @@ class UTBotStrategy(ABCStrategy):
     def exit_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_close_trade()
         pd_data = ut_bot(candles)
-        ema_200 = ema(candles.close, 200)
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit or is_loss or pd_data['Sell'].iat[-1]
-                     or (ema_200[-1] > candles.close[-1])):
+                and (is_profit or is_loss or pd_data['Sell'].iat[-1]):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -65,8 +66,7 @@ class UTBotStrategy(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit or is_loss or pd_data['Buy'].iat[-1]
-                     or (ema_200[-1] < candles.close[-1])):
+                and (is_profit or is_loss or pd_data['Buy'].iat[-1]):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
