@@ -38,7 +38,7 @@ class CCIEMAStrategy(ABCStrategy):
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
                 and ema_30[-1] < candles.close[-1] \
-                and (cci7[-2] < -100 < cci7[-1]) \
+                and (cci7[-2] < 0 < cci7[-1]) \
                 and close_price[-1] > open_price[-1]:
             return self._update_open_trade(TradeType.long.name, candles.close[-1], "ema_34", 0, candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.long.name}")
@@ -46,7 +46,7 @@ class CCIEMAStrategy(ABCStrategy):
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
                 and ema_30[-1] > candles.close[-1] \
-                and (cci7[-2] > 100 > cci7[-1]) \
+                and (cci7[-2] > 0 > cci7[-1]) \
                 and close_price[-1] < open_price[-1]:
             return self._update_open_trade(TradeType.short.name, candles.close[-1], "ema_34", 0, candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
@@ -57,7 +57,7 @@ class CCIEMAStrategy(ABCStrategy):
         is_loss, stop_loss = self._is_stop_loss(candles)
         cci7 = cci(candles.high, candles.low, candles.close, 7)
         if last_order_status.ready_to_procceed and last_order_status.is_long \
-                and (cci7[-1] > 200 or is_loss or is_profit):
+                and (cci7[-1] > 150 or is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -71,7 +71,7 @@ class CCIEMAStrategy(ABCStrategy):
             )
 
         if last_order_status.ready_to_procceed and last_order_status.is_short \
-                and (cci7[-1] < -200 or is_loss or is_profit):
+                and (cci7[-1] < -150 or is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
