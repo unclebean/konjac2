@@ -12,7 +12,7 @@ Instruments = [
     # "GBP_CAD",
     "GBP_USD",
     "NZD_CAD",
-    "USD_CAD",
+    # "USD_CAD",
     # "USD_JPY",
 ]
 
