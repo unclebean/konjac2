@@ -4,50 +4,41 @@ from pandas_ta import ema
 from pandas_ta.momentum import cci
 
 from .abc_strategy import ABCStrategy
-from ..chart.heikin_ashi import heikin_ashi
 from ..indicator.utils import TradeType
 
 log = logging.getLogger(__name__)
 
 
-class CCIEMAStrategy(ABCStrategy):
-    strategy_name = "cci_ema"
+class DoubleCCIStrategy(ABCStrategy):
+    strategy_name = "double cci"
 
     def __init__(self, symbol: str, trade_short_order=True):
         ABCStrategy.__init__(self, symbol, trade_short_order)
 
     def seek_trend(self, candles, day_candles=None):
-        ema_10 = ema(candles.close, 10)
-        ema_30 = ema(candles.close, 30)
+        cci25 = cci(candles.high, candles.low, candles.close, 25)
+        cci50 = cci(candles.high, candles.low, candles.close, 50)
         trend = None
-        if ema_10[-2] <= ema_30[-2] and ema_10[-1] > ema_30[-1]:
+        if (cci25[-2] < 0 < cci25[-1] and cci50[-1] > 0) or (cci50[-2] < 0 < cci50[-1] and cci25[-1] > 0):
             trend = TradeType.long.name
-        if ema_10[-2] >= ema_30[-2] and ema_10[-1] < ema_30[-1] and self.trade_short_order:
+        if (cci25[-2] > 0 > cci25[-1] and cci50[-1] < 0) or (cci50[-2] > 0 > cci50[-1] and cci25[-1] < 0):
             trend = TradeType.short.name
         if trend is not None:
             self._delete_last_in_progress_trade()
             self._start_new_trade(trend, candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None):
-        cci7 = cci(candles.high, candles.low, candles.close, 7)
-        ema_30 = ema(candles.close, 30)
-        ha_data = heikin_ashi(candles)
-        open_price = ha_data.open
-        close_price = ha_data.close
+        ema_34 = ema(candles.close, 34)
         last_order_status = self._can_open_new_trade()
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and ema_30[-1] < candles.close[-1] \
-                and (cci7[-2] < -100 < cci7[-1]) \
-                and close_price[-1] > open_price[-1]:
+                and ema_34[-1] < candles.close[-1]:
             return self._update_open_trade(TradeType.long.name, candles.close[-1], "ema_34", 0, candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.long.name}")
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and ema_30[-1] > candles.close[-1] \
-                and (cci7[-2] > 100 > cci7[-1]) \
-                and close_price[-1] < open_price[-1]:
+                and ema_34[-1] > candles.close[-1]:
             return self._update_open_trade(TradeType.short.name, candles.close[-1], "ema_34", 0, candles.index[-1])
             # say_something(f"{self.symbol} open {TradeType.short.name}")
 
@@ -55,14 +46,13 @@ class CCIEMAStrategy(ABCStrategy):
         last_order_status = self._can_close_trade()
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
-        cci7 = cci(candles.high, candles.low, candles.close, 7)
         if last_order_status.ready_to_procceed and last_order_status.is_long \
-                and (cci7[-1] > 200 or is_loss or is_profit):
+                and (is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
                 "ema_34",
-                cci7[-1],
+                0,
                 candles.index[-1],
                 is_profit,
                 is_loss,
@@ -71,12 +61,12 @@ class CCIEMAStrategy(ABCStrategy):
             )
 
         if last_order_status.ready_to_procceed and last_order_status.is_short \
-                and (cci7[-1] < -200 or is_loss or is_profit):
+                and (is_loss or is_profit):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
                 "ema_34",
-                cci7[-1],
+                0,
                 candles.index[-1],
                 is_profit,
                 is_loss,
