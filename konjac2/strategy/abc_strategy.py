@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 class ABCStrategy(ABC):
     strategy_name = "abc strategy"
-    balance = 10000
+    balance = 100000
 
     def __init__(self, symbol: str, trade_short_order=True):
         self.symbol = symbol
@@ -259,7 +259,7 @@ class ABCStrategy(ABC):
 
         return None
 
-    def _get_ris_vwap_trend(self, candles):
+    def _get_rsi_vwap_trend(self, candles):
         r_vwap = RSI_VWAP(candles, group_by="week")
         if r_vwap[-3] < 5 and r_vwap[-2] < 5 and r_vwap[-1] < 5:
             return TradeType.short.name
