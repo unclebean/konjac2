@@ -16,22 +16,21 @@ class LogisticRegressionCCIStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, day_candles=None):
-        action, accuracy, _ = self._get_open_signal(day_candles, for_trend=True)
+        action, accuracy, _ = self._get_open_signal(day_candles, for_trend=False)
         if action is TradeType.long.name and day_candles.close[-1] > day_candles.open[-1]:
             self._delete_last_in_progress_trade()
-            self._start_new_trade(action, candles.index[-1], h4_date=day_candles.index[-1])
+            self._start_new_trade(TradeType.short.name, candles.index[-1], h4_date=day_candles.index[-1])
         if action is TradeType.short.name and day_candles.close[-1] < day_candles.open[-1]:
             self._delete_last_in_progress_trade()
-            self._start_new_trade(action, candles.index[-1], h4_date=day_candles.index[-1])
+            self._start_new_trade(TradeType.long.name, candles.index[-1], h4_date=day_candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
-        cci7 = cci(candles.high[-100:], candles.low[-100:], candles.close[-100:], 7)
-        if last_order_status.ready_to_procceed and last_order_status.is_long and cci7[-2] < -100 < cci7[-1]:
+        if last_order_status.ready_to_procceed and last_order_status.is_long:
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
-        if last_order_status.ready_to_procceed and last_order_status.is_short and cci7[-2] > 100 > cci7[-1]:
+        if last_order_status.ready_to_procceed and last_order_status.is_short:
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
@@ -43,7 +42,7 @@ class LogisticRegressionCCIStrategy(ABCStrategy):
         cci7 = cci(candles.high[-100:], candles.low[-100:], candles.close[-100:], 7)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (candles.index[-1].hour == 23 or cci7[-1] > 200 or is_profit or is_loss):
+                and (candles.index[-1].hour == 23 or is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
@@ -58,7 +57,7 @@ class LogisticRegressionCCIStrategy(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (candles.index[-1].hour == 23 or cci7[-1] < -200 or is_profit or is_loss):
+                and (candles.index[-1].hour == 23 or is_profit or is_loss):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -72,7 +71,7 @@ class LogisticRegressionCCIStrategy(ABCStrategy):
             )
 
     def _get_open_signal(self, candles, for_trend=True):
-        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0,
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=1,
                                                             for_trend=for_trend)
         most_important_feature = max(features, key=lambda f: f["Importance"])
         if trend is None:

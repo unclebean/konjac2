@@ -14,7 +14,7 @@ class StochSarStrategy(ABCStrategy):
         stoch_d = stoch_data["STOCHd_5_5_5"]
         psar_ = psar(candles.high, candles.low, candles.close)
         last_psar = psar_['PSARl_0.02_0.2'][-1]
-        trend = self._get_ris_vwap_trend(candles)
+        trend = self._get_rsi_vwap_trend(candles)
         hurst_result = get_hurst_exponent(candles.close.values)
         if stoch_k[-1] > stoch_d[-1] \
                 and candles.close[-1] > last_psar \

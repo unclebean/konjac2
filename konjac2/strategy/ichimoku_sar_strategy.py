@@ -10,7 +10,7 @@ class IchimokuSar(ABCStrategy):
 
     def seek_trend(self, candles, day_candles=None):
         is_long, is_short = self._get_signals(candles, day_candles)
-        trend = self._get_ris_vwap_trend(candles)
+        trend = self._get_rsi_vwap_trend(candles)
         self._delete_last_in_progress_trade()
         if trend is TradeType.long.name:
             self._start_new_trade(TradeType.long.name, candles.index[-1], h4_date=day_candles.index[-1])
