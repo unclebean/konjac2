@@ -14,6 +14,7 @@ from ..service.crypto.binance import place_trade, close_position
 from ..service.crypto.gemini import sell_spot, buy_spot
 from ..strategy.abc_strategy import ABCStrategy
 from ..strategy.cci_ema_strategy import CCIEMAStrategy
+from ..strategy.ema_squeeze_strategy import EmaSqueezeStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
 
 log = logging.getLogger(__name__)
@@ -118,13 +119,10 @@ async def retrieve_fx_position_state(symbol):
 
 
 async def scan_forex():
-    for instrument in Instruments:
-        try:
-            # if is_opened_maximum_positions():
-            #     break
-            await trade_forex(instrument)
-        except Exception as err:
-            print(str(err))
+    try:
+        await trade_forex(symbol="USD_JPY", trading_strategy=EmaSqueezeStrategy, quantity=5000)
+    except Exception as err:
+        log.error(str(err))
 
     # await trade_forex(trading_strategy=LogisticRegressionStrategy)
     # await trade_forex(symbol="WTICO_USD", trading_strategy=UTBotStrategy, quantity=80)
@@ -138,6 +136,6 @@ async def scanner_job():
 
 async def scanner_h1_job():
     await asyncio.sleep(30)
-    # await scan_forex()
+    await scan_forex()
     await asyncio.sleep(60)
     await scan_crypto()
