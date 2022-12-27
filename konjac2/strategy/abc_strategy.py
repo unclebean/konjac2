@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 class ABCStrategy(ABC):
     strategy_name = "abc strategy"
-    balance = 100000
+    balance = 4000
 
     def __init__(self, symbol: str, trade_short_order=True):
         self.symbol = symbol
