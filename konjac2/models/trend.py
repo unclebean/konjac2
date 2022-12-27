@@ -21,7 +21,7 @@ class TradingTrend(Base):
 def get_last_time_trend(symbol):
     session = apply_session()
     trend = (
-        session.query(TradingTrend).filter(TradingTrend.symbol == symbol).order_by(TradingTrend.update_date.desc())
+        session.query(TradingTrend).filter(TradingTrend.symbol == symbol).order_by(TradingTrend.update_time.desc())
     ).first()
     session.close()
     return trend
