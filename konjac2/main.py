@@ -20,7 +20,7 @@ app.include_router(ChartRouter)
 async def startup_event():
     file_path = os.environ.get("konjac_log", "./logs/konjac_api.log")
     logger = logging.getLogger()
-    fhandler = RotatingFileHandler(file_path, maxBytes=10000000, backupCount=5)
+    fhandler = RotatingFileHandler(file_path, maxBytes=5000000, backupCount=5)
     formatter = logging.Formatter("%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s")
     fhandler.setFormatter(formatter)
     logger.addHandler(fhandler)
