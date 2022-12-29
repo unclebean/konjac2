@@ -21,10 +21,11 @@ log = logging.getLogger(__name__)
 
 
 async def smart_bot(currency="ETH"):
+    query_symbol = f"{currency}/BUSD"
     spot_symbol = f"{currency}/USD"
     future_symbol = f"{currency}/USDT"
     strategy = UTBotStrategy(symbol=spot_symbol)
-    data = fetch_data(spot_symbol, "H1", True, limit=1500)
+    data = fetch_data(query_symbol, "H1", True, limit=1500)
     log.info(f"fetching data for {spot_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
     # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
