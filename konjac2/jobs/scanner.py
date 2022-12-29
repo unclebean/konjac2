@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 async def smart_bot(currency="ETH"):
-    query_symbol = f"{currency}/BUSD"
+    query_symbol = f"{currency}/USD"
     spot_symbol = f"{currency}/USD"
     future_symbol = f"{currency}/USDT"
     strategy = UTBotStrategy(symbol=spot_symbol)
