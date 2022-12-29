@@ -24,8 +24,8 @@ TIMEFRAME_CCXT_MAPPER = {
 def crypto_fetcher(symbol, timeframe, complete=True, **kwargs):
     since = kwargs.get("since", None)
     limit = kwargs.get("limit", None)
-    exchange = get_gemini_context()
-    # exchange = get_context()
+    # exchange = get_gemini_context()
+    exchange = get_binance_context()
     return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
 
 
