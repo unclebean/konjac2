@@ -20,7 +20,7 @@ def start(update: Update, context: CallbackContext):
 
 def say_something(something):
     requests.get(
-        "https://api.telegram.org/bot1244865740:AAF0Noszz4SefXcZWUU0E-79yC31qkwxIb4/sendMessage",
+        f"https://api.telegram.org/{settings.telegram_bot}/sendMessage",
         params={
             "parse_mode": "HTML",
             "chat_id": "1068224058",
