@@ -8,7 +8,6 @@ from konjac2.models.trade import TradeStatus, get_last_time_trade
 from konjac2.service.fetcher import fetch_data
 from konjac2.indicator.utils import TradeType, resample_to_interval
 from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
-from konjac2.strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from . import Instruments
 from ..service.crypto.binance import place_trade, close_position
 from ..service.crypto.gemini import sell_spot, buy_spot
@@ -21,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 async def smart_bot(currency="ETH"):
-    query_symbol = f"{currency}/USD"
+    query_symbol = f"{currency}/USDT"
     spot_symbol = f"{currency}/USD"
     future_symbol = f"{currency}/USDT"
     strategy = UTBotStrategy(symbol=spot_symbol)
@@ -36,13 +35,15 @@ async def smart_bot(currency="ETH"):
     trade = get_last_time_trade(spot_symbol)
     if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
-            sell_spot(spot_symbol)
+            # disable spot trade for now
+            # sell_spot(spot_symbol)
             close_position(future_symbol)
             log.info("closed position!")
             say_something("closed position {}".format(spot_symbol))
         except Exception as err:
             log.error("closed position error! {}".format(err))
-            sell_spot(spot_symbol)
+            # disable spot trade for now
+            # sell_spot(spot_symbol)
             close_position(future_symbol)
 
     strategy.seek_trend(data, d_data)
@@ -51,22 +52,24 @@ async def smart_bot(currency="ETH"):
     if is_opened_trade and trade is not None and trade.status == TradeStatus.opened.name:
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         try:
-            if trade_type == TradeType.long:
-                buy_spot(spot_symbol)
+            # disable spot trade for now
+            # if trade_type == TradeType.long:
+            #     buy_spot(spot_symbol)
             place_trade(future_symbol, "buy", trade_type)
             log.info("opened position!")
             say_something("opened position {}".format(spot_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
-            if trade_type == TradeType.long:
-                buy_spot(spot_symbol)
+            # disable spot trade for now
+            # if trade_type == TradeType.long:
+            #     buy_spot(spot_symbol)
             place_trade(future_symbol, "buy", trade_type)
             say_something("opened position failed!")
     log.info("job running done!")
 
 
 async def scan_crypto():
-    await smart_bot()
+    await smart_bot(currency="XRP")
 
 
 async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000):
