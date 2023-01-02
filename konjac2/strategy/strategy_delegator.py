@@ -21,6 +21,7 @@ class StrategyDelegator:
         is_loss, stop_loss = cls.is_stop_loss(symbol, candles)
         if last_order_status.ready_to_procceed and last_order_status.is_long:
             return cls.update_close_trade(
+                symbol,
                 TradeType.short.name,
                 candles.close[-1],
                 "exchange",
@@ -34,6 +35,7 @@ class StrategyDelegator:
 
         if last_order_status.ready_to_procceed and last_order_status.is_short:
             return cls.update_close_trade(
+                symbol,
                 TradeType.long.name,
                 candles.close[-1],
                 "exchange",
