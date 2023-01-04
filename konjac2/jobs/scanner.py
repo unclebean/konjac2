@@ -36,14 +36,14 @@ async def smart_bot(currency="ETH"):
     if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
         try:
             # disable spot trade for now
-            # sell_spot(spot_symbol)
+            sell_spot(spot_symbol)
             close_position(future_symbol)
             log.info("closed position!")
             say_something("closed position {}".format(spot_symbol))
         except Exception as err:
             log.error("closed position error! {}".format(err))
             # disable spot trade for now
-            # sell_spot(spot_symbol)
+            sell_spot(spot_symbol)
             close_position(future_symbol)
 
     strategy.seek_trend(data, d_data)
@@ -53,23 +53,23 @@ async def smart_bot(currency="ETH"):
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         try:
             # disable spot trade for now
-            # if trade_type == TradeType.long:
-            #     buy_spot(spot_symbol)
+            if trade_type == TradeType.long:
+                buy_spot(spot_symbol)
             place_trade(future_symbol, "buy", trade_type)
             log.info("opened position!")
             say_something("opened position {}".format(spot_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
             # disable spot trade for now
-            # if trade_type == TradeType.long:
-            #     buy_spot(spot_symbol)
+            if trade_type == TradeType.long:
+                buy_spot(spot_symbol)
             place_trade(future_symbol, "buy", trade_type)
             say_something("opened position failed!")
     log.info("job running done!")
 
 
 async def scan_crypto():
-    await smart_bot(currency="XRP")
+    await smart_bot()
 
 
 async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000):
