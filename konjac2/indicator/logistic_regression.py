@@ -5,13 +5,12 @@ from pandas_ta import amat, aroon, chop, decay, decreasing, dpo, increasing, psa
 from pandas_ta.overlap import ema, ichimoku
 from pandas_ta.volatility import bbands, atr
 from pandas_ta.momentum import macd, cci, rsi, stoch, mom
-from pandas_ta.volume import obv
 from pandas_ta.trend import adx
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler
+
 from .vwap import VWAP
-from ..chart.heikin_ashi import heikin_ashi
 
 scaler = MinMaxScaler()
 period = 34
@@ -107,13 +106,13 @@ def _get_params():
 def prepare_indicators_data(candlestick, delta_hours=0, for_trend=True):
     result = np.where(candlestick["close"].shift(-1) > candlestick["close"], 1, 0)[1:]
     # candlestick.apply(lambda row: 1 if row.close > row.open else 0, axis=1)
-    indicators = trend_params(candlestick) if for_trend else rsi_stoch_macd_params(candlestick)
+    indicators = trend_params(candlestick) if for_trend else new_params(candlestick)
 
     (count_y,) = result.shape
     merged_indicators = indicators
     # merged_indicators = merge_lag_data(indicators)
 
-    merged_indicators = pd.DataFrame(scaler.fit_transform(merged_indicators), columns=merged_indicators.columns)
+    # merged_indicators = pd.DataFrame(scaler.fit_transform(merged_indicators), columns=merged_indicators.columns)
 
     row_x, _ = merged_indicators.shape
 
@@ -121,19 +120,27 @@ def prepare_indicators_data(candlestick, delta_hours=0, for_trend=True):
 
 
 def sol_params(candlestick):
-    heikin_ashi_data = heikin_ashi(candlestick)
-
-    close_price = heikin_ashi_data.close
-    obv_values = obv(close_price, heikin_ashi_data.volume)
-    obv_ema200 = ema(obv_values, 200)
-
     return pd.DataFrame(
         {
-            "close_shift1": close_price - close_price.shift(1),
-            "close_shift2": close_price.shift(1) - close_price.shift(2),
-            "close_shift3": close_price.shift(2) - close_price.shift(3),
-            "close_shift4": close_price.shift(3) - close_price.shift(4),
-            "close_shift5": close_price.shift(4) - close_price.shift(5),
+            "max_high1": candlestick.close.shift(1).rolling(window=8).max(),
+            "max_high2": candlestick.close.shift(1).rolling(window=13).max(),
+            "max_high3": candlestick.close.shift(1).rolling(window=21).max(),
+            "max_high4": candlestick.close.shift(1).rolling(window=34).max(),
+            "max_high5": candlestick.close.shift(1).rolling(window=55).max(),
+            "min_low1": candlestick.close.shift(1).rolling(window=8).min(),
+            "min_low2": candlestick.close.shift(1).rolling(window=13).min(),
+            "min_low3": candlestick.close.shift(1).rolling(window=21).min(),
+            "min_low4": candlestick.close.shift(1).rolling(window=34).min(),
+            "min_low5": candlestick.close.shift(1).rolling(window=55).min(),
+            "avg1": candlestick.close.shift(1).rolling(window=8).mean(),
+            "avg2": candlestick.close.shift(1).rolling(window=13).mean(),
+            "avg3": candlestick.close.shift(1).rolling(window=21).mean(),
+            "avg4": candlestick.close.shift(1).rolling(window=34).mean(),
+            "avg5": candlestick.close.shift(1).rolling(window=55).mean(),
+            # "hust20": get_hurst_exponent(candlestick.close.values, max_lag=20),
+            # "hust50": get_hurst_exponent(candlestick.close.values, max_lag=30),
+            # "hust80": get_hurst_exponent(candlestick.close.values, max_lag=80),
+            # "hust120": get_hurst_exponent(candlestick.close.values, max_lag=120),
         },
         index=candlestick.index,
     )

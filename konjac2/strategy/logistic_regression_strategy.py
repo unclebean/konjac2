@@ -1,5 +1,7 @@
 import logging
 
+from pandas_ta import ema
+
 from ..indicator.utils import TradeType
 from ..indicator.logistic_regression import predict_xgb_next_ticker
 from .abc_strategy import ABCStrategy
@@ -14,9 +16,7 @@ class LogisticRegressionStrategy(ABCStrategy):
         self.symbol = symbol
 
     def seek_trend(self, candles, day_candles=None):
-        if candles.index[-1].hour != 8:
-            return
-        action, accuracy, _ = self._get_open_signal(day_candles, for_trend=True)
+        action, accuracy, _ = self._get_open_signal(candles, for_trend=False, predict_step=0)
         if action is TradeType.long.name and day_candles.close[-1] > day_candles.open[-1]:
             self._delete_last_in_progress_trade()
             self._start_new_trade(action, candles.index[-1], h4_date=day_candles.index[-1])
@@ -26,22 +26,33 @@ class LogisticRegressionStrategy(ABCStrategy):
 
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
-        if last_order_status.ready_to_procceed and last_order_status.is_long:
+        ema50 = ema(candles.close, length=50)
+        action, accuracy, _ = self._get_open_signal(candles, for_trend=False, predict_step=1)
+        if last_order_status.ready_to_procceed and last_order_status.is_long \
+                and action is TradeType.long.name \
+                and ema50[-3] < candles.close[-3] \
+                and ema50[-2] < candles.close[-2] \
+                and ema50[-1] < candles.close[-1]:
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
-        if last_order_status.ready_to_procceed and last_order_status.is_short:
+        if last_order_status.ready_to_procceed and last_order_status.is_short \
+                and action is TradeType.short.name \
+                and ema50[-3] > candles.close[-3] \
+                and ema50[-2] > candles.close[-2] \
+                and ema50[-1] > candles.close[-1]:
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
             )
 
     def exit_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_close_trade()
+        action, accuracy, _ = self._get_open_signal(candles, for_trend=False, predict_step=0)
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit or is_loss):
+                and (is_profit or is_loss or action is not TradeType.long.name):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
@@ -56,7 +67,7 @@ class LogisticRegressionStrategy(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit or is_loss):
+                and (is_profit or is_loss or action is not TradeType.short.name):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -69,8 +80,8 @@ class LogisticRegressionStrategy(ABCStrategy):
                 stop_loss,
             )
 
-    def _get_open_signal(self, candles, for_trend=True):
-        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=0,
+    def _get_open_signal(self, candles, for_trend=True, predict_step=1):
+        trend, accuracy, features = predict_xgb_next_ticker(candles.copy(deep=True), predict_step=predict_step,
                                                             for_trend=for_trend)
         most_important_feature = max(features, key=lambda f: f["Importance"])
         if trend is None:
