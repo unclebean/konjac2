@@ -14,6 +14,7 @@ from ..service.crypto.gemini import sell_spot, buy_spot
 from ..strategy.abc_strategy import ABCStrategy
 from ..strategy.cci_ema_strategy import CCIEMAStrategy
 from ..strategy.ema_squeeze_strategy import EmaSqueezeStrategy
+from ..strategy.logistic_regression_strategy import LogisticRegressionStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
 
 log = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
     query_symbol = symbol
     trade_symbol = symbol
     strategy = trading_strategy(symbol=query_symbol)
-    data = fetch_data(query_symbol, "H1", True, counts=5000)
+    data = fetch_data(query_symbol, "H1", True, counts=1501)
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
     d_data = resample_to_interval(data, 360)
 
@@ -125,6 +126,7 @@ async def retrieve_fx_position_state(symbol):
 async def scan_forex():
     try:
         await trade_forex(symbol="USD_JPY", trading_strategy=EmaSqueezeStrategy, quantity=5000)
+        await trade_forex(symbol="AUD_USD", trading_strategy=LogisticRegressionStrategy, quantity=5000)
     except Exception as err:
         log.error(str(err))
 
