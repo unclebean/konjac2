@@ -79,7 +79,7 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
     strategy = trading_strategy(symbol=query_symbol)
     data = fetch_data(query_symbol, "H1", True, counts=1501)
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
-    d_data = resample_to_interval(data, 360)
+    d_data = resample_to_interval(data, 60)
 
     is_exit_trade = strategy.exit_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
