@@ -73,10 +73,10 @@ async def scan_crypto():
     await smart_bot()
 
 
-async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000, trade_short_order=True):
+async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000, trade_short_order=True, trade_long_order=True):
     query_symbol = symbol
     trade_symbol = symbol
-    strategy = trading_strategy(symbol=query_symbol, trade_short_order=trade_short_order)
+    strategy = trading_strategy(symbol=query_symbol, trade_short_order=trade_short_order, trade_long_order=trade_long_order)
     data = fetch_data(query_symbol, "H1", True, counts=1501)
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
     d_data = resample_to_interval(data, 60)
