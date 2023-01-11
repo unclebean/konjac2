@@ -12,14 +12,13 @@ log = logging.getLogger(__name__)
 class LogisticRegressionStrategy(ABCStrategy):
     strategy_name = "logistic regression strategy"
 
-    def __init__(self, symbol: str, trade_short_order=True):
-        super().__init__(symbol, trade_short_order)
+    def __init__(self, symbol: str, trade_short_order=True, trade_long_order=True):
+        super().__init__(symbol, trade_short_order, trade_long_order)
         self.symbol = symbol
-        self.trade_short_order = trade_short_order
 
     def seek_trend(self, candles, day_candles=None):
         action, accuracy, _ = self._get_open_signal(candles, for_trend=False, predict_step=0)
-        if action is TradeType.long.name and day_candles.close[-1] > day_candles.open[-1]:
+        if action is TradeType.long.name and day_candles.close[-1] > day_candles.open[-1] and self.trade_long_order:
             self._delete_last_in_progress_trade()
             self._start_new_trade(action, candles.index[-1], h4_date=day_candles.index[-1])
         if action is TradeType.short.name and day_candles.close[-1] < day_candles.open[-1] and self.trade_short_order:

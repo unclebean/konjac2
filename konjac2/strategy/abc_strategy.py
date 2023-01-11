@@ -16,9 +16,10 @@ class ABCStrategy(ABC):
     strategy_name = "abc strategy"
     balance = 100000
 
-    def __init__(self, symbol: str, trade_short_order=True):
+    def __init__(self, symbol: str, trade_short_order=True, trade_long_order=True):
         self.symbol = symbol
         self.trade_short_order = trade_short_order
+        self.trade_long_order = trade_long_order
 
     @abstractmethod
     def seek_trend(self, candles, day_candles=None):
