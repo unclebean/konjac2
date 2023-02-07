@@ -9,10 +9,13 @@ log = logging.getLogger(__name__)
 
 
 def place_trade(symbol, side, trade_type: TradeType, tp=0, sl=0, loss_position=None):
-    if side == "buy":
-        open_position(symbol, trade_type, tp, sl, loss_position)
-    else:
-        close_position(symbol)
+    try:
+        if side == "buy":
+            open_position(symbol, trade_type, tp, sl, loss_position)
+        else:
+            close_position(symbol)
+    except Exception as err:
+        log.error("place order error {}".format(err))
 
 
 def open_position(symbol, trade_type: TradeType, tp=0, sl=0, loss_position=None):

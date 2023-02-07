@@ -12,9 +12,11 @@ from . import Instruments
 from ..service.crypto.binance import place_trade, close_position
 from ..service.crypto.gemini import sell_spot, buy_spot
 from ..strategy.abc_strategy import ABCStrategy
+from ..strategy.bbcci_strategy import BBCCIStrategy
 from ..strategy.cci_ema_strategy import CCIEMAStrategy
 from ..strategy.ema_squeeze_strategy import EmaSqueezeStrategy
 from ..strategy.logistic_regression_strategy import LogisticRegressionStrategy
+from ..strategy.rsi_trend_don_chain_strategy import RsiTrendDonChainStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
 
 log = logging.getLogger(__name__)
@@ -25,7 +27,8 @@ async def smart_bot(currency="ETH"):
     spot_symbol = f"{currency}/USD"
     future_symbol = f"{currency}/USDT"
     strategy = UTBotStrategy(symbol=spot_symbol)
-    data = fetch_data(query_symbol, "H1", True, limit=1500)
+    # somehow gemini only return finished timeframe data
+    data = fetch_data(query_symbol, "H1", False, limit=1500)
     log.info(f"fetching data for {spot_symbol} {data.index[-1]}")
     d_data = resample_to_interval(data, 360)
     # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
@@ -73,11 +76,11 @@ async def scan_crypto():
     await smart_bot()
 
 
-async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000, trade_short_order=True, trade_long_order=True):
+async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CCIEMAStrategy, quantity=15000, trade_short_order=True, trade_long_order=True, timeframe="H1"):
     query_symbol = symbol
     trade_symbol = symbol
     strategy = trading_strategy(symbol=query_symbol, trade_short_order=trade_short_order, trade_long_order=trade_long_order)
-    data = fetch_data(query_symbol, "H1", True, counts=1501)
+    data = fetch_data(query_symbol, timeframe, True, counts=1501)
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
     d_data = resample_to_interval(data, 60)
 
@@ -125,9 +128,10 @@ async def retrieve_fx_position_state(symbol):
 
 async def scan_forex():
     try:
-        await trade_forex(symbol="USD_JPY", trading_strategy=EmaSqueezeStrategy, quantity=5000)
-        await trade_forex(symbol="AUD_USD", trading_strategy=LogisticRegressionStrategy, quantity=5000)
-        await trade_forex(symbol="EUR_USD", trading_strategy=LogisticRegressionStrategy, quantity=5000, trade_short_order=False)
+        # await trade_forex(symbol="USD_JPY", trading_strategy=EmaSqueezeStrategy, quantity=5000)
+        # await trade_forex(symbol="AUD_USD", trading_strategy=LogisticRegressionStrategy, quantity=5000)
+        # await trade_forex(symbol="EUR_USD", trading_strategy=LogisticRegressionStrategy, quantity=5000, trade_short_order=False)
+        log.info("stop h1 job scanner")
     except Exception as err:
         log.error(str(err))
 
@@ -137,8 +141,7 @@ async def scan_forex():
 
 async def scanner_job():
     for instrument in Instruments:
-        pass
-        # await retrieve_fx_position_state(instrument)
+        await trade_forex(symbol=instrument, trading_strategy=RsiTrendDonChainStrategy, quantity=5000)
 
 
 async def scanner_h1_job():

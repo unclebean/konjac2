@@ -111,3 +111,14 @@ def is_long_or_short(candles):
                or (lower_high > higher_high and lower_high > higher_low)
 
     return is_long, is_short
+
+
+def is_wick_bar(candles)->bool:
+    if candles.open[-1] < candles.close[-1]:
+        bar_height = abs(candles.high[-1] - candles.low[-1])
+        wick_height = abs(candles.high[-1] - candles.close[-1])
+        return wick_height / bar_height > 0.2
+    else:
+        bar_height = abs(candles.high[-1] - candles.low[-1])
+        wick_height = abs(candles.low[-1] - candles.close[-1])
+        return wick_height / bar_height > 0.2
