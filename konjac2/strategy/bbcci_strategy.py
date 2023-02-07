@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 class BBCCIStrategy(ABCStrategy):
     strategy_name = "bbcci"
 
-    def __init__(self, symbol: str):
+    def __init__(self, symbol: str, trade_short_order=True, trade_long_order=True):
         ABCStrategy.__init__(self, symbol)
 
     def seek_trend(self, candles, day_candles=None):

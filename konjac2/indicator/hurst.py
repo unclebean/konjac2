@@ -1,3 +1,4 @@
+import numpy as np
 from numpy import log, polyfit, sqrt, std, subtract
 
 """
@@ -213,7 +214,7 @@ def hurst(ts):
     return poly[0] * 2.0
 
 
-def get_hurst_exponent(time_series, max_lag=55):
+def get_hurst_exponent_bak(time_series, max_lag=55):
     """Returns the Hurst Exponent of the time series"""
     lags = range(2, max_lag)
     # variances of the lagged differences
@@ -221,3 +222,18 @@ def get_hurst_exponent(time_series, max_lag=55):
     # calculate the slope of the log plot -> the Hurst Exponent
     reg = polyfit(log(lags), log(tau), 1)
     return reg[0] * 2
+
+
+def get_hurst_exponent(ts, max_lag=55):
+    lags = range(2, max_lag)
+    tau = [np.std(np.subtract(ts[lag:], ts[:-lag])) for lag in lags]
+
+    return np.polyfit(np.log(lags), np.log(tau), 1)[0]
+
+
+def avg_hurst(ts):
+    all_hurst = []
+    for lag in [20, 55, 100, 250]:
+        all_hurst.append(get_hurst_exponent(ts, lag))
+
+    return sum(all_hurst) / len(all_hurst)
