@@ -20,13 +20,12 @@ class RsiTrendDonChainStrategy(ABCStrategy):
 
     def entry_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_open_new_trade()
-        upper_don, _, lower_don = don_chain_channels(candles)
+        upper_don, mid_don, lower_don = don_chain_channels(candles)
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
                 and lower_don[-2] == lower_don[-1]
-                and lower_don[-2] >= candles.close[-2]
-                and lower_don[-1] < candles.close[-1]
+                and mid_don[-1] > candles.close[-1]
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -35,8 +34,7 @@ class RsiTrendDonChainStrategy(ABCStrategy):
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
                 and upper_don[-2] == upper_don[-1]
-                and upper_don[-2] <= candles.close[-2]
-                and upper_don[-1] > candles.close[-1]
+                and mid_don[-1] < candles.close[-1]
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
