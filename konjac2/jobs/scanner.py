@@ -146,6 +146,7 @@ async def scanner_job():
 
 async def scanner_h1_job():
     await asyncio.sleep(30)
+    await scanner_job()
     await scan_forex()
     await asyncio.sleep(60)
     await scan_crypto()
