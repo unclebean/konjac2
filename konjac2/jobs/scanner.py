@@ -93,7 +93,7 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
         try:
             close_trade(trade_symbol)
             log.info("closed position!")
-            say_something("closed position {}".format(query_symbol))
+            # say_something("closed position {}".format(query_symbol))
         except Exception as err:
             log.error("closed position error! {}".format(err))
             close_trade(trade_symbol)
@@ -110,7 +110,7 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
         try:
             make_trade(trade_symbol, trade.trend, quantity=quantity)
             log.info("opened position!")
-            say_something("opened position {}".format(query_symbol))
+            # say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
             make_trade(trade_symbol, trade.trend, quantity=quantity)
