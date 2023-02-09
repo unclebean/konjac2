@@ -13,9 +13,9 @@ class RsiTrendDonChainStrategy(ABCStrategy):
     def seek_trend(self, candles, day_candles=None):
         trend = rsi_trend(candles)
         self._delete_last_in_progress_trade()
-        if trend[-1] > 0:
+        if trend[-1] > 0 and trend[-1] > 5:
             self._start_new_trade(TradeType.long.name, candles.index[-1], h4_date=day_candles.index[-1])
-        if trend[-1] < 0:
+        if trend[-1] < 0 and trend[-1] < -5:
             self._start_new_trade(TradeType.short.name, candles.index[-1], h4_date=day_candles.index[-1])
 
     def entry_signal(self, candles, day_candles=None) -> bool:
