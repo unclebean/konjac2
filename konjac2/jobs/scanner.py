@@ -140,12 +140,12 @@ async def scan_forex():
 
 
 async def scanner_job():
+    await asyncio.sleep(30)
     for instrument in Instruments:
         await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=RsiTrendDonChainStrategy, quantity=5000)
 
 
 async def scanner_h1_job():
-    await asyncio.sleep(30)
     await scanner_job()
     await scan_forex()
     await asyncio.sleep(60)
