@@ -25,7 +25,7 @@ class RsiTrendDonChainStrategy(ABCStrategy):
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
                 and lower_don[-2] == lower_don[-1]
-                and mid_don[-1] > candles.close[-1]
+                and lower_don[-1] == candles.low[-1]
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -34,7 +34,7 @@ class RsiTrendDonChainStrategy(ABCStrategy):
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
                 and upper_don[-2] == upper_don[-1]
-                and mid_don[-1] < candles.close[-1]
+                and upper_don[-1] == candles.high[-1]
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -42,12 +42,12 @@ class RsiTrendDonChainStrategy(ABCStrategy):
 
     def exit_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_close_trade()
-        _, mid_don, _ = don_chain_channels(candles)
+        upper_don, mid_don, lower_don = don_chain_channels(candles)
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit or is_loss or mid_don[-1] < candles.close[-1]):
+                and (is_profit or is_loss or upper_don[-1] == candles.high[-1]):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -62,7 +62,7 @@ class RsiTrendDonChainStrategy(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit or is_loss or mid_don[-1] > candles.close[-1]):
+                and (is_profit or is_loss or lower_don[-1] > candles.low[-1]):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],

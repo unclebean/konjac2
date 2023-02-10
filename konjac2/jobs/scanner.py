@@ -81,6 +81,7 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
     trade_symbol = symbol
     strategy = trading_strategy(symbol=query_symbol, trade_short_order=trade_short_order, trade_long_order=trade_long_order)
     data = fetch_data(query_symbol, timeframe, True, counts=2001)
+    log.info(f"fetching data for {symbol} {data.index[-1]}")
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
     d_data = resample_to_interval(data, 60)
 
@@ -140,7 +141,7 @@ async def scan_forex():
 
 
 async def scanner_job():
-    await asyncio.sleep(30)
+    await asyncio.sleep(10)
     for instrument in Instruments:
         await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=RsiTrendDonChainStrategy, quantity=5000)
 
