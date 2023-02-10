@@ -9,7 +9,6 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 class TradeSignal(BaseModel):
-    symbol: str
     signal: str
     action: str
 
@@ -20,6 +19,6 @@ async def get_daily_trend():
     return daily_trends
 
 
-@router.post("/trading_view/signal", tags=["trend"])
-async def receive_trading_view_signal(trade_signal: TradeSignal):
-    log.info(f'symbol: {trade_signal.symbol} signal: {trade_signal.signal} action: {trade_signal.action}')
+@router.post("/trading_view/signal/{symbol}", tags=["trend"])
+async def receive_trading_view_signal(symbol: str, trade_signal: TradeSignal):
+    log.info(f'symbol: {symbol} signal: {trade_signal.signal} action: {trade_signal.action}')
