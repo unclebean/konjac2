@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from konjac2.service.trender import get_today_trenders
@@ -20,5 +20,6 @@ async def get_daily_trend():
 
 
 @router.post("/trading_view/signal/{symbol}", tags=["trend"])
-async def receive_trading_view_signal(symbol: str, trade_signal: TradeSignal):
-    log.info(f'symbol: {symbol} signal: {trade_signal.signal} action: {trade_signal.action}')
+async def receive_trading_view_signal(symbol: str, trade_signal: TradeSignal, request: Request):
+    client_host = request.client.host
+    log.info(f'symbol: {symbol} signal: {trade_signal.signal} action: {trade_signal.action} ip: {client_host}')
