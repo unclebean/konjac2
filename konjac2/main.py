@@ -27,7 +27,7 @@ async def startup_event():
     logger.setLevel(logging.INFO)
 
 
-@app.on_event("startup")
+# @app.on_event("startup")
 async def start_bot():
     startup_bot()
 
