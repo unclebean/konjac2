@@ -18,8 +18,8 @@ def VWAP(candlestick, delta_hours=2, group_by="day"):
         candles = candlesGroupByDay.get_group(key).sort_index()
         vwap = mr_right_vwap(candles.high, candles.low, candles.close, candles.volume, len(candles))
         stDev = np.std(vwap)
-        upper_band = vwap + stDev * 2
-        lower_band = vwap - stDev * 2
+        upper_band = vwap + stDev * 1.5
+        lower_band = vwap - stDev * 1.5
         vwaps.append(vwap)
         upper_bands.append(upper_band)
         lower_bands.append(lower_band)
