@@ -49,6 +49,7 @@ class BBAdxRsi(ABCStrategy):
 
     def exit_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_close_trade()
+        rsi_data = rsi(candles.close, length=5)
         bb_20 = bbands(candles.close, 20)
         bb_20_low = bb_20["BBL_20_2.0"]
         bb_20_up = bb_20["BBU_20_2.0"]
@@ -56,7 +57,7 @@ class BBAdxRsi(ABCStrategy):
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit or is_loss or bb_20_up[-1] <= candles.close[-1]):
+                and (is_profit or is_loss or bb_20_up[-1] <= candles.close[-1] or rsi_data[-1] >= 70):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -71,7 +72,7 @@ class BBAdxRsi(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit or is_loss or bb_20_low[-1] >= candles.close[-1]):
+                and (is_profit or is_loss or bb_20_low[-1] >= candles.close[-1] or rsi_data[-1] <= 30):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],
