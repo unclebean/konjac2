@@ -12,6 +12,7 @@ FX_WTICO_STOP_LOSS = 0.4
 CP_STOP_LOSS = 0.05
 CP_TAKE_PROFIT = 0.08
 CP_MARGIN = 7
+CP_TRADING_INSTRUMENTS = 4
 
 
 def get_nearest_complete_h4_hour():

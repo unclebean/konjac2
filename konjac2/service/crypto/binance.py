@@ -3,7 +3,7 @@ import logging
 from konjac2.indicator.utils import TradeType
 from konjac2.service.crypto.context import get_binance_context
 from konjac2.service.crypto.fetcher import _fetcher
-from konjac2.service.utils import CP_STOP_LOSS, CP_TAKE_PROFIT, CP_MARGIN
+from konjac2.service.utils import CP_STOP_LOSS, CP_TAKE_PROFIT, CP_MARGIN, CP_TRADING_INSTRUMENTS
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ def open_position(symbol, trade_type: TradeType, tp=0, sl=0, loss_position=None)
     balance = _get_binance_balance()
     log.info("open position for {} current balance {}".format(symbol, balance))
     price = _binance_fetcher(symbol, "M15", complete=False)[-1:]["close"].values[0]
-    amount = balance / price * CP_MARGIN
+    amount = (balance / CP_TRADING_INSTRUMENTS) / price * CP_MARGIN
     side = "buy" if trade_type == TradeType.long else "sell"
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
