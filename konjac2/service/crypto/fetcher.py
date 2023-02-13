@@ -28,6 +28,11 @@ def crypto_fetcher(symbol, timeframe, complete=True, **kwargs):
     # exchange = get_binance_context()
     return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
 
+def binance_fetcher(symbol, timeframe, complete=True, **kwargs):
+    since = kwargs.get("since", None)
+    limit = kwargs.get("limit", None)
+    exchange = get_binance_context()
+    return _fetcher(exchange, symbol, timeframe, complete, since, limit=limit)
 
 def binance_fetch_pairs():
     exchange = get_binance_context()

@@ -10,6 +10,7 @@ from konjac2.indicator.utils import TradeType, resample_to_interval
 from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
 from . import Instruments
 from ..service.crypto.binance import place_trade, close_position
+from ..service.crypto.fetcher import binance_fetcher
 from ..service.crypto.gemini import sell_spot, buy_spot
 from ..strategy.abc_strategy import ABCStrategy
 from ..strategy.bbcci_strategy import BBCCIStrategy
@@ -139,11 +140,50 @@ async def scan_forex():
     # await trade_forex(trading_strategy=LogisticRegressionStrategy)
     # await trade_forex(symbol="WTICO_USD", trading_strategy=UTBotStrategy, quantity=80)
 
+async def smart_dog(currency="DOGE"):
+    query_symbol = f"{currency}/USDT"
+    spot_symbol = f"{currency}/USD"
+    future_symbol = f"{currency}/USDT"
+    strategy = RsiTrendDonChainStrategy(symbol=spot_symbol)
+    # somehow gemini only return finished timeframe data
+    data = binance_fetcher(query_symbol, "M5", False, limit=2001)
+    log.info(f"fetching data for {spot_symbol} {data.index[-1]}")
+    d_data = resample_to_interval(data, 360)
+    # d_data = fetch_data(query_symbol, "H4", True, counts=1500)
+
+    # opened_position = opened_position_by_symbol(trade_symbol)
+
+    is_exit_trade = strategy.exit_signal(data, d_data)
+    trade = get_last_time_trade(spot_symbol)
+    if is_exit_trade and trade is not None and trade.status == TradeStatus.closed.name:
+        try:
+            # disable spot trade for now
+            close_position(future_symbol)
+            log.info("closed position!")
+        except Exception as err:
+            log.error("closed position error! {}".format(err))
+            # disable spot trade for now
+            close_position(future_symbol)
+
+    strategy.seek_trend(data, d_data)
+    is_opened_trade = strategy.entry_signal(data, d_data)
+    trade = get_last_time_trade(spot_symbol)
+    if is_opened_trade and trade is not None and trade.status == TradeStatus.opened.name:
+        trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
+        try:
+            place_trade(future_symbol, "buy", trade_type)
+            log.info("opened position!")
+        except Exception as err:
+            log.error("open position error! {}".format(err))
+            place_trade(future_symbol, "buy", trade_type)
+    log.info("job running done!")
+
 
 async def scanner_job():
     await asyncio.sleep(10)
     for instrument in Instruments:
-        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=RsiTrendDonChainStrategy, quantity=5000)
+        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBCCIStrategy, quantity=5000)
+    await smart_dog()
 
 
 async def scanner_h1_job():

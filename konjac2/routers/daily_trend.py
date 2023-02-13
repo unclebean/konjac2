@@ -32,12 +32,11 @@ async def get_daily_trend():
 @router.post("/trading_view/signal/{symbol}", tags=["trend"])
 async def receive_trading_view_signal(symbol: str, trade_signal: TradeSignal, request: Request):
     client_host = request.client.host
-    log.info(type(client_host))
     log.info(f'symbol: {symbol} signal: {trade_signal.signal} action: {trade_signal.action} ip: {client_host}')
     if client_host in TradingViewIPs:
         future_symbol = f"{symbol}/USDT"
         log.info(f"request from trading view for {future_symbol}")
-        if trade_signal.action is "sell":
+        if trade_signal.action == "sell":
             try:
                 # disable spot trade for now
                 close_position(future_symbol)
@@ -45,7 +44,7 @@ async def receive_trading_view_signal(symbol: str, trade_signal: TradeSignal, re
             except Exception as err:
                 log.error("closed position error! {}".format(err))
                 close_position(future_symbol)
-        if trade_signal.action is "buy":
+        if trade_signal.action == "buy":
             try:
                 # disable spot trade for now
                 if trade_signal.signal == TradeType.long.name:
