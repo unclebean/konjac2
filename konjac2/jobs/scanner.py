@@ -14,6 +14,7 @@ from ..service.crypto.fetcher import binance_fetcher
 from ..service.crypto.gemini import sell_spot, buy_spot
 from ..strategy.abc_strategy import ABCStrategy
 from ..strategy.bb_adx_rsi_strategy import BBAdxRsi
+from ..strategy.bb_adx_rsi_strategy_v2 import BBAdxRsiV2
 from ..strategy.bbcci_strategy import BBCCIStrategy
 from ..strategy.cci_ema_strategy import CCIEMAStrategy
 from ..strategy.ema_squeeze_strategy import EmaSqueezeStrategy
@@ -183,11 +184,13 @@ async def smart_dog(currency="DOGE"):
 async def scanner_job():
     await asyncio.sleep(10)
     for instrument in Instruments:
-        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBAdxRsi, quantity=5000)
+        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBAdxRsiV2, quantity=5000)
     await smart_dog()
     await smart_dog("ADA")
     await smart_dog("ATOM")
     await smart_dog("XRP")
+    await smart_dog("SOL")
+    await smart_dog("DOT")
 
 
 async def scanner_h1_job():
