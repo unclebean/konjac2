@@ -2,8 +2,8 @@ import re
 from datetime import datetime
 
 
-FX_STOP_LOSS = 0.003
-FX_JPY_STOP_LOSS = 0.3
+FX_STOP_LOSS = 0.005
+FX_JPY_STOP_LOSS = 0.5
 FX_TAKE_PROFIT = 0.007
 FX_JPY_TAKE_PROFIT = 0.7
 FX_WTICO_TAKE_PROFIT = 0.7
