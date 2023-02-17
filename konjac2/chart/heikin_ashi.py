@@ -18,6 +18,7 @@ def heikin_ashi(df):
     heikin_ashi_df["low"] = heikin_ashi_df.loc[:, ["open", "close"]].join(df["low"]).min(axis=1)
 
     heikin_ashi_df["volume"] = df["volume"]
+    heikin_ashi_df.index.name = "date"
 
     return heikin_ashi_df
 

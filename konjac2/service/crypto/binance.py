@@ -3,7 +3,8 @@ import logging
 from konjac2.indicator.utils import TradeType
 from konjac2.service.crypto.context import get_binance_context
 from konjac2.service.crypto.fetcher import _fetcher
-from konjac2.service.utils import CP_STOP_LOSS, CP_TAKE_PROFIT, CP_MARGIN, CP_TRADING_INSTRUMENTS
+from konjac2.service.utils import CP_STOP_LOSS, CP_TAKE_PROFIT, CP_MARGIN, CP_TRADING_INSTRUMENTS, ETH_TAKE_PROFIT, \
+    ETH_STOP_LOSS
 
 log = logging.getLogger(__name__)
 
@@ -28,8 +29,12 @@ def open_position(symbol, trade_type: TradeType, tp=0, sl=0, loss_position=None)
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
     quantity_price = amount * price
-    gain_rate = CP_TAKE_PROFIT if tp == 0 else tp
-    loss_rate = CP_STOP_LOSS if sl == 0 else sl
+    if "ETH" in symbol:
+        gain_rate = ETH_TAKE_PROFIT if tp == 0 else tp
+        loss_rate = ETH_STOP_LOSS if sl == 0 else sl
+    else:
+        gain_rate = CP_TAKE_PROFIT if tp == 0 else tp
+        loss_rate = CP_STOP_LOSS if sl == 0 else sl
     if side == "buy":
         gain = (quantity_price + quantity_price * gain_rate) / amount
         loss = (quantity_price - quantity_price * loss_rate) / amount
