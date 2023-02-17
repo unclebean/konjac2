@@ -146,7 +146,7 @@ async def smart_dog(currency="DOGE"):
     query_symbol = f"{currency}/USDT"
     spot_symbol = f"{currency}/USD"
     future_symbol = f"{currency}/USDT"
-    strategy = BBAdxRsi(symbol=spot_symbol)
+    strategy = BBAdxRsiV2(symbol=spot_symbol)
     # somehow gemini only return finished timeframe data
     data = binance_fetcher(query_symbol, "M5", True, limit=2001)
     log.info(f"fetching data for {spot_symbol} {data.index[-1]}")
