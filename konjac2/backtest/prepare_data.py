@@ -1,5 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
+
+from ..service.crypto.fetcher import binance_fetcher
 from ..service.fetcher import fetch_data
 
 
@@ -7,7 +9,7 @@ def generate_dates(start_date="2019-05-01T21:00:00", step_hours=1, step_mins=0, 
     start = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
     forward_dates = []
     index = 0
-    while len(forward_dates) < 500:
+    while len(forward_dates) < 700:
         start = start + timedelta(hours=step_hours, minutes=step_mins)
         # if start.weekday() < 5:
         if index % counts == 0:
@@ -38,7 +40,7 @@ def prepare_crypto_backtest_data(symbol: str, timeframe: str, step_hours=1, step
     datasets = None
     for date in dates:
         predict_date = int(datetime.timestamp(date) * 1000)
-        m30 = fetch_data(symbol, timeframe, True, limit=5000, since=predict_date)
+        m30 = binance_fetcher(symbol, timeframe, True, limit=5000, since=predict_date)
         datasets = m30 if datasets is None else pd.concat([datasets, m30], axis=0)
     datasets = datasets.reset_index().drop_duplicates(subset="date", keep="first").set_index("date")
     file_name = symbol.replace("/", "_")

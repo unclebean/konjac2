@@ -29,7 +29,7 @@ def open_position(symbol, trade_type: TradeType, tp=0, sl=0, loss_position=None)
     exchange.cancel_all_orders(symbol)
     exchange.create_market_order(symbol, side, amount)
     quantity_price = amount * price
-    if "ETH" in symbol:
+    if "ETH" in symbol or "MATIC" in symbol:
         gain_rate = ETH_TAKE_PROFIT if tp == 0 else tp
         loss_rate = ETH_STOP_LOSS if sl == 0 else sl
     else:
