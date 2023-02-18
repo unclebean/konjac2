@@ -9,7 +9,7 @@ def generate_dates(start_date="2019-05-01T21:00:00", step_hours=1, step_mins=0, 
     start = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
     forward_dates = []
     index = 0
-    while len(forward_dates) < 700:
+    while len(forward_dates) < 2000:
         start = start + timedelta(hours=step_hours, minutes=step_mins)
         # if start.weekday() < 5:
         if index % counts == 0:

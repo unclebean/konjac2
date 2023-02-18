@@ -81,12 +81,17 @@ def _fx_stop_loss(symbol: str, quantity: float) -> float:
 def _crypto_stop_loss(order_position: float, quantity: float) -> float:
     return order_position * quantity * CP_STOP_LOSS
 
+def _crypto_eth_stop_loss(order_position: float, quantity: float) -> float:
+    return order_position * quantity * ETH_STOP_LOSS
+
 
 def get_stop_loss(symbol: str, order_position: float, quantity: float) -> float:
     if is_forex_symbol(symbol):
         return _fx_stop_loss(symbol, quantity)
 
     if is_crypto_symbol(symbol):
+        if "ETH" in symbol or "MATIC" in symbol:
+            return _crypto_eth_stop_loss(order_position, quantity)
         return _crypto_stop_loss(order_position, quantity)
 
 
@@ -98,10 +103,16 @@ def _crypto_take_profit(order_position: float, quantity: float) -> float:
     return order_position * quantity * CP_TAKE_PROFIT
 
 
+def _crypto_eth_take_profit(order_position: float, quantity: float) -> float:
+    return order_position * quantity * ETH_TAKE_PROFIT
+
+
 def get_take_profit(symbol: str, order_position: float, quantity: float) -> float:
     if is_forex_symbol(symbol):
         return _fx_take_profit(symbol, quantity)
 
     if is_crypto_symbol(symbol):
+        if "ETH" in symbol or "MATIC" in symbol:
+            return _crypto_eth_take_profit(order_position, quantity)
         return _crypto_take_profit(order_position, quantity)
 
