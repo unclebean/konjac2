@@ -44,14 +44,14 @@ async def smart_bot(currency="ETH"):
         try:
             # disable spot trade for now
             sell_spot(spot_symbol)
-            close_position(future_symbol)
+            # close_position(future_symbol)
             log.info("closed position!")
             say_something("closed position {}".format(spot_symbol))
         except Exception as err:
             log.error("closed position error! {}".format(err))
             # disable spot trade for now
             sell_spot(spot_symbol)
-            close_position(future_symbol)
+            # close_position(future_symbol)
 
     strategy.seek_trend(data, d_data)
     is_opened_trade = strategy.entry_signal(data, d_data)
@@ -62,7 +62,7 @@ async def smart_bot(currency="ETH"):
             # disable spot trade for now
             if trade_type == TradeType.long:
                 buy_spot(spot_symbol)
-            place_trade(future_symbol, "buy", trade_type)
+            # place_trade(future_symbol, "buy", trade_type)
             log.info("opened position!")
             say_something("opened position {}".format(spot_symbol))
         except Exception as err:
@@ -70,7 +70,7 @@ async def smart_bot(currency="ETH"):
             # disable spot trade for now
             if trade_type == TradeType.long:
                 buy_spot(spot_symbol)
-            place_trade(future_symbol, "buy", trade_type)
+            # place_trade(future_symbol, "buy", trade_type)
             say_something("opened position failed!")
     log.info("job running done!")
 
@@ -187,9 +187,9 @@ async def scanner_job():
         await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBAdxRsiV2, quantity=5000)
     await smart_dog()
     # await smart_dog("ADA")
-    await smart_dog("ATOM")
+    # await smart_dog("ATOM")
     # await smart_dog("XRP")
-    await smart_dog("SOL")
+    # await smart_dog("SOL")
     await smart_dog("DOT")
 
 

@@ -15,7 +15,7 @@ ETH_STOP_LOSS = 0.05
 ETH_TAKE_PROFIT = 0.08
 
 CP_MARGIN = 7
-CP_TRADING_INSTRUMENTS = 4
+CP_TRADING_INSTRUMENTS = 3
 
 
 def get_nearest_complete_h4_hour():
