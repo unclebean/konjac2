@@ -186,9 +186,9 @@ async def scanner_job():
     for instrument in Instruments:
         await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBAdxRsiV2, quantity=5000)
     await smart_dog()
-    await smart_dog("ADA")
+    # await smart_dog("ADA")
     await smart_dog("ATOM")
-    await smart_dog("XRP")
+    # await smart_dog("XRP")
     await smart_dog("SOL")
     await smart_dog("DOT")
 
