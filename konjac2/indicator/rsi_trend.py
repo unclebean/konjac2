@@ -4,6 +4,13 @@ from konjac2.indicator.utils import resample_to_interval
 
 
 def rsi_trend(candles):
+    rsi_data = rsi(candles.close, length=14 * 36)
+    ema_data = ema(rsi_data, length=14 * 36)
+    diff = rsi_data - ema_data
+    return diff
+
+
+def rsi_trend_bak(candles):
     # rsi_data = rsi(candles.close, length=14)
     # ema_data = ema(rsi_data, length=14)
 
@@ -13,4 +20,3 @@ def rsi_trend(candles):
     h3_ema_data = ema(h3_rsi_data, length=14)
 
     return h3_rsi_data.values - h3_ema_data.values
-
