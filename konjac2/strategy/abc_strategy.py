@@ -78,10 +78,12 @@ class ABCStrategy(ABC):
         return StrategyDelegator.get_all_open_trade_signal_indicators(trade_id)
 
     def _is_take_profit(self, candles):
-        return StrategyDelegator.is_take_profit(self.symbol, candles)
+        # return StrategyDelegator.is_take_profit(self.symbol, candles)
+        return StrategyDelegator.is_atr_take_profit(self.symbol, candles)
 
     def _is_stop_loss(self, candles):
-        return StrategyDelegator.is_stop_loss(self.symbol, candles)
+        # return StrategyDelegator.is_stop_loss(self.symbol, candles)
+        return StrategyDelegator.is_atr_stop_loss(self.symbol, candles)
 
     def _get_longer_timeframe_volatility(self, candles, longer_timeframe_candles, rolling=7, holder_dev=3):
         daily_volatility = (longer_timeframe_candles["high"] - longer_timeframe_candles["low"]) / \
