@@ -2,6 +2,8 @@ import logging
 from collections import namedtuple
 from datetime import datetime
 
+from pandas_ta import atr
+
 from konjac2.indicator.utils import TradeType
 from konjac2.models import Signal, apply_session
 from konjac2.models.signal import get_open_trade_signals
@@ -216,6 +218,19 @@ class StrategyDelegator:
         return False, 0
 
     @classmethod
+    def is_atr_take_profit(cls, symbol: str, candles):
+        last_trade = cls.get_trade(symbol)
+        if last_trade is not None and last_trade.status == TradeStatus.opened.name:
+            atr_data = atr(candles.high, candles.low, candles.close)
+
+            profit = (candles.close[-1] - last_trade.opened_position) * 3
+            if last_trade.trend == TradeType.short.name:
+                profit = (last_trade.opened_position - candles.close[-1]) * 3
+
+            return profit >= atr_data[-1] * 3, atr_data[-1] * 3 * last_trade.quantity
+        return False, 0
+
+    @classmethod
     def is_stop_loss(cls, symbol: str, candles):
         last_trade = cls.get_trade(symbol)
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
@@ -229,4 +244,17 @@ class StrategyDelegator:
                 loss = (high_price - last_trade.opened_position) * last_trade.quantity
 
             return loss >= stop_loss, stop_loss
+        return False, 0
+
+    @classmethod
+    def is_atr_stop_loss(cls, symbol: str, candles):
+        last_trade = cls.get_trade(symbol)
+        if last_trade is not None and last_trade.status == TradeStatus.opened.name:
+            atr_data = atr(candles.high, candles.low, candles.close)
+
+            loss = (last_trade.opened_position - candles.close[-1]) * 2
+            if last_trade.trend == TradeType.short.name:
+                loss = (candles.close[-1] - last_trade.opened_position) * 2
+
+            return loss >= atr_data[-1] * 2, atr_data[-1] * 2 * last_trade.quantity
         return False, 0
