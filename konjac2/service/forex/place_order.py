@@ -25,8 +25,8 @@ def _long_trade(symbol: str, units, stop_loss, take_profit):
             "type": "MARKET",
             "instrument": symbol,
             "units": units,
-            "stopLossOnFill": {"distance": str(t_stop_loss)},
-            "takeProfitOnFill": {"distance": str(t_take_profit)},
+            "stopLossOnFill": {"distance": str(round(t_stop_loss, 6))},
+            "takeProfitOnFill": {"distance": str(round(t_take_profit, 6))},
         }
     )
     log.info("create long trade %s status %d", symbol, response.status)
@@ -42,8 +42,8 @@ def _short_trade(symbol: str, units, stop_loss, take_profit):
             "type": "MARKET",
             "instrument": symbol,
             "units": -units,
-            "stopLossOnFill": {"distance": str(t_stop_loss)},
-            "takeProfitOnFill": {"distance": str(t_take_profit)},
+            "stopLossOnFill": {"distance": str(round(t_stop_loss, 6))},
+            "takeProfitOnFill": {"distance": str(round(t_take_profit, 6))},
         }
     )
     log.info("create short trade %s status %d", symbol, response.status)

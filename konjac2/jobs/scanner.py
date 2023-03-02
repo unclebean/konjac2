@@ -113,19 +113,13 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
             and not has_opened_trades(query_symbol)
     ):
         atr_data = atr(data.high, data.low, data.close)[-1]
-        if trade.trend == TradeType.long.name:
-            sl = data.close[-1] - atr_data * 2
-            tp = data.close[-1] + atr_data * 3
-        else:
-            sl = data.close[-1] + atr_data * 2
-            tp = data.close[-1] - atr_data * 3
         try:
-            make_trade(trade_symbol, trade.trend, quantity=quantity, stop_loss=sl, take_profit=tp)
+            make_trade(trade_symbol, trade.trend, quantity=quantity, stop_loss=atr_data*2, take_profit=atr_data*3)
             log.info("opened position!")
             # say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
-            make_trade(trade_symbol, trade.trend, quantity=quantity, stop_loss=sl, take_profit=tp)
+            make_trade(trade_symbol, trade.trend, quantity=quantity, stop_loss=atr_data*2, take_profit=atr_data*3)
             say_something("opened position failed!")
     log.info("job running done!")
 
@@ -181,14 +175,8 @@ async def smart_dog(currency="DOGE"):
     if is_opened_trade and trade is not None and trade.status == TradeStatus.opened.name:
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         atr_data = atr(data.high, data.low, data.close)[-1]
-        if trade.trend == TradeType.long.name:
-            sl = data.close[-1] - atr_data * 2
-            tp = data.close[-1] + atr_data * 3
-        else:
-            sl = data.close[-1] + atr_data * 2
-            tp = data.close[-1] - atr_data * 3
         try:
-            place_trade(future_symbol, "buy", trade_type, sl=sl, tp=tp)
+            place_trade(future_symbol, "buy", trade_type, sl=atr_data*2, tp=atr_data*3)
             log.info("opened position!")
         except Exception as err:
             log.error("open position error! {}".format(err))
