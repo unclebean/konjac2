@@ -6,40 +6,44 @@ from konjac2.service.utils import get_fx_take_profit_rate, get_fx_stop_loss_rate
 log = logging.getLogger(__name__)
 
 
-def make_trade(symbol: str, signal: str, quantity=15000):
+def make_trade(symbol: str, signal: str, quantity=15000, stop_loss=0, take_profit=0):
     log.info(
         f"symbol {symbol} strategy signal {signal}",
     )
     if TradeType.long.name == signal:
-        _long_trade(symbol, units=quantity)
+        _long_trade(symbol, units=quantity, stop_loss=stop_loss, take_profit=take_profit)
     if TradeType.short.name == signal:
-        _short_trade(symbol, units=quantity)
+        _short_trade(symbol, units=quantity, stop_loss=stop_loss, take_profit=take_profit)
 
 
-def _long_trade(symbol: str, units):
+def _long_trade(symbol: str, units, stop_loss, take_profit):
+    t_stop_loss = get_fx_stop_loss_rate(symbol) if stop_loss == 0 else stop_loss
+    t_take_profit = get_fx_take_profit_rate(symbol) if take_profit == 0  else take_profit
     response = get_context().order.market(
         get_account(),
         **{
             "type": "MARKET",
             "instrument": symbol,
             "units": units,
-            "stopLossOnFill": {"distance": str(get_fx_stop_loss_rate(symbol))},
-            "takeProfitOnFill": {"distance": str(get_fx_take_profit_rate(symbol))},
+            "stopLossOnFill": {"distance": str(t_stop_loss)},
+            "takeProfitOnFill": {"distance": str(t_take_profit)},
         }
     )
     log.info("create long trade %s status %d", symbol, response.status)
     return response.status
 
 
-def _short_trade(symbol: str, units):
+def _short_trade(symbol: str, units, stop_loss, take_profit):
+    t_stop_loss = get_fx_stop_loss_rate(symbol) if stop_loss == 0 else stop_loss
+    t_take_profit = get_fx_take_profit_rate(symbol) if take_profit == 0 else take_profit
     response = get_context().order.market(
         get_account(),
         **{
             "type": "MARKET",
             "instrument": symbol,
             "units": -units,
-            "stopLossOnFill": {"distance": str(get_fx_stop_loss_rate(symbol))},
-            "takeProfitOnFill": {"distance": str(get_fx_take_profit_rate(symbol))},
+            "stopLossOnFill": {"distance": str(t_stop_loss)},
+            "takeProfitOnFill": {"distance": str(t_take_profit)},
         }
     )
     log.info("create short trade %s status %d", symbol, response.status)
