@@ -19,6 +19,7 @@ from ..strategy.bbcci_strategy import BBCCIStrategy
 from ..strategy.cci_ema_strategy import CCIEMAStrategy
 from ..strategy.ema_squeeze_strategy import EmaSqueezeStrategy
 from ..strategy.logistic_regression_strategy import LogisticRegressionStrategy
+from ..strategy.macd_histogram_strategy import MacdHistogramStrategy
 from ..strategy.rsi_trend_don_chain_strategy import RsiTrendDonChainStrategy
 from ..strategy.ut_bot_strategy import UTBotStrategy
 
@@ -86,7 +87,7 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
     data = fetch_data(query_symbol, timeframe, True, counts=2001)
     log.info(f"fetching data for {symbol} {data.index[-1]}")
     # d_data = fetch_data(query_symbol, "H4", True, counts=500)
-    d_data = resample_to_interval(data, 60)
+    d_data = resample_to_interval(data, 10)
 
     is_exit_trade = strategy.exit_signal(data, day_candles=d_data)
     trade = get_last_time_trade(query_symbol)
@@ -186,7 +187,7 @@ async def smart_dog(currency="DOGE"):
 async def scanner_job():
     await asyncio.sleep(10)
     for instrument in Instruments:
-        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBAdxRsiV2, quantity=5000)
+        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=MacdHistogramStrategy, quantity=5000)
     await smart_dog()
     # await smart_dog("ADA")
     # await smart_dog("ATOM")
