@@ -221,7 +221,8 @@ class StrategyDelegator:
     def is_atr_take_profit(cls, symbol: str, candles):
         last_trade = cls.get_trade(symbol)
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
-            atr_data = atr(candles.high, candles.low, candles.close)
+            entry_candles = candles[:last_trade.entry_date]
+            atr_data = atr(entry_candles.high, entry_candles.low, entry_candles.close)
 
             profit = (candles.close[-1] - last_trade.opened_position) * 3
             if last_trade.trend == TradeType.short.name:
@@ -250,7 +251,8 @@ class StrategyDelegator:
     def is_atr_stop_loss(cls, symbol: str, candles):
         last_trade = cls.get_trade(symbol)
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
-            atr_data = atr(candles.high, candles.low, candles.close)
+            entry_candles = candles[:last_trade.entry_date]
+            atr_data = atr(entry_candles.high, entry_candles.low, entry_candles.close)
 
             loss = (last_trade.opened_position - candles.close[-1]) * 2
             if last_trade.trend == TradeType.short.name:
