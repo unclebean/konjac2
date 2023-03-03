@@ -223,12 +223,12 @@ class StrategyDelegator:
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
             entry_candles = candles[:last_trade.entry_date]
             atr_data = atr(entry_candles.high, entry_candles.low, entry_candles.close)
-
-            profit = (candles.close[-1] - last_trade.opened_position) * 3
+            atr_times = 5
+            profit = (candles.close[-1] - last_trade.opened_position) * atr_times
             if last_trade.trend == TradeType.short.name:
-                profit = (last_trade.opened_position - candles.close[-1]) * 3
+                profit = (last_trade.opened_position - candles.close[-1]) * atr_times
 
-            return profit >= atr_data[-1] * 3, atr_data[-1] * 3 * last_trade.quantity
+            return profit >= atr_data[-1] * atr_times, atr_data[-1] * atr_times * last_trade.quantity
         return False, 0
 
     @classmethod
@@ -253,10 +253,10 @@ class StrategyDelegator:
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
             entry_candles = candles[:last_trade.entry_date]
             atr_data = atr(entry_candles.high, entry_candles.low, entry_candles.close)
-
-            loss = (last_trade.opened_position - candles.close[-1]) * 2
+            atr_times = 5
+            loss = (last_trade.opened_position - candles.close[-1]) * atr_times
             if last_trade.trend == TradeType.short.name:
-                loss = (candles.close[-1] - last_trade.opened_position) * 2
+                loss = (candles.close[-1] - last_trade.opened_position) * atr_times
 
-            return loss >= atr_data[-1] * 2, atr_data[-1] * 2 * last_trade.quantity
+            return loss >= atr_data[-1] * atr_times, atr_data[-1] * atr_times * last_trade.quantity
         return False, 0
