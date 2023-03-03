@@ -1,19 +1,19 @@
 Instruments = [
     #"AUD_CAD",
     #"AUD_JPY",
-    "AUD_USD",
-    "EUR_AUD",
+    # "AUD_USD",
+    # "EUR_AUD",
     #"EUR_CAD",
-    "EUR_GBP",
+    # "EUR_GBP",
     #"EUR_JPY",
     # "EUR_NZD",
     "EUR_USD",
     #"GBP_AUD",
-    "GBP_CAD",
-    "GBP_USD",
+    # "GBP_CAD",
+    # "GBP_USD",
     # "NZD_CAD",
     #"USD_CAD",
-    "USD_JPY",
+    # "USD_JPY",
 ]
 
 TrustCrypto = [
