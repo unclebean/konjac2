@@ -110,7 +110,6 @@ class MacdHistogramStrategy(ABCStrategy):
                     (macd_histogram[-1] >= 0 and macd_histogram[-1] < macd_histogram[-2] and stock_rsi_k[-1] < stock_rsi_d[-1])
                     or is_profit
                     or is_loss
-                    or longer_timeframe_trend != TradeType.long.name
             ):
                 return self._update_close_trade(
                     TradeType.short.name,
@@ -139,7 +138,6 @@ class MacdHistogramStrategy(ABCStrategy):
                     (macd_histogram[-1] <= 0 and macd_histogram[-1] > macd_histogram[-2] and stock_rsi_k[-1] > stock_rsi_d[-1])
                     or is_profit
                     or is_loss
-                    or longer_timeframe_trend != TradeType.short.name
             ):
                 return self._update_close_trade(
                     TradeType.long.name,
