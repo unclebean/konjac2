@@ -114,12 +114,12 @@ async def trade_forex(symbol="EUR_USD", trading_strategy: type[ABCStrategy] = CC
     ):
         atr_data = atr(data.high, data.low, data.close)[-1]
         try:
-            make_trade(trade_symbol, trade.trend, quantity=quantity, stop_loss=atr_data*2, take_profit=atr_data*3)
+            make_trade(trade_symbol, trade.trend, quantity=quantity)
             log.info("opened position!")
             # say_something("opened position {}".format(query_symbol))
         except Exception as err:
             log.error("open position error! {}".format(err))
-            make_trade(trade_symbol, trade.trend, quantity=quantity, stop_loss=atr_data*2, take_profit=atr_data*3)
+            make_trade(trade_symbol, trade.trend, quantity=quantity)
             say_something("opened position failed!")
     log.info("job running done!")
 
@@ -176,11 +176,11 @@ async def smart_dog(currency="DOGE"):
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         atr_data = atr(data.high, data.low, data.close)[-1]
         try:
-            place_trade(future_symbol, "buy", trade_type, sl=atr_data*2, tp=atr_data*3)
+            place_trade(future_symbol, "buy", trade_type)
             log.info("opened position!")
         except Exception as err:
             log.error("open position error! {}".format(err))
-            place_trade(future_symbol, "buy", trade_type, sl=atr_data*2, tp=atr_data*3)
+            place_trade(future_symbol, "buy", trade_type)
     log.info("job running done!")
 
 
