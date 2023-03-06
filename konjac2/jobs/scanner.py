@@ -148,7 +148,7 @@ async def smart_dog(currency="DOGE"):
     query_symbol = f"{currency}/USDT"
     spot_symbol = f"{currency}/USD"
     future_symbol = f"{currency}/USDT"
-    strategy = MacdHistogramStrategy(symbol=spot_symbol)
+    strategy = BBAdxRsiV2(symbol=spot_symbol)
     # somehow gemini only return finished timeframe data
     data = binance_fetcher(query_symbol, "M5", True, limit=2001)
     log.info(f"fetching data for {spot_symbol} {data.index[-1]}")
@@ -187,7 +187,7 @@ async def smart_dog(currency="DOGE"):
 async def scanner_job():
     await asyncio.sleep(10)
     for instrument in Instruments:
-        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=MacdHistogramStrategy, quantity=5000)
+        await trade_forex(symbol=instrument, timeframe="M5", trading_strategy=BBAdxRsiV2, quantity=5000)
     # await smart_dog()
     # await smart_dog("ADA")
     # await smart_dog("ATOM")
