@@ -28,11 +28,13 @@ class BBAdxRsiV2(ABCStrategy):
         bb_20 = bbands(candles.close, 20)
         bb_20_low = bb_20["BBL_20_2.0"]
         bb_20_up = bb_20["BBU_20_2.0"]
+        rsi_data = rsi(candles.close, length=5)
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
                 and bb_20_low[-2] >= candles.close[-2]
                 and bb_20_low[-1] < candles.close[-1]
+                and rsi_data[-1] > 30
         ):
             return self._update_open_trade(
                 TradeType.long.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
@@ -42,6 +44,7 @@ class BBAdxRsiV2(ABCStrategy):
                 and last_order_status.is_short
                 and bb_20_up[-2] <= candles.close[-2]
                 and bb_20_up[-1] > candles.close[-1]
+                and rsi_data[-1] < 70
         ):
             return self._update_open_trade(
                 TradeType.short.name, candles.close[-1], self.strategy_name, 0, candles.index[-1]
