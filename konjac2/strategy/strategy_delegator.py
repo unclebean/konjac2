@@ -228,7 +228,7 @@ class StrategyDelegator:
             if last_trade.trend == TradeType.short.name:
                 profit = (last_trade.opened_position - candles.low[-1])
 
-            return profit >= atr_data[-1] * atr_times, profit * last_trade.quantity
+            return profit >= atr_data[-1] * atr_times, atr_data[-1] * atr_times * last_trade.quantity
         return False, 0
 
     @classmethod
@@ -258,5 +258,5 @@ class StrategyDelegator:
             if last_trade.trend == TradeType.short.name:
                 loss = (candles.high[-1] - last_trade.opened_position)
 
-            return loss >= atr_data[-1] * atr_times, loss * last_trade.quantity
+            return loss >= atr_data[-1] * atr_times, atr_data[-1] * atr_times * last_trade.quantity
         return False, 0
