@@ -1,6 +1,7 @@
 from pandas_ta import adx, rsi, bbands
 
 from konjac2.indicator.utils import TradeType
+from konjac2.service.utils import align_decimal_length
 from konjac2.strategy.abc_strategy import ABCStrategy
 
 
@@ -26,12 +27,17 @@ class BBAdxRsiV3(ABCStrategy):
         bb_20 = bbands(candles.close, 20)
         bb_20_low = bb_20["BBL_20_2.0"]
         bb_20_up = bb_20["BBU_20_2.0"]
+        bb_low_last_second, bb_low_last_second_close_price = align_decimal_length(bb_20_low[-2], candles.close[-2])
+        bb_low_last, bb_low_last_close_price = align_decimal_length(bb_20_low[-1], candles.close[-1])
+        bb_up_last_second, bb_up_last_second_close_price = align_decimal_length(bb_20_up[-2], candles.close[-2])
+        bb_up_last, bb_up_last_close_price = align_decimal_length(bb_20_up[-1], candles.close[-1])
+
         rsi_data = rsi(candles.close, length=5)
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_long
-                and bb_20_low[-2] >= candles.close[-2]
-                and bb_20_low[-1] < candles.close[-1]
+                and bb_low_last_second >= bb_low_last_second_close_price
+                and bb_low_last < bb_low_last_close_price
                 and rsi_data[-1] > 30
         ):
             return self._update_open_trade(
@@ -40,8 +46,8 @@ class BBAdxRsiV3(ABCStrategy):
         if (
                 last_order_status.ready_to_procceed
                 and last_order_status.is_short
-                and bb_20_up[-2] <= candles.close[-2]
-                and bb_20_up[-1] > candles.close[-1]
+                and bb_up_last_second <= bb_up_last_second_close_price
+                and bb_up_last > bb_up_last_close_price
                 and rsi_data[-1] < 70
         ):
             return self._update_open_trade(
@@ -54,11 +60,13 @@ class BBAdxRsiV3(ABCStrategy):
         bb_20 = bbands(candles.close, 20)
         bb_20_low = bb_20["BBL_20_2.0"]
         bb_20_up = bb_20["BBU_20_2.0"]
+        bb_low_last, bb_low_last_close_price = align_decimal_length(bb_20_low[-1], candles.close[-1])
+        bb_up_last, bb_up_last_close_price = align_decimal_length(bb_20_up[-1], candles.close[-1])
         is_profit, take_profit = self._is_take_profit(candles)
         is_loss, stop_loss = self._is_stop_loss(candles)
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_long \
-                and (is_profit or is_loss or bb_20_up[-1] <= candles.close[-1] or rsi_data[-1] >= 70):
+                and (is_profit or is_loss or bb_up_last <= bb_up_last_close_price or rsi_data[-1] >= 70):
             return self._update_close_trade(
                 TradeType.short.name,
                 candles.close[-1],
@@ -73,7 +81,7 @@ class BBAdxRsiV3(ABCStrategy):
 
         if last_order_status.ready_to_procceed \
                 and last_order_status.is_short \
-                and (is_profit or is_loss or bb_20_low[-1] >= candles.close[-1] or rsi_data[-1] <= 30):
+                and (is_profit or is_loss or bb_low_last >= bb_low_last_close_price or rsi_data[-1] <= 30):
             return self._update_close_trade(
                 TradeType.long.name,
                 candles.close[-1],

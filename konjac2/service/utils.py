@@ -1,4 +1,5 @@
 import re
+import math
 from datetime import datetime
 
 
@@ -116,3 +117,15 @@ def get_take_profit(symbol: str, order_position: float, quantity: float) -> floa
             return _crypto_eth_take_profit(order_position, quantity)
         return _crypto_take_profit(order_position, quantity)
 
+
+def align_decimal_length(first_number, second_number):
+    first_number_decimal_len = len(str(first_number).split('.')[1])
+    second_number_decimal_len = len(str(second_number).split('.')[1])
+
+    shortest_decimal_len = first_number_decimal_len \
+        if first_number_decimal_len < second_number_decimal_len \
+        else second_number_decimal_len
+    shortest_len = int("1" + "0" * shortest_decimal_len)
+    truncated_first_num = math.trunc(first_number * shortest_len) / shortest_len
+    truncated_second_num = math.trunc(second_number * shortest_len) / shortest_len
+    return truncated_first_num, truncated_second_num
