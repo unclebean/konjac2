@@ -56,7 +56,7 @@ class BBAdxRsiV3(ABCStrategy):
 
     def exit_signal(self, candles, day_candles=None) -> bool:
         last_order_status = self._can_close_trade()
-        rsi_data = rsi(candles.close, length=14)
+        rsi_data = rsi(candles.close, length=5)
         bb_20 = bbands(candles.close, 20)
         bb_20_low = bb_20["BBL_20_2.0"]
         bb_20_up = bb_20["BBU_20_2.0"]
