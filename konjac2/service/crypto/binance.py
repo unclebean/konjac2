@@ -49,6 +49,28 @@ def open_position(symbol, trade_type: TradeType, tp=0, sl=0, loss_position=None)
         exchange.create_order(symbol, "STOP", "buy", amount, price=loss_price, params={"stopPrice": loss_price})
 
 
+def open_position_with_atr(symbol, trade_type: TradeType, take_profit=0, stop_loss=0):
+    exchange = get_binance_context()
+    balance = _get_binance_balance()
+    log.info("open position for {} current balance {}".format(symbol, balance))
+    price = _binance_fetcher(symbol, "M5", complete=False)[-1:]["close"].values[0]
+    amount = (balance / CP_TRADING_INSTRUMENTS) / price * CP_MARGIN
+    side = "buy" if trade_type == TradeType.long else "sell"
+    exchange.cancel_all_orders(symbol)
+    exchange.create_market_order(symbol, side, amount)
+    if side == "buy":
+        gain = price + take_profit
+        loss = price - stop_loss
+        exchange.create_order(symbol, "TAKE_PROFIT", "sell", amount, price=gain, params={"stopPrice": gain})
+        exchange.create_order(symbol, "STOP", "sell", amount, price=loss, params={"stopPrice": loss})
+    else:
+        gain = price - take_profit
+        loss = price - stop_loss
+        exchange.create_order(symbol, "TAKE_PROFIT", "buy", amount, price=gain, params={"stopPrice": gain})
+        exchange.create_order(symbol, "STOP", "buy", amount, price=loss, params={"stopPrice": loss})
+    log.info(f"{symbol} {side} order for take profit at price {gain} stop at price {loss}")
+
+
 def close_position(symbol):
     exchange = get_binance_context()
     positions = exchange.fetch_positions()
