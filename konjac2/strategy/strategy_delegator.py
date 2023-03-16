@@ -223,7 +223,7 @@ class StrategyDelegator:
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
             entry_candles = candles[:last_trade.entry_date]
             atr_data = atr(entry_candles.high, entry_candles.low, entry_candles.close)
-            atr_times = 5
+            atr_times = 3
             profit = (candles.close[-1] - last_trade.opened_position)
             if last_trade.trend == TradeType.short.name:
                 profit = (last_trade.opened_position - candles.close[-1])
@@ -253,7 +253,7 @@ class StrategyDelegator:
         if last_trade is not None and last_trade.status == TradeStatus.opened.name:
             entry_candles = candles[:last_trade.entry_date]
             atr_data = atr(entry_candles.high, entry_candles.low, entry_candles.close)
-            atr_times = 5
+            atr_times = 4
             loss = (last_trade.opened_position - candles.close[-1])
             if last_trade.trend == TradeType.short.name:
                 loss = (candles.close[-1] - last_trade.opened_position)

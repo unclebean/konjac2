@@ -177,11 +177,11 @@ async def smart_dog(currency="DOGE"):
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         atr_data = atr(data.high, data.low, data.close)[-1]
         try:
-            open_position_with_atr(future_symbol, trade_type, take_profit=atr_data*5, stop_loss=atr_data*5)
+            open_position_with_atr(future_symbol, trade_type, take_profit=atr_data*3, stop_loss=atr_data*4)
             log.info("opened position!")
         except Exception as err:
             log.error("open position error! {}".format(err))
-            open_position_with_atr(future_symbol, trade_type, take_profit=atr_data*5, stop_loss=atr_data*5)
+            open_position_with_atr(future_symbol, trade_type, take_profit=atr_data*3, stop_loss=atr_data*4)
     log.info("job running done!")
 
 
