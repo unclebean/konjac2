@@ -9,7 +9,7 @@ from konjac2.service.fetcher import fetch_data
 from konjac2.indicator.utils import TradeType, resample_to_interval
 from konjac2.service.forex.place_order import close_trade, has_opened_trades, make_trade
 from . import Instruments
-from ..service.crypto.binance import place_trade, close_position
+from ..service.crypto.binance import place_trade, close_position, open_position_with_atr
 from ..service.crypto.fetcher import binance_fetcher
 from ..service.crypto.gemini import sell_spot, buy_spot
 from ..strategy.abc_strategy import ABCStrategy
@@ -177,11 +177,11 @@ async def smart_dog(currency="DOGE"):
         trade_type = TradeType.long if trade.trend == TradeType.long.name else TradeType.short
         atr_data = atr(data.high, data.low, data.close)[-1]
         try:
-            place_trade(future_symbol, "buy", trade_type)
+            open_position_with_atr(future_symbol, trade_type, take_profit=atr_data*5, stop_loss=atr_data*5)
             log.info("opened position!")
         except Exception as err:
             log.error("open position error! {}".format(err))
-            place_trade(future_symbol, "buy", trade_type)
+            open_position_with_atr(future_symbol, trade_type, take_profit=atr_data*5, stop_loss=atr_data*5)
     log.info("job running done!")
 
 
