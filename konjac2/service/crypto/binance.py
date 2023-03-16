@@ -76,10 +76,13 @@ def close_position(symbol):
     positions = exchange.fetch_positions()
     symbol_position = next(p for p in positions if p["symbol"] == symbol)
     side = symbol_position["side"]
-    if side == "long":
-        exchange.create_market_sell_order(symbol, float(symbol_position["contracts"]))
-    else:
-        exchange.create_market_buy_order(symbol, float(symbol_position["contracts"]))
+    try:
+        if side == "long":
+            exchange.create_market_sell_order(symbol, float(symbol_position["contracts"]))
+        else:
+            exchange.create_market_buy_order(symbol, float(symbol_position["contracts"]))
+    except Exception as err:
+        log.error("closed position error! {}".format(err))
     exchange.cancel_all_orders(symbol)
 
 
