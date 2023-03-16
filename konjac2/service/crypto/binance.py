@@ -65,7 +65,7 @@ def open_position_with_atr(symbol, trade_type: TradeType, take_profit=0, stop_lo
         exchange.create_order(symbol, "STOP", "sell", amount, price=loss, params={"stopPrice": loss})
     else:
         gain = price - take_profit
-        loss = price - stop_loss
+        loss = price + stop_loss
         exchange.create_order(symbol, "TAKE_PROFIT", "buy", amount, price=gain, params={"stopPrice": gain})
         exchange.create_order(symbol, "STOP", "buy", amount, price=loss, params={"stopPrice": loss})
     log.info(f"{symbol} {side} order for take profit at price {gain} stop at price {loss}")
