@@ -6,13 +6,11 @@ from fastapi import FastAPI
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from konjac2.bot.telegram_bot import startup_bot
-from konjac2.routers.daily_trend import router as TrendRouter
 from konjac2.routers.chart import router as ChartRouter
 from konjac2.jobs.scanner import scanner_job, scanner_h1_job
 from konjac2.config import settings
 
 app = FastAPI()
-app.include_router(TrendRouter)
 app.include_router(ChartRouter)
 
 

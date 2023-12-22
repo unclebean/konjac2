@@ -29,3 +29,4 @@ RUN ["chmod", "a+x", "./bin/run.sh"]
 EXPOSE 5555
 
 CMD ["sh", "-c", "/app/bin/run.sh start"]
+

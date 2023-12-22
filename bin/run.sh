@@ -7,7 +7,7 @@ case $1 in
     start)
         pwd
         # Launch your program as a detached process
-        poetry run uvicorn konjac2.main:app --host 0.0.0.0 --port 5555
+        exec poetry run gunicorn konjac2.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:5555
         # Get its PID and store it
         echo $! > ${PIDFILE}
     ;;
