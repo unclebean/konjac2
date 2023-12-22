@@ -7,6 +7,16 @@ RUN apt-get update \
   && apt-get install -y tzdata \
   && pip3 install --upgrade pip
 
+# Install LLVM dependencies
+RUN apt-get update && \
+    apt-get install -y llvm
+
+# Upgrade pip
+RUN python -m pip install --upgrade pip
+
+# Install llvmlite separately
+RUN pip install llvmlite
+
 RUN echo "Asia/Singapore" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
 ENV TZ Asia/Singapore
