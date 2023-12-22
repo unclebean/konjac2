@@ -7,7 +7,6 @@ authors = ["hou jian <unclebean2013@gmail.com>"]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
 fastapi = "^0.74.1"
-ccxt = "^1.76.66"
 pandas-ta = "^0.3.14-beta.0"
 v20 = "^3.0.25"
 uvicorn = "^0.17.6"
@@ -28,6 +27,11 @@ scikit-learn = "^1.0.2"
 xgboost = "^1.6.0"
 pykalman = "^0.9.5"
 vectorbt = "^0.24.2"
+tensorflow = "^2.13.0"
+tzlocal = "2.0.0"
+statsmodels = "^0.14.0"
+oandapyV20 = "^0.7.2"
+ccxt = "^4.0.73"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
